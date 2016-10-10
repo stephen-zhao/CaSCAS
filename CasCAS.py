@@ -196,132 +196,6 @@ class Parser:
             ci += rem.end()
         return lt
 
-    # # Str -> (Listof Token)
-    # def tokenize_old(self, s):
-    #     # lt: list of tokens
-    #     # ct: current token
-    #     # ci: current char
-    #     # loop through s,
-    #     ci = 0
-    #     lt = []
-    #     while ci < len(s):
-    #         # regex match to tokenize:
-    #         # if regex"\(":
-    #         #   count parentheses (increment ci in a loop)
-    #         #       when parentheses count > 0, we just add s[ci] to ct.string
-    #         #       when parentheses count == 0, append ct to lt, break
-    #         if re.match("\(", s[ci]):
-    #             ct = s[ci]
-    #             parenCount = 1
-    #             ci += 1
-    #             while parenCount > 0:
-    #                 if ci >= len(s):
-    #                     self.printTokenizeErr(s, ci, ct)
-    #                     return []
-    #                 if re.match("\(", s[ci]):
-    #                     parenCount += 1
-    #                 elif re.match("\)", s[ci]):
-    #                     parenCount -= 1
-    #                 ct.addChar(s[ci])
-    #                 ci += 1
-    #             lt.append(ct)
-
-    #         # elif regex"[\+\-\*/\^]":
-    #         #   ct = new Token(s[ci])
-    #         #   append ct to lt
-    #         elif re.match("[\+\-\*/\^]", s[ci]):
-    #             ct = s[ci]
-    #             ci += 1
-    #             lt.append(ct)
-
-    #         # elif regex"[0-9]":
-    #         #   ct = new Token(s[ci])
-    #         #   check for digits (in loop)
-    #         #       if digit, ct.string += s[ci]; increment ci
-    #         #       otherwise append ct to lt, break
-    #         elif re.match("[0-9]", s[ci]):
-    #             ct = s[ci]
-    #             ci += 1
-    #             while ci < len(s) and re.match("[0-9]", s[ci]):
-    #                 ct.addChar(s[ci])
-    #                 ci += 1
-    #             lt.append(ct)
-
-    #         # elif regex"[A-Za-z]":
-    #         #   ct = new Token(s[ci])
-    #         #   check for: (in loop)
-    #         #       if regex"[A-Za-z0-9]", ct.string += s[ci]; increment ci
-    #         #       if regex"\(", count parentheses
-    #         #       otherwise append ct to lt, break
-    #         elif re.match("[A-Za-z]", s[ci]):
-    #             ct = s[ci]
-    #             ci += 1
-    #             parenCount = -1
-    #             while ci < len(s) and re.match("[A-Za-z0-9]", s[ci]):
-    #                 ct.addChar(s[ci])
-    #                 ci += 1
-    #                 if (parenCount == -1 and
-    #                         ci < len(s) and
-    #                         re.match("\(", s[ci])):
-    #                     ct.addChar(s[ci])
-    #                     parenCount = 1
-    #                     ci += 1
-    #                     while parenCount > 0:
-    #                         if ci >= len(s):
-    #                             self.printTokenizeErr(s, ci, ct)
-    #                             return []
-    #                         if re.match("\(", s[ci]):
-    #                             parenCount += 1
-    #                         elif re.match("\)", s[ci]):
-    #                             parenCount -= 1
-    #                         ct.addChar(s[ci])
-    #                         ci += 1
-    #                     break
-    #             lt.append(ct)
-
-    #         # elif " ":
-    #         #   ignore and move on
-    #         elif s[ci] == ' ':
-    #             ci += 1
-
-    #         # else:
-    #         #   cannotTokenize(ct,c)
-    #         else:
-    #             self.printTokenizeErr(s, ci)
-    #             return []
-
-    #     return lt
-
-    #     # lt: list of tokens
-    #     # ct: current token
-    #     # ci: current char
-    #     # loop through s,
-    #     # regex match to tokenize:
-    #     # if regex"\(":
-    #     #   count parentheses (increment ci in a loop)
-    #     #       when parentheses count > 0, we just add s[ci] to ct.string
-    #     #       when parentheses count == 0, append ct to lt, break
-    #     # elif regex"[\+\-\*/\^]":
-    #     #   ct = new Token(s[ci])
-    #     #   append ct to lt
-    #     # elif regex"[0-9]":
-    #     #   ct = new Token(s[ci])
-    #     #   check for digits (in loop)
-    #     #       if digit, ct.string += s[ci]; increment ci
-    #     #       otherwise append ct to lt, break
-    #     # elif regex"[A-Za-z]":
-    #     #   ct = new Token(s[ci])
-    #     #   check for: (in loop)
-    #     #       if regex"[A-Za-z0-9]", ct.string += s[ci]; increment ci
-    #     #       if regex"\(", count parentheses
-    #     #       otherwise append ct to lt, break
-    #     # elif " ":
-    #     #   ignore and move on
-    #     # else:
-    #     #   cannotTokenize(ct,c)
-    #     #
-    #     # return lt
-
     # Str -> SyntaxNode
     def parse(self, s):
         return self.parseTokens(self.tokenize(s))
@@ -348,13 +222,17 @@ class Parser:
             # otherwise is a symbol of some sort
             return Symbol(lt[0])
 
-        # check for - and +
+        # check for addition
         for ti in range(0, len(lt)):
-            if lt[ti] == "-":
-                newltfromti = self.subtoplus(lt[ti:])    # new lt elements for elements from ti to end
-                lt = lt[0:ti] + newltfromti[:]
+            # if lt[ti] == "-":
+            #     newltfromti = self.subtoplus(lt[ti:])    # new lt elements for elements from ti to end
+            #     lt = lt[0:ti] + newltfromti[:]
             if lt[ti] == "+":
                 return AddNode(self.parseTokens(lt[:ti]), self.parseTokens(lt[ti + 1:]))
+        # check for subtraction
+        for ti in range(len(lt) - 1, -1, -1):
+            if lt[ti] == "-":
+                return SubNode(self.parseTokens(lt[:ti]), self.parseTokens(lt[ti + 1:]))
         # check for multiplication
         for ti in range(0, len(lt)):
             if lt[ti] == "*":
@@ -371,6 +249,7 @@ class Parser:
 
 
     # (Listof Token) -> (Listof Token)
+    # deprecated
     def subtoplus(self, lt):
         # takes in a list of tokens in the form of ["-", t1, t2, ... tn-1, regex"[+-]", ...]
         # converts it to ["+", "-1", "*", "(t1 t1 t2 ... tn-1)", ...]
@@ -394,7 +273,7 @@ class Parser:
 
 
 P = Parser()
-F = "sin(4+x)-x^(3-y)+x*y^2/u-6*tan(x)"
+F = "sin(4+x)-x^(3-y)+x*y^2/u-6*tan(x)-2*x+y^(x)"
 print(P.tokenize(F))
 print(P.subtoplus(["-", "4", "*", "x", "/", "y", "^", "(2 + e)"]))
 pF = P.parse(F).printSyntaxTree()
