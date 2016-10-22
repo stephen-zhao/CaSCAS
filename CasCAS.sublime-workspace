@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"sim",
+				"simplifyTrivials\tfunction"
+			],
+			[
 				"startsWith",
 				"startswith\tfunction"
 			],
@@ -59,8 +63,16 @@
 			"file": "CasCAS.py",
 			"settings":
 			{
-				"buffer_size": 8521,
+				"buffer_size": 12789,
 				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": ".gitignore",
+			"settings":
+			{
+				"buffer_size": 1082,
 				"line_ending": "Windows"
 			}
 		},
@@ -258,10 +270,12 @@
 	},
 	"expanded_folders":
 	[
-		"/D/projects/CaSCAS"
+		"/D/projects/CaSCAS",
+		"/D/projects/CaSCAS/res_local"
 	],
 	"file_history":
 	[
+		"/D/projects/CaSCAS/res_local/CAS_UCB_UAriz.ppt",
 		"/C/Users/Stephen/Desktop/joeIsBae",
 		"/D/projects/CaSCAS/CasCAS.sublime-project",
 		"/C/Users/Stephen/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
@@ -388,12 +402,11 @@
 		"/C/Users/Stephen/AppData/Local/Temp/7zO5C62.tmp/sky01_Karelia.xml",
 		"/D/Games/World_of_Tanks/res/awesomium/mle036_Radiotower1.dds",
 		"/D/Games/World_of_Tanks/res/awesomium/.data",
-		"/D/Games/World_of_Tanks/res/awesomium/.rdata",
-		"/D/Games/World_of_Tanks/res/awesomium/1"
+		"/D/Games/World_of_Tanks/res/awesomium/.rdata"
 	],
 	"find":
 	{
-		"height": 74.0
+		"height": 70.0
 	},
 	"find_in_files":
 	{
@@ -407,6 +420,12 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"yes",
+			"simp",
+			"print",
+			"print(type",
+			"QNode",
+			"qnode",
 			"print",
 			"printTokenizeErr",
 			"startsWith",
@@ -480,20 +499,20 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 8521,
+						"buffer_size": 12789,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								8521,
-								8521
+								8060,
+								8066
 							]
 						],
 						"settings":
 						{
-							"color_helper.box_height": 24,
+							"color_helper.box_height": 17,
 							"color_helper.color_scheme": "Packages/User/Color Highlighter/themes/Material Twilight (SL).tmTheme",
 							"color_helper.file_palette":
 							[
@@ -506,7 +525,7 @@
 								"current_ext": ".py",
 								"current_syntax": "Python/Python",
 								"enabled": false,
-								"last_updated": 1476494533.24
+								"last_updated": 1477100208.31
 							},
 							"color_scheme": "Packages/User/Color Highlighter/themes/Material Twilight (SL).tmTheme",
 							"syntax": "Packages/Python/Python.sublime-syntax",
@@ -514,7 +533,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 7574.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -522,6 +541,49 @@
 				},
 				{
 					"buffer": 1,
+					"file": ".gitignore",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 1082,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1082,
+								1082
+							]
+						],
+						"settings":
+						{
+							"color_helper.box_height": 17,
+							"color_helper.color_scheme": "Packages/User/SublimeLinter/Material Twilight (SL).tmTheme",
+							"color_helper.file_palette":
+							[
+							],
+							"color_helper.preview_meta":
+							{
+							},
+							"color_helper.scan":
+							{
+								"current_ext": "",
+								"current_syntax": "Materialize/Langs/Git",
+								"enabled": false,
+								"last_updated": 1477100208.31
+							},
+							"syntax": "Packages/Materialize/Langs/Git.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 1512.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
 					"file": "notes.txt",
 					"semi_transient": false,
 					"settings":
@@ -539,26 +601,29 @@
 						],
 						"settings":
 						{
-							"color_helper.box_height": 22,
+							"color_helper.box_height": 17,
 							"color_helper.color_scheme": "Packages/User/Color Highlighter/themes/Material Twilight (SL).tmTheme",
 							"color_helper.file_palette":
 							[
 							],
+							"color_helper.preview_meta":
+							{
+							},
 							"color_helper.scan":
 							{
 								"current_ext": ".txt",
 								"current_syntax": "Text/Plain text",
 								"enabled": false,
-								"last_updated": 1476406679.49
+								"last_updated": 1477100208.31
 							},
 							"color_scheme": "Packages/User/Color Highlighter/themes/Material Twilight (SL).tmTheme",
 							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 97.0,
+						"translation.y": 63.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 2,
 					"type": "text"
 				}
 			]
@@ -566,7 +631,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 74.0
+		"height": 29.0
 	},
 	"input":
 	{
@@ -597,7 +662,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 143.0
+		"height": 295.0
 	},
 	"output.find_results":
 	{
@@ -607,7 +672,7 @@
 	"project": "CasCAS.sublime-project",
 	"replace":
 	{
-		"height": 122.0
+		"height": 54.0
 	},
 	"save_all_on_build": true,
 	"select_file":

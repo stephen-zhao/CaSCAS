@@ -29,6 +29,12 @@ class SyntaxNode:
         else:
             return "(" + self.keyword + " " + " ".join(map(lambda n: n.__repr__(), self.lsn)) + ")"
 
+    def __str__(self):
+        if not self.lsn:
+            return self.keyword
+        else:
+            return "(" + self.keyword + " " + " ".join(map(lambda n: n.__str__(), self.lsn)) + ")"
+
     def initAsParent(parent):
         for child in parent.lsn:
             child.parent = parent
@@ -36,9 +42,11 @@ class SyntaxNode:
         parent.nodeCount += 1
 
     def printSyntaxTree(self, detail=STD_DET):
-        print(self.__repr__())
         if detail == SyntaxNode.DBG_DET:
+            print(self.__repr__())
             print(self.nodeCount)
+        else:
+            print(self.__str__())
         return self
 
     def isZero(self):
@@ -79,6 +87,9 @@ class SyntaxNode:
             if numNotPred > 1:
                 return False
         return True
+
+    def setRecountNodes(self):
+        self.nodeCount = sum(map(lambda sn: sn.nodeCount, self.lsn), 1)
 
     def simplify(self):
         return self.getRoot().simplifyTrivials(0).parent
@@ -137,6 +148,7 @@ class SyntaxNode:
                 self.divisor().isZero()):
             print("fuqu")
 
+        self.setRecountNodes()
         self.parent.lsn[iChild].parent = self.parent
 
         return self
@@ -153,6 +165,14 @@ class SyntaxTree(SyntaxNode):
 
     def getRoot(self):
         return self.lsn[0]
+
+    def printSyntaxTree(self, detail=SyntaxNode.STD_DET):
+        if detail == SyntaxNode.DBG_DET:
+            print("Syntax tree:", self.getRoot().__repr__())
+            print("Node count:", self.getRoot().nodeCount)
+        else:
+            print(self.__str__())
+        return self
 
 
 class FuncNode(SyntaxNode):
@@ -275,6 +295,14 @@ class QNode(SyntaxNode):
             return -1
 
     def __repr__(self):
+        if self.isZero():
+            return "0"
+        elif self.denominator() == 1:
+            return str(self.numerator())
+        else:
+            return str(self.numerator()) + "/" + str(self.denominator())
+
+    def __str__(self):
         if self.isZero():
             return "0"
         elif self.denominator() == 1:
@@ -415,7 +443,8 @@ P = Parser()
 
 F2 = "1 +0"
 F3 = "8 + 1 + 0 + (8 - 0 + 1) + sin(1 + 3)"
-pF = P.parse(F3).printSyntaxTree(1).simplify().printSyntaxTree(1)
+F4 = "e^0 + 5^0"
+pF = P.parse(F4).printSyntaxTree(1).simplify().printSyntaxTree(1)
 
 #print(regex.match(r"[\+\-\*/\^]|[0-9]+|(?P<brackets>\((?:[^\(\)]|(?0))*\))|([A-Za-z][A-Za-z0-9]*(?P<funcapp>\((?:[^\(\)]|(?0))*\))?)", "").group())
 
