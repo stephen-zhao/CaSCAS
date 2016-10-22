@@ -5,19 +5,19 @@
 		[
 			[
 				"startsWith",
-				"startswith	function"
+				"startswith\tfunction"
 			],
 			[
 				"Str",
-				"str	class"
+				"str\tclass"
 			],
 			[
 				"class",
-				"classmethod	class"
+				"classmethod\tclass"
 			],
 			[
 				"print",
-				"printTokenizeErr	function"
+				"printTokenizeErr\tfunction"
 			],
 			[
 				"list-s",
@@ -49,7 +49,7 @@
 			],
 			[
 				"for",
-				"for	for (…) {…}"
+				"for\tfor (…) {…}"
 			]
 		]
 	},
@@ -59,24 +59,9 @@
 			"file": "CasCAS.py",
 			"settings":
 			{
-				"buffer_size": 12756,
+				"buffer_size": 8521,
+				"encoding": "UTF-8",
 				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/C/Python35-32/Lib/site-packages/test_regex.py",
-			"settings":
-			{
-				"buffer_size": 185967,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "CasCAS.sublime-project",
-			"settings":
-			{
-				"buffer_size": 247,
-				"line_ending": "Unix"
 			}
 		},
 		{
@@ -115,10 +100,18 @@
 	"build_varint": "",
 	"command_palette":
 	{
-		"height": 49.0,
-		"last_filter": "",
+		"height": 94.0,
+		"last_filter": "switch",
 		"selected_items":
 		[
+			[
+				"switch",
+				"Project: Switch Project"
+			],
+			[
+				"project",
+				"Project: Edit Project"
+			],
 			[
 				"test",
 				"Anaconda: Run Current Test"
@@ -269,6 +262,10 @@
 	],
 	"file_history":
 	[
+		"/C/Users/Stephen/Desktop/joeIsBae",
+		"/D/projects/CaSCAS/CasCAS.sublime-project",
+		"/C/Users/Stephen/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
+		"/C/Python35-32/Lib/site-packages/test_regex.py",
 		"/C/Python35-32/Lib/site-packages/regex.py",
 		"/C/Python35-32/Lib/site-packages/regex-2016.09.22.dist-info/METADATA",
 		"/C/Python35-32/Lib/site-packages/regex-2016.09.22.dist-info/metadata.json",
@@ -326,7 +323,6 @@
 		"/D/projects/zhaostephen_v0.2/app/views/components/page_footer.ejs",
 		"/C/Users/Stephen/AppData/Roaming/Sublime Text 3/Packages/User/Distraction Free.sublime-settings",
 		"/D/projects/zhaostephen_v0.2/app/models/home.json",
-		"/C/Users/Stephen/Desktop/joeIsBae",
 		"/C/Users/Stephen/Anaconda3/Lib/site-packages/notebook/static/components/codemirror/addon/selection/active-line.js",
 		"/D/projects/zhaostephen_v0.2/app/views/pages/home/home.ejs",
 		"/D/projects/zhaostephen_v0.2/views/pages/home/home.ejs",
@@ -393,14 +389,11 @@
 		"/D/Games/World_of_Tanks/res/awesomium/mle036_Radiotower1.dds",
 		"/D/Games/World_of_Tanks/res/awesomium/.data",
 		"/D/Games/World_of_Tanks/res/awesomium/.rdata",
-		"/D/Games/World_of_Tanks/res/awesomium/1",
-		"/C/Users/Stephen/AppData/Local/Temp/7zOFCF3.tmp/1",
-		"/C/Users/Stephen/AppData/Local/Temp/7zOC9EC.tmp/1",
-		"/C/LiteStep/step.rc"
+		"/D/Games/World_of_Tanks/res/awesomium/1"
 	],
 	"find":
 	{
-		"height": 72.0
+		"height": 74.0
 	},
 	"find_in_files":
 	{
@@ -478,7 +471,7 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -487,28 +480,33 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 12756,
+						"buffer_size": 8521,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								9229,
-								9229
+								8521,
+								8521
 							]
 						],
 						"settings":
 						{
+							"color_helper.box_height": 24,
+							"color_helper.color_scheme": "Packages/User/Color Highlighter/themes/Material Twilight (SL).tmTheme",
 							"color_helper.file_palette":
 							[
 							],
+							"color_helper.preview_meta":
+							{
+							},
 							"color_helper.scan":
 							{
 								"current_ext": ".py",
 								"current_syntax": "Python/Python",
 								"enabled": false,
-								"last_updated": 1475934978.08
+								"last_updated": 1476494533.24
 							},
 							"color_scheme": "Packages/User/Color Highlighter/themes/Material Twilight (SL).tmTheme",
 							"syntax": "Packages/Python/Python.sublime-syntax",
@@ -516,95 +514,14 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 7488.0,
+						"translation.y": 7574.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 0,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "/C/Python35-32/Lib/site-packages/test_regex.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 185967,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								12,
-								0
-							]
-						],
-						"settings":
-						{
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".py",
-								"current_syntax": "Python/Python",
-								"enabled": false,
-								"last_updated": 1475934978.08
-							},
-							"color_scheme": "Packages/User/Color Highlighter/themes/Material Twilight (SL).tmTheme",
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 3,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "CasCAS.sublime-project",
-					"semi_transient": true,
-					"settings":
-					{
-						"buffer_size": 247,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								246,
-								246
-							]
-						],
-						"settings":
-						{
-							"color_helper.file_palette":
-							[
-							],
-							"color_helper.scan":
-							{
-								"current_ext": ".sublime-project",
-								"current_syntax": "JavaScript/JSON",
-								"enabled": false,
-								"last_updated": 1475934978.08
-							},
-							"color_scheme": "Packages/User/Color Highlighter/themes/Material Twilight (SL).tmTheme",
-							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
-							"translate_tabs_to_spaces": false
-						},
-						"translation.x": 0.0,
-						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 3,
 					"file": "notes.txt",
 					"semi_transient": false,
 					"settings":
@@ -616,12 +533,14 @@
 						"selection":
 						[
 							[
-								35,
-								103
+								100,
+								100
 							]
 						],
 						"settings":
 						{
+							"color_helper.box_height": 22,
+							"color_helper.color_scheme": "Packages/User/Color Highlighter/themes/Material Twilight (SL).tmTheme",
 							"color_helper.file_palette":
 							[
 							],
@@ -630,16 +549,16 @@
 								"current_ext": ".txt",
 								"current_syntax": "Text/Plain text",
 								"enabled": false,
-								"last_updated": 1475934978.08
+								"last_updated": 1476406679.49
 							},
 							"color_scheme": "Packages/User/Color Highlighter/themes/Material Twilight (SL).tmTheme",
 							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 70.0,
+						"translation.y": 97.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 1,
 					"type": "text"
 				}
 			]
@@ -647,7 +566,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 34.0
+		"height": 74.0
 	},
 	"input":
 	{
@@ -688,7 +607,7 @@
 	"project": "CasCAS.sublime-project",
 	"replace":
 	{
-		"height": 64.0
+		"height": 122.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -708,7 +627,7 @@
 		[
 			[
 				"",
-				"D:\\projects\\stephen-zhao.github.io\\stephen-zhao.github.io.sublime-workspace"
+				"D:\\projects\\stephen-zhao.github.io\\stephen-zhao.github.io.sublime-project"
 			]
 		],
 		"width": 380.0

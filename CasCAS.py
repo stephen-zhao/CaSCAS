@@ -1,69 +1,27 @@
-import re
 import regex
 
-
-# class Token:
-#     # | "(...)"
-#     # | "az(...)"
-#     # | "..."
-#     def __init__(self, s):
-#         self.__clist = list(s)
-
-#     def __repr__(self):
-#         return "".join(self.__clist)
-
-#     def __len__(self):
-#         return len(self.__clist)
-
-#     def __getitem__(self, key):
-#         return self.__clist[key]
-
-#     def __iter__(self):
-#         self.i = 0
-#         return self
-
-#     def __eq__(self, other):
-#         if type(other) is str:
-#             return self.__str__() == other
-#         elif type(other) is Token:
-#             return self.__str__() == Token.__str__()
-#         else:
-#             return False
-
-#     def next(self):
-#         if self.i < len(self):
-#             i = self.i
-#             self.i += 1
-#             return self[i]
-#         else:
-#             raise StopIteration()
-
-#     def addChar(self, c):
-#         self.__clist.append(c)
-
-#     def startsWith(self, s, start=0, end=None):
-#         return self.__repr__().startswith(s, start, end)
+LANG_RACKET = True
 
 
 class SyntaxNode:
+    # | FuncNode
     # | AddNode
     # | SubNode
     # | MultNode
     # | DivNode
     # | ExpNode
-    # | ConstRational
-    # | Symbol
+    # | QNode
+    # | SymNode
+    # | SyntaxTree
+
+    STD_DET = 0
+    DBG_DET = 1
 
     def __init__(self):
         self.keyword = ""   # keyword to identify it
         self.lsn = []       # list of sub-nodes
-
-    @classmethod
-    def fromCustom(cls, keyword, *nodes):
-        inst = cls()
-        inst.keyword = keyword
-        inst.lsn = list(nodes)
-        return inst
+        self.nodeCount = 0
+        self.parent = None
 
     def __repr__(self):
         if not self.lsn:
@@ -71,22 +29,167 @@ class SyntaxNode:
         else:
             return "(" + self.keyword + " " + " ".join(map(lambda n: n.__repr__(), self.lsn)) + ")"
 
-    def printSyntaxTree(self):
+    def initAsParent(parent):
+        for child in parent.lsn:
+            child.parent = parent
+            parent.nodeCount += child.nodeCount
+        parent.nodeCount += 1
+
+    def printSyntaxTree(self, detail=STD_DET):
         print(self.__repr__())
+        if detail == SyntaxNode.DBG_DET:
+            print(self.nodeCount)
+        return self
+
+    def isZero(self):
+        if (type(self) is QNode):
+            return self.numerator() == 0
+        else:
+            return False
+
+    def isOne(self):
+        if (type(self) is QNode):
+            return self.numerator() == self.denominator()
+        else:
+            return False
+
+    # getSubNodeIndexThatIsntPred
+    # Gets the index of the only child node that isn't (pred)
+    # Returns index if such a child exists and all other children are (pred)
+    # Returns 0 if all children are (pred)
+    # Returns -1 if more than one children are (pred)
+    def getSubNodeIndexThatIsntPred(self, pred):
+        iChildThatIsntPred = -1
+        for i in range(len(self.lsn)):
+            if not pred(self.lsn[i]):
+                if iChildThatIsntPred == -1:
+                    iChildThatIsntPred = i
+                else:
+                    return -1
+        if iChildThatIsntPred == -1:
+            return 0
+        else:
+            return iChildThatIsntPred
+
+    def isOneOrLessSubNodesNotPred(self, pred):
+        numNotPred = 0
+        for sn in self.lsn:
+            if not pred(sn):
+                numNotPred += 1
+            if numNotPred > 1:
+                return False
+        return True
+
+    def simplify(self):
+        return self.getRoot().simplifyTrivials(0).parent
+
+    # SyntaxNode -> SyntaxNode
+    def simplifyTrivials(self, iChild):
+        if (type(self) is QNode or
+                type(self) is SymNode):
+            return self
+
+        for i in range(len(self.lsn)):
+            self.lsn[i].simplifyTrivials(i)
+
+        if (type(self) is ExpNode and
+                self.exponent().isZero() and
+                self.base().isZero()):
+            print("tbd")
+
+        elif (type(self) is ExpNode and
+                self.exponent().isZero()):
+            self.parent.lsn[iChild] = QNode(1)
+
+        elif (type(self) is ExpNode and
+                self.base().isZero()):
+            self.parent.lsn[iChild] = QNode(0)
+
+        elif (type(self) is ExpNode and
+                self.exponent().isOne()):
+            self.parent.lsn[iChild] = self.base()
+
+        elif (type(self) is SubNode and
+                self.subtractend().isZero()):
+            self.parent.lsn[iChild] = self.minuend()
+
+        elif (type(self) is MultNode and
+                any(map(lambda sn: sn.isZero(), self.multiplicands()))):
+            self.parent.lsn[iChild] = QNode(0)
+
+        elif (type(self) is MultNode and
+                self.isOneOrLessSubNodesNotPred(SyntaxNode.isOne)):
+            self.parent.lsn[iChild] = self.multiplicands()[
+                self.getSubNodeIndexThatIsntPred(SyntaxNode.isOne)
+            ]
+
+        elif (type(self) is AddNode and
+                self.isOneOrLessSubNodesNotPred(SyntaxNode.isZero)):
+            self.parent.lsn[iChild] = self.addends()[
+                self.getSubNodeIndexThatIsntPred(SyntaxNode.isZero)
+            ]
+
+        elif (type(self) is DivNode and
+                self.divisor().isOne()):
+            self.parent.lsn[iChild] = self.dividend()
+
+        elif (type(self) is DivNode and
+                self.divisor().isZero()):
+            print("fuqu")
+
+        self.parent.lsn[iChild].parent = self.parent
+
+        return self
+
+
+class SyntaxTree(SyntaxNode):
+    KEYWORD = "Tree"
+
+    def __init__(self, root):
+        SyntaxNode.__init__(self)
+        self.keyword = SyntaxTree.KEYWORD
+        self.lsn = [root]
+        SyntaxNode.initAsParent(self)
+
+    def getRoot(self):
+        return self.lsn[0]
+
+
+class FuncNode(SyntaxNode):
+    def __init__(self, name, *args):
+        SyntaxNode.__init__(self)
+        self.keyword = name
+        self.lsn = list(args)
+        SyntaxNode.initAsParent(self)
+
+    def name(self):
+        return self.lsn[0]
+
+    def args(self):
+        return self.lsn[1:]
 
 
 class AddNode(SyntaxNode):
+    KEYWORD = "+"
+
     def __init__(self, *addends):
-        self.keyword = "+"
+        SyntaxNode.__init__(self)
+        self.keyword = AddNode.KEYWORD
         self.lsn = list(addends)
+        SyntaxNode.initAsParent(self)
 
     def addends(self):
         return self.lsn
 
+
 class SubNode(SyntaxNode):
+    KEYWORD = "-"
+
     def __init__(self, minuend, subtractend):
-        self.keyword = "-"
+        SyntaxNode.__init__(self)
+        self.keyword = SubNode.KEYWORD
         self.lsn = [minuend, subtractend]
+        SyntaxNode.initAsParent(self)
 
     def minuend(self):
         return self.lsn[0]
@@ -96,18 +199,26 @@ class SubNode(SyntaxNode):
 
 
 class MultNode(SyntaxNode):
+    KEYWORD = "*"
+
     def __init__(self, *multiplicands):
-        self.keyword = "*"
+        SyntaxNode.__init__(self)
+        self.keyword = MultNode.KEYWORD
         self.lsn = list(multiplicands)
+        SyntaxNode.initAsParent(self)
 
     def multiplicands(self):
         return self.lsn
 
 
 class DivNode(SyntaxNode):
+    KEYWORD = "/"
+
     def __init__(self, dividend, divisor):
-        self.keyword = "/"
+        SyntaxNode.__init__(self)
+        self.keyword = DivNode.KEYWORD
         self.lsn = [dividend, divisor]
+        SyntaxNode.initAsParent(self)
 
     def dividend(self):
         return self.lsn[0]
@@ -117,9 +228,13 @@ class DivNode(SyntaxNode):
 
 
 class ExpNode(SyntaxNode):
+    KEYWORD = "expt" if LANG_RACKET else "^"
+
     def __init__(self, base, exponent):
-        self.keyword = "^"
+        SyntaxNode.__init__(self)
+        self.keyword = ExpNode.KEYWORD
         self.lsn = [base, exponent]
+        SyntaxNode.initAsParent(self)
 
     def base(self):
         return self.lsn[0]
@@ -128,15 +243,19 @@ class ExpNode(SyntaxNode):
         return self.lsn[1]
 
 
-class ConstRational(SyntaxNode):
+class QNode(SyntaxNode):
+    KEYWORD = "QNode"
+
     def __init__(self, primitiveValue):
-        self.keyword = "constRational"
+        SyntaxNode.__init__(self)
+        self.keyword = QNode.KEYWORD
         if type(primitiveValue) is int:
             self.lsn = [primitiveValue, 1]
         elif type(primitiveValue) is float:
             self.lsn = list(primitiveValue.as_integer_ratio())
         else:
             self.lsn = [int(primitiveValue), 1]
+        self.nodeCount = 1
 
     def approxVal(self):
         return (1.0 * self.lsn[0]) / (1.0 * self.lsn[1])
@@ -147,16 +266,34 @@ class ConstRational(SyntaxNode):
     def denominator(self):
         return self.lsn[1]
 
+    def sign(self):
+        if self.numerator() == 0:
+            return 0
+        elif (self.numerator() > 0) == (self.denominator() > 0):
+            return 1
+        else:
+            return -1
 
-class Symbol(SyntaxNode):
+    def __repr__(self):
+        if self.isZero():
+            return "0"
+        elif self.denominator() == 1:
+            return str(self.numerator())
+        else:
+            return str(self.numerator()) + "/" + str(self.denominator())
+
+
+class SymNode(SyntaxNode):
     def __init__(self, symbol):
+        SyntaxNode.__init__(self)
         self.keyword = symbol
         self.lsn = []
+        self.nodeCount = 1
 
 
 class Parser:
-
     def __init__(self):
+        SyntaxNode.__init__(self)
         self.TOKENIZING_REGEX_STRING \
             = r"[\+\-\*/\^]"\
             r"|[0-9]+"\
@@ -198,7 +335,7 @@ class Parser:
 
     # Str -> SyntaxNode
     def parse(self, s):
-        return self.parseTokens(self.tokenize(s))
+        return SyntaxTree(self.parseTokens(self.tokenize(s)))
 
     # (listof Token) -> SyntaxNode
     def parseTokens(self, lt):
@@ -208,19 +345,19 @@ class Parser:
             if lt[0][0] == '(' and lt[0][-1] == ')':
                 return self.parseTokens(self.tokenize(lt[0][1:-1]))
             # check for numerical numbers
-            if regex.match(r"\-?[0-9]+", lt[0].__repr__()):
-                return ConstRational(lt[0])
+            if regex.match(r"[0-9]+", lt[0]):
+                return QNode(lt[0])
             # check for known functions
             for func in self.LIST_KNOWN_FUNCTION_NAMES:
-                if lt[0].startswith(func) and \
-                        lt[0][len(func)] == '(' and \
-                        lt[0][-1] == ')':
-                    return SyntaxNode.fromCustom(
+                if (lt[0].startswith(func) and
+                        lt[0][len(func)] == '(' and
+                        lt[0][-1] == ')'):
+                    return FuncNode(
                         func,
-                        self.parseTokens(self.tokenize(lt[0][len(func)+1:-1]))
+                        self.parseTokens(self.tokenize(lt[0][len(func) + 1:-1]))
                     )
             # otherwise is a symbol of some sort
-            return Symbol(lt[0])
+            return SymNode(lt[0])
 
         # check for addition
         for ti in range(0, len(lt)):
@@ -246,8 +383,6 @@ class Parser:
             if lt[ti] == "^":
                 return ExpNode(self.parseTokens(lt[:ti]), self.parseTokens(lt[ti + 1:]))
 
-
-
     # (Listof Token) -> (Listof Token)
     # deprecated
     def subtoplus(self, lt):
@@ -271,12 +406,16 @@ class Parser:
         return newlt
 
 
-
 P = Parser()
-F = "sin(4+x)-x^(3-y)+x*y^2/u-6*tan(x)-2*x+y^(x)"
-print(P.tokenize(F))
-print(P.subtoplus(["-", "4", "*", "x", "/", "y", "^", "(2 + e)"]))
-pF = P.parse(F).printSyntaxTree()
+# F1 = "sin(4+x)-x^(3-y)+x*y^2/u-6*tan(x)-2*x+y^(x)"
+# F = "sin(4+x)"
+# print(P.tokenize(F))
+# print(P.subtoplus(["-", "4", "*", "x", "/", "y", "^", "(2 + e)"]))
+# pF = P.parse(F).printSyntaxTree(1)
+
+F2 = "1 +0"
+F3 = "8 + 1 + 0 + (8 - 0 + 1) + sin(1 + 3)"
+pF = P.parse(F3).printSyntaxTree(1).simplify().printSyntaxTree(1)
 
 #print(regex.match(r"[\+\-\*/\^]|[0-9]+|(?P<brackets>\((?:[^\(\)]|(?0))*\))|([A-Za-z][A-Za-z0-9]*(?P<funcapp>\((?:[^\(\)]|(?0))*\))?)", "").group())
 
@@ -287,6 +426,3 @@ pF = P.parse(F).printSyntaxTree()
 #                        [-1, *, (x^(3-y))]             _______________ + _________
 #                                                  __ * ________          [-1, *, (6*tan(x))]
 #                                                 [x]   [y, ^, 2, /, u, /, y]
-#
-#
-#
