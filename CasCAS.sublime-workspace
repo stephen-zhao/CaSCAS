@@ -63,7 +63,7 @@
 			"file": "CasCAS.py",
 			"settings":
 			{
-				"buffer_size": 13714,
+				"buffer_size": 14463,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -420,6 +420,8 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"__init",
+			"SyntaxNode\\.",
 			"def __repr__",
 			"__repr__(",
 			"yes",
@@ -471,6 +473,15 @@
 		"regex": true,
 		"replace_history":
 		[
+			"super(DivNode, self).",
+			"super(MultNode, self).",
+			"super(SubNode, self).",
+			"super(AddNode, self).",
+			"super(FuncNode, self).",
+			"super(SyntaxTree, self).",
+			"super(SymNode, self).",
+			"super(QNode, self).",
+			"super(ExpNode, self).",
 			"_____",
 			"____",
 			"__",
@@ -501,15 +512,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 13714,
+						"buffer_size": 14463,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								8673,
-								8673
+								5852,
+								5852
 							]
 						],
 						"settings":
@@ -527,7 +538,7 @@
 								"current_ext": ".py",
 								"current_syntax": "Python/Python",
 								"enabled": false,
-								"last_updated": 1477194294.18
+								"last_updated": 1477541043.37
 							},
 							"color_scheme": "Packages/User/Color Highlighter/themes/Material Twilight (SL).tmTheme",
 							"syntax": "Packages/Python/Python.sublime-syntax",
@@ -535,7 +546,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 6363.0,
+						"translation.y": 4070.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -668,7 +679,7 @@
 	"project": "CasCAS.sublime-project",
 	"replace":
 	{
-		"height": 54.0
+		"height": 114.0
 	},
 	"save_all_on_build": true,
 	"select_file":

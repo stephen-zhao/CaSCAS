@@ -113,10 +113,10 @@ class SyntaxTree(SyntaxNode):
     KEYWORD = "Tree"
 
     def __init__(self, root):
-        SyntaxNode.__init__(self)
+        super(SyntaxTree, self).__init__()
         self.keyword = SyntaxTree.KEYWORD
         self.lsn = [root]
-        SyntaxNode.initAsParent(self)
+        super(SyntaxTree, self).initAsParent()
 
     def getRoot(self):
         return self.lsn[0]
@@ -132,10 +132,10 @@ class SyntaxTree(SyntaxNode):
 
 class FuncNode(SyntaxNode):
     def __init__(self, name, *args):
-        SyntaxNode.__init__(self)
+        super(FuncNode, self).__init__()
         self.keyword = name
         self.lsn = list(args)
-        SyntaxNode.initAsParent(self)
+        super(FuncNode, self).initAsParent()
 
     def name(self):
         return self.lsn[0]
@@ -153,19 +153,19 @@ class AddNode(SyntaxNode):
     KEYWORD = "+"
 
     def __init__(self, *addends):
-        SyntaxNode.__init__(self)
+        super(AddNode, self).__init__()
         self.keyword = AddNode.KEYWORD
         self.lsn = list(addends)
-        SyntaxNode.initAsParent(self)
+        super(AddNode, self).initAsParent()
 
     def addends(self):
         return self.lsn
 
     def simplifyTrivials(self, iChild):
         self.simplifyTrivials__subnodes(iChild)
-        if self.isOneOrLessSubNodesNotPred(SyntaxNode.isZero):
+        if self.isOneOrLessSubNodesNotPred(AddNode.isZero):
             self.parent.lsn[iChild] = self.addends()[
-                self.getSubNodeIndexThatIsntPred(SyntaxNode.isZero)
+                self.getSubNodeIndexThatIsntPred(AddNode.isZero)
             ]
 
         self.simplifyTrivials__after(iChild)
@@ -176,10 +176,10 @@ class SubNode(SyntaxNode):
     KEYWORD = "-"
 
     def __init__(self, minuend, subtractend):
-        SyntaxNode.__init__(self)
+        super(SubNode, self).__init__()
         self.keyword = SubNode.KEYWORD
         self.lsn = [minuend, subtractend]
-        SyntaxNode.initAsParent(self)
+        super(SubNode, self).initAsParent()
 
     def minuend(self):
         return self.lsn[0]
@@ -200,10 +200,10 @@ class MultNode(SyntaxNode):
     KEYWORD = "*"
 
     def __init__(self, *multiplicands):
-        SyntaxNode.__init__(self)
+        super(MultNode, self).__init__()
         self.keyword = MultNode.KEYWORD
         self.lsn = list(multiplicands)
-        SyntaxNode.initAsParent(self)
+        super(MultNode, self).initAsParent()
 
     def multiplicands(self):
         return self.lsn
@@ -213,9 +213,9 @@ class MultNode(SyntaxNode):
         if any(map(lambda sn: sn.isZero(), self.multiplicands())):
             self.parent.lsn[iChild] = QNode(0)
 
-        elif self.isOneOrLessSubNodesNotPred(SyntaxNode.isOne):
+        elif self.isOneOrLessSubNodesNotPred(MultNode.isOne):
             self.parent.lsn[iChild] = self.multiplicands()[
-                self.getSubNodeIndexThatIsntPred(SyntaxNode.isOne)
+                self.getSubNodeIndexThatIsntPred(MultNode.isOne)
             ]
 
         self.simplifyTrivials__after(iChild)
@@ -226,10 +226,10 @@ class DivNode(SyntaxNode):
     KEYWORD = "/"
 
     def __init__(self, dividend, divisor):
-        SyntaxNode.__init__(self)
+        super(DivNode, self).__init__()
         self.keyword = DivNode.KEYWORD
         self.lsn = [dividend, divisor]
-        SyntaxNode.initAsParent(self)
+        super(DivNode, self).initAsParent()
 
     def dividend(self):
         return self.lsn[0]
@@ -254,10 +254,10 @@ class ExpNode(SyntaxNode):
     KEYWORD = "expt" if LANG_RACKET else "^"
 
     def __init__(self, base, exponent):
-        SyntaxNode.__init__(self)
+        super(ExpNode, self).__init__()
         self.keyword = ExpNode.KEYWORD
         self.lsn = [base, exponent]
-        SyntaxNode.initAsParent(self)
+        super(ExpNode, self).initAsParent()
 
     def base(self):
         return self.lsn[0]
@@ -288,7 +288,7 @@ class QNode(SyntaxNode):
     KEYWORD = "QNode"
 
     def __init__(self, primitiveValue):
-        SyntaxNode.__init__(self)
+        super(QNode, self).__init__()
         self.keyword = QNode.KEYWORD
         if type(primitiveValue) is int:
             self.lsn = [primitiveValue, 1]
@@ -337,7 +337,7 @@ class QNode(SyntaxNode):
 
 class SymNode(SyntaxNode):
     def __init__(self, symbol):
-        SyntaxNode.__init__(self)
+        super(SymNode, self).__init__()
         self.keyword = symbol
         self.lsn = []
         self.nodeCount = 1
@@ -348,7 +348,6 @@ class SymNode(SyntaxNode):
 
 class Parser:
     def __init__(self):
-        SyntaxNode.__init__(self)
         self.TOKENIZING_REGEX_STRING \
             = r"[\+\-\*/\^]"\
             r"|[0-9]+"\
