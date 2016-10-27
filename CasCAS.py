@@ -94,63 +94,18 @@ class SyntaxNode:
     def simplify(self):
         return self.getRoot().simplifyTrivials(0).parent
 
-    # SyntaxNode -> SyntaxNode
-    def simplifyTrivials(self, iChild):
-        if (type(self) is QNode or
-                type(self) is SymNode):
-            return self
-
+    def simplifyTrivials__subnodes(self, iChild):
         for i in range(len(self.lsn)):
             self.lsn[i].simplifyTrivials(i)
 
-        if (type(self) is ExpNode and
-                self.exponent().isZero() and
-                self.base().isZero()):
-            print("tbd")
-
-        elif (type(self) is ExpNode and
-                self.exponent().isZero()):
-            self.parent.lsn[iChild] = QNode(1)
-
-        elif (type(self) is ExpNode and
-                self.base().isZero()):
-            self.parent.lsn[iChild] = QNode(0)
-
-        elif (type(self) is ExpNode and
-                self.exponent().isOne()):
-            self.parent.lsn[iChild] = self.base()
-
-        elif (type(self) is SubNode and
-                self.subtractend().isZero()):
-            self.parent.lsn[iChild] = self.minuend()
-
-        elif (type(self) is MultNode and
-                any(map(lambda sn: sn.isZero(), self.multiplicands()))):
-            self.parent.lsn[iChild] = QNode(0)
-
-        elif (type(self) is MultNode and
-                self.isOneOrLessSubNodesNotPred(SyntaxNode.isOne)):
-            self.parent.lsn[iChild] = self.multiplicands()[
-                self.getSubNodeIndexThatIsntPred(SyntaxNode.isOne)
-            ]
-
-        elif (type(self) is AddNode and
-                self.isOneOrLessSubNodesNotPred(SyntaxNode.isZero)):
-            self.parent.lsn[iChild] = self.addends()[
-                self.getSubNodeIndexThatIsntPred(SyntaxNode.isZero)
-            ]
-
-        elif (type(self) is DivNode and
-                self.divisor().isOne()):
-            self.parent.lsn[iChild] = self.dividend()
-
-        elif (type(self) is DivNode and
-                self.divisor().isZero()):
-            print("fuqu")
-
+    def simplifyTrivials__after(self, iChild):
         self.setRecountNodes()
         self.parent.lsn[iChild].parent = self.parent
 
+    # SyntaxNode -> SyntaxNode
+    def simplifyTrivials(self, iChild):
+        self.simplifyTrivials__subnodes(iChild)
+        self.simplifyTrivials__after(iChild)
         return self
 
 
@@ -188,6 +143,11 @@ class FuncNode(SyntaxNode):
     def args(self):
         return self.lsn[1:]
 
+    def simplifyTrivials(self, iChild):
+        self.simplifyTrivials__subnodes(iChild)
+        self.simplifyTrivials__after(iChild)
+        return self
+
 
 class AddNode(SyntaxNode):
     KEYWORD = "+"
@@ -200,6 +160,16 @@ class AddNode(SyntaxNode):
 
     def addends(self):
         return self.lsn
+
+    def simplifyTrivials(self, iChild):
+        self.simplifyTrivials__subnodes(iChild)
+        if self.isOneOrLessSubNodesNotPred(SyntaxNode.isZero):
+            self.parent.lsn[iChild] = self.addends()[
+                self.getSubNodeIndexThatIsntPred(SyntaxNode.isZero)
+            ]
+
+        self.simplifyTrivials__after(iChild)
+        return self
 
 
 class SubNode(SyntaxNode):
@@ -217,6 +187,14 @@ class SubNode(SyntaxNode):
     def subtractend(self):
         return self.lsn[1]
 
+    def simplifyTrivials(self, iChild):
+        self.simplifyTrivials__subnodes(iChild)
+        if self.subtractend().isZero():
+            self.parent.lsn[iChild] = self.minuend()
+
+        self.simplifyTrivials__after(iChild)
+        return self
+
 
 class MultNode(SyntaxNode):
     KEYWORD = "*"
@@ -229,6 +207,19 @@ class MultNode(SyntaxNode):
 
     def multiplicands(self):
         return self.lsn
+
+    def simplifyTrivials(self, iChild):
+        self.simplifyTrivials__subnodes(iChild)
+        if any(map(lambda sn: sn.isZero(), self.multiplicands())):
+            self.parent.lsn[iChild] = QNode(0)
+
+        elif self.isOneOrLessSubNodesNotPred(SyntaxNode.isOne):
+            self.parent.lsn[iChild] = self.multiplicands()[
+                self.getSubNodeIndexThatIsntPred(SyntaxNode.isOne)
+            ]
+
+        self.simplifyTrivials__after(iChild)
+        return self
 
 
 class DivNode(SyntaxNode):
@@ -246,6 +237,18 @@ class DivNode(SyntaxNode):
     def divisor(self):
         return self.lsn[1]
 
+    def simplifyTrivials(self, iChild):
+        self.simplifyTrivials__subnodes(iChild)
+
+        if self.divisor().isOne():
+            self.parent.lsn[iChild] = self.dividend()
+
+        elif self.divisor().isZero():
+            print("fuqu")
+
+        self.simplifyTrivials__after(iChild)
+        return self
+
 
 class ExpNode(SyntaxNode):
     KEYWORD = "expt" if LANG_RACKET else "^"
@@ -261,6 +264,24 @@ class ExpNode(SyntaxNode):
 
     def exponent(self):
         return self.lsn[1]
+
+    def simplifyTrivials(self, iChild):
+        self.simplifyTrivials__subnodes(iChild)
+        if (self.exponent().isZero() and
+                self.base().isZero()):
+            print("tbd")
+
+        elif self.exponent().isZero():
+            self.parent.lsn[iChild] = QNode(1)
+
+        elif self.base().isZero():
+            self.parent.lsn[iChild] = QNode(0)
+
+        elif self.exponent().isOne():
+            self.parent.lsn[iChild] = self.base()
+
+        self.simplifyTrivials__after(iChild)
+        return self
 
 
 class QNode(SyntaxNode):
@@ -285,6 +306,9 @@ class QNode(SyntaxNode):
 
     def denominator(self):
         return self.lsn[1]
+
+    def simplifyTrivials(self, iChild):
+        return self
 
     def sign(self):
         if self.numerator() == 0:
@@ -317,6 +341,9 @@ class SymNode(SyntaxNode):
         self.keyword = symbol
         self.lsn = []
         self.nodeCount = 1
+
+    def simplifyTrivials(self, iChild):
+        return self
 
 
 class Parser:

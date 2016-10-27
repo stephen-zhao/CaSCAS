@@ -63,7 +63,7 @@
 			"file": "CasCAS.py",
 			"settings":
 			{
-				"buffer_size": 12789,
+				"buffer_size": 13714,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -420,6 +420,8 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"def __repr__",
+			"__repr__(",
 			"yes",
 			"simp",
 			"print",
@@ -499,15 +501,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 12789,
+						"buffer_size": 13714,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								8060,
-								8066
+								8673,
+								8673
 							]
 						],
 						"settings":
@@ -525,7 +527,7 @@
 								"current_ext": ".py",
 								"current_syntax": "Python/Python",
 								"enabled": false,
-								"last_updated": 1477100208.31
+								"last_updated": 1477194294.18
 							},
 							"color_scheme": "Packages/User/Color Highlighter/themes/Material Twilight (SL).tmTheme",
 							"syntax": "Packages/Python/Python.sublime-syntax",
@@ -533,7 +535,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 6363.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -563,9 +565,6 @@
 							"color_helper.file_palette":
 							[
 							],
-							"color_helper.preview_meta":
-							{
-							},
 							"color_helper.scan":
 							{
 								"current_ext": "",
@@ -576,7 +575,7 @@
 							"syntax": "Packages/Materialize/Langs/Git.tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 1512.0,
+						"translation.y": 1514.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
@@ -606,9 +605,6 @@
 							"color_helper.file_palette":
 							[
 							],
-							"color_helper.preview_meta":
-							{
-							},
 							"color_helper.scan":
 							{
 								"current_ext": ".txt",
@@ -662,7 +658,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 295.0
+		"height": 179.0
 	},
 	"output.find_results":
 	{
