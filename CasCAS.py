@@ -1,39 +1,57 @@
 import regex
 
-LANG_RACKET = True
+# Options flags consts (temporary)
+FLG_NORMAL = FLG_RESET = 0b000
+FLG_DEBUG = 0b001
+FLG_LANG_RACKET = 0b010
+FLG_LANG_HASKELL = 0b100
+
+# OPTION FLAGS
+g_optionFlags = FLG_DEBUG
 
 
+# SyntaxNode is the base class for all node types that are allowed in a
+#   syntax tree
+# Grammar def:
+# SyntaxNode = FuncNode
+#            | AddNode
+#            | SubNode
+#            | MultNode
+#            | DivNode
+#            | ExpNode
+#            | QNode
+#            | SymNode
+#            | SyntaxTree (temporary)
 class SyntaxNode:
-    # | FuncNode
-    # | AddNode
-    # | SubNode
-    # | MultNode
-    # | DivNode
-    # | ExpNode
-    # | QNode
-    # | SymNode
-    # | SyntaxTree
-
-    STD_DET = 0
-    DBG_DET = 1
 
     def __init__(self):
-        self.keyword = ""   # keyword to identify it
-        self.lsn = []       # list of sub-nodes
+        # field for keyword to identify type of SyntaxNode
+        self.keyword = ""
+        # field for node count of subtree at self
         self.nodeCount = 0
+        # field for a generic list of node parameters,
+        #   usually used for subnodes (lsn = list sub
+        #   nodes)
+        self.lsn = []
+        # field as reference to parent node
         self.parent = None
 
     def __repr__(self):
-        if not self.lsn:
-            return self.keyword
-        else:
-            return "(" + self.keyword + " " + " ".join(map(lambda n: n.__repr__(), self.lsn)) + ")"
+        return (
+            "<" + type(self).__name__ + " " + self.keyword + " " + " ".join(
+                map(lambda n: repr(n), self.lsn)
+            ) + ">"
+        )
 
     def __str__(self):
         if not self.lsn:
             return self.keyword
         else:
-            return "(" + self.keyword + " " + " ".join(map(lambda n: n.__str__(), self.lsn)) + ")"
+            return (
+                "(" + self.keyword + " " + " ".join(
+                    map(lambda n: str(n), self.lsn)
+                ) + ")"
+            )
 
     def initAsParent(parent):
         for child in parent.lsn:
@@ -41,51 +59,39 @@ class SyntaxNode:
             parent.nodeCount += child.nodeCount
         parent.nodeCount += 1
 
-    def printSyntaxTree(self, detail=STD_DET):
-        if detail == SyntaxNode.DBG_DET:
-            print(self.__repr__())
-            print(self.nodeCount)
-        else:
-            print(self.__str__())
+    def print(self):
+        print(str(self))
         return self
 
-    def isZero(self):
-        if (type(self) is QNode):
-            return self.numerator() == 0
-        else:
+    def isExplicitlyZero(self):
             return False
 
-    def isOne(self):
-        if (type(self) is QNode):
-            return self.numerator() == self.denominator()
-        else:
+    def isExplicitlyOne(self):
             return False
 
-    # getSubNodeIndexThatIsntPred
-    # Gets the index of the only child node that isn't (pred)
-    # Returns index if such a child exists and all other children are (pred)
-    # Returns 0 if all children are (pred)
-    # Returns -1 if more than one children are (pred)
-    def getSubNodeIndexThatIsntPred(self, pred):
-        iChildThatIsntPred = -1
+    # getUniqueSubNodeIndexThatIs
+    # Gets the index of the only child node that is (pred)
+    # Returns index if such a child exists & all other children are not (pred)
+    # Returns -2 if more than one child is (pred)
+    # Returns -1 if no children are (pred)
+    def getUniqueSubNodeIndexThatIs(self, pred):
+        iChildThatIsPred = -1
         for i in range(len(self.lsn)):
-            if not pred(self.lsn[i]):
-                if iChildThatIsntPred == -1:
-                    iChildThatIsntPred = i
+            if pred(self.lsn[i]):
+                if iChildThatIsPred == -1:
+                    iChildThatIsPred = i
                 else:
-                    return -1
-        if iChildThatIsntPred == -1:
-            return 0
-        else:
-            return iChildThatIsntPred
+                    iChildThatIsPred = -2
+        return iChildThatIsPred
 
-    def isOneOrLessSubNodesNotPred(self, pred):
-        numNotPred = 0
+    def isOneOrLessSubNodes(self, pred):
+        encounteredOne = False
         for sn in self.lsn:
-            if not pred(sn):
-                numNotPred += 1
-            if numNotPred > 1:
-                return False
+            if pred(sn):
+                if not encounteredOne:
+                    encounteredOne = True
+                else:
+                    return False
         return True
 
     def setRecountNodes(self):
@@ -109,6 +115,7 @@ class SyntaxNode:
         return self
 
 
+# SyntaxTree wraps the root node of a syntax tree made of nested SyntaxNodes
 class SyntaxTree(SyntaxNode):
     KEYWORD = "Tree"
 
@@ -118,18 +125,22 @@ class SyntaxTree(SyntaxNode):
         self.lsn = [root]
         super(SyntaxTree, self).initAsParent()
 
+    def __str__(self):
+        return str(self.getRoot())
+
     def getRoot(self):
         return self.lsn[0]
 
-    def printSyntaxTree(self, detail=SyntaxNode.STD_DET):
-        if detail == SyntaxNode.DBG_DET:
-            print("Syntax tree:", self.getRoot().__repr__())
+    def print(self):
+        if g_optionFlags & FLG_DEBUG:
+            print("Syntax tree:", str(self.getRoot()))
             print("Node count:", self.getRoot().nodeCount)
         else:
-            print(self.__str__())
+            print(str(self))
         return self
 
 
+# FuncNode represents a function application node in a syntax tree
 class FuncNode(SyntaxNode):
     def __init__(self, name, *args):
         super(FuncNode, self).__init__()
@@ -149,6 +160,7 @@ class FuncNode(SyntaxNode):
         return self
 
 
+# AddNode represents an addition node in a syntax tree
 class AddNode(SyntaxNode):
     KEYWORD = "+"
 
@@ -163,15 +175,20 @@ class AddNode(SyntaxNode):
 
     def simplifyTrivials(self, iChild):
         self.simplifyTrivials__subnodes(iChild)
-        if self.isOneOrLessSubNodesNotPred(AddNode.isZero):
+        if (self.isOneOrLessSubNodes(
+                lambda sn: not AddNode.isExplicitlyZero(sn))):
+            subNodeIndex = self.getSubNodeIndexThatIs(
+                lambda sn: not AddNode.isExplicitlyZero(sn)
+            )
             self.parent.lsn[iChild] = self.addends()[
-                self.getSubNodeIndexThatIsntPred(AddNode.isZero)
+                subNodeIndex if subNodeIndex != -1 else 0
             ]
 
         self.simplifyTrivials__after(iChild)
         return self
 
 
+# SubNode represents a binary subtraction node in a syntax tree
 class SubNode(SyntaxNode):
     KEYWORD = "-"
 
@@ -189,13 +206,14 @@ class SubNode(SyntaxNode):
 
     def simplifyTrivials(self, iChild):
         self.simplifyTrivials__subnodes(iChild)
-        if self.subtractend().isZero():
+        if self.subtractend().isExplicitlyZero():
             self.parent.lsn[iChild] = self.minuend()
 
         self.simplifyTrivials__after(iChild)
         return self
 
 
+# MultNode represents a multiplication node in a syntax tree
 class MultNode(SyntaxNode):
     KEYWORD = "*"
 
@@ -210,18 +228,23 @@ class MultNode(SyntaxNode):
 
     def simplifyTrivials(self, iChild):
         self.simplifyTrivials__subnodes(iChild)
-        if any(map(lambda sn: sn.isZero(), self.multiplicands())):
+        if any(map(lambda sn: sn.isExplicitlyZero(), self.multiplicands())):
             self.parent.lsn[iChild] = QNode(0)
 
-        elif self.isOneOrLessSubNodesNotPred(MultNode.isOne):
+        elif (self.isOneOrLessSubNodes(
+                lambda sn: not MultNode.isExplicitlyOne(sn))):
+            subNodeIndex = self.getSubNodeIndexThatIs(
+                lambda sn: not MultNode.isExplicitlyOne(sn)
+            )
             self.parent.lsn[iChild] = self.multiplicands()[
-                self.getSubNodeIndexThatIsntPred(MultNode.isOne)
+                subNodeIndex if subNodeIndex != -1 else 0
             ]
 
         self.simplifyTrivials__after(iChild)
         return self
 
 
+# DivNode represents a binary division node in a syntax tree
 class DivNode(SyntaxNode):
     KEYWORD = "/"
 
@@ -240,18 +263,19 @@ class DivNode(SyntaxNode):
     def simplifyTrivials(self, iChild):
         self.simplifyTrivials__subnodes(iChild)
 
-        if self.divisor().isOne():
+        if self.divisor().isExplicitlyOne():
             self.parent.lsn[iChild] = self.dividend()
 
-        elif self.divisor().isZero():
+        elif self.divisor().isExplicitlyZero():
             print("fuqu")
 
         self.simplifyTrivials__after(iChild)
         return self
 
 
+# ExpNode represents a binary exponentiation node in a syntax tree
 class ExpNode(SyntaxNode):
-    KEYWORD = "expt" if LANG_RACKET else "^"
+    KEYWORD = "expt" if g_optionFlags & FLG_LANG_RACKET else "^"
 
     def __init__(self, base, exponent):
         super(ExpNode, self).__init__()
@@ -267,23 +291,24 @@ class ExpNode(SyntaxNode):
 
     def simplifyTrivials(self, iChild):
         self.simplifyTrivials__subnodes(iChild)
-        if (self.exponent().isZero() and
-                self.base().isZero()):
+        if (self.exponent().isExplicitlyZero() and
+                self.base().isExplicitlyZero()):
             print("tbd")
 
-        elif self.exponent().isZero():
+        elif self.exponent().isExplicitlyZero():
             self.parent.lsn[iChild] = QNode(1)
 
-        elif self.base().isZero():
+        elif self.base().isExplicitlyZero():
             self.parent.lsn[iChild] = QNode(0)
 
-        elif self.exponent().isOne():
+        elif self.exponent().isExplicitlyOne():
             self.parent.lsn[iChild] = self.base()
 
         self.simplifyTrivials__after(iChild)
         return self
 
 
+# QNode represents a rational number in a syntax tree
 class QNode(SyntaxNode):
     KEYWORD = "QNode"
 
@@ -310,6 +335,12 @@ class QNode(SyntaxNode):
     def simplifyTrivials(self, iChild):
         return self
 
+    def isExplicitlyZero(self):
+        return self.numerator() == 0
+
+    def isExplicitlyOne(self):
+        return self.numerator() == self.denominator()
+
     def sign(self):
         if self.numerator() == 0:
             return 0
@@ -319,7 +350,7 @@ class QNode(SyntaxNode):
             return -1
 
     def __repr__(self):
-        if self.isZero():
+        if self.isExplicitlyZero():
             return "0"
         elif self.denominator() == 1:
             return str(self.numerator())
@@ -327,7 +358,7 @@ class QNode(SyntaxNode):
             return str(self.numerator()) + "/" + str(self.denominator())
 
     def __str__(self):
-        if self.isZero():
+        if self.isExplicitlyZero():
             return "0"
         elif self.denominator() == 1:
             return str(self.numerator())
@@ -335,6 +366,7 @@ class QNode(SyntaxNode):
             return str(self.numerator()) + "/" + str(self.denominator())
 
 
+# SymNode represents a symbol (variable or constant or ) in a syntax tree
 class SymNode(SyntaxNode):
     def __init__(self, symbol):
         super(SymNode, self).__init__()
@@ -346,6 +378,7 @@ class SymNode(SyntaxNode):
         return self
 
 
+# Collection of methods to parse user input
 class Parser:
     def __init__(self):
         self.TOKENIZING_REGEX_STRING \
@@ -360,6 +393,11 @@ class Parser:
                 "arcsin", "arccos", "arctan", "arcsec", "arccsc", "arccot",
                 "log", "ln"
             ]
+
+    def __repr__(self):
+        return (
+            "<" + type(self).__name__ + ">"
+        )
 
     # Str, Int, Token? -> Void
     def printTokenizeErr(self, s, i, t=""):
@@ -408,7 +446,9 @@ class Parser:
                         lt[0][-1] == ')'):
                     return FuncNode(
                         func,
-                        self.parseTokens(self.tokenize(lt[0][len(func) + 1:-1]))
+                        self.parseTokens(
+                            self.tokenize(lt[0][len(func) + 1:-1])
+                        )
                     )
             # otherwise is a symbol of some sort
             return SymNode(lt[0])
@@ -416,31 +456,43 @@ class Parser:
         # check for addition
         for ti in range(0, len(lt)):
             # if lt[ti] == "-":
-            #     newltfromti = self.subtoplus(lt[ti:])    # new lt elements for elements from ti to end
+            #     newltfromti = self.subtoplus(lt[ti:])
+            # # new lt elements for elements from ti to end
             #     lt = lt[0:ti] + newltfromti[:]
             if lt[ti] == "+":
-                return AddNode(self.parseTokens(lt[:ti]), self.parseTokens(lt[ti + 1:]))
+                return AddNode(
+                    self.parseTokens(lt[:ti]), self.parseTokens(lt[ti + 1:])
+                )
         # check for subtraction
         for ti in range(len(lt) - 1, -1, -1):
             if lt[ti] == "-":
-                return SubNode(self.parseTokens(lt[:ti]), self.parseTokens(lt[ti + 1:]))
+                return SubNode(
+                    self.parseTokens(lt[:ti]), self.parseTokens(lt[ti + 1:])
+                )
         # check for multiplication
         for ti in range(0, len(lt)):
             if lt[ti] == "*":
-                return MultNode(self.parseTokens(lt[:ti]), self.parseTokens(lt[ti + 1:]))
+                return MultNode(
+                    self.parseTokens(lt[:ti]), self.parseTokens(lt[ti + 1:])
+                )
         # check for division
         for ti in range(len(lt) - 1, -1, -1):
             if lt[ti] == "/":
-                return DivNode(self.parseTokens(lt[:ti]), self.parseTokens(lt[ti + 1:]))
+                return DivNode(
+                    self.parseTokens(lt[:ti]), self.parseTokens(lt[ti + 1:])
+                )
         # check for exponentiation
         for ti in range(0, len(lt)):
             if lt[ti] == "^":
-                return ExpNode(self.parseTokens(lt[:ti]), self.parseTokens(lt[ti + 1:]))
+                return ExpNode(
+                    self.parseTokens(lt[:ti]), self.parseTokens(lt[ti + 1:])
+                )
 
     # (Listof Token) -> (Listof Token)
     # deprecated
     def subtoplus(self, lt):
-        # takes in a list of tokens in the form of ["-", t1, t2, ... tn-1, regex"[+-]", ...]
+        # takes in a list of tokens in the form of
+        #   ["-", t1, t2, ... tn-1, regex"[+-]", ...]
         # converts it to ["+", "-1", "*", "(t1 t1 t2 ... tn-1)", ...]
         newlt = ["+", "-1", "*"]
         try:
@@ -470,14 +522,9 @@ P = Parser()
 F2 = "1 +0"
 F3 = "8 + 1 + 0 + (8 - 0 + 1) + sin(1 + 3)"
 F4 = "e^0 + 5^0"
-pF = P.parse(F4).printSyntaxTree(1).simplify().printSyntaxTree(1)
+pF = P.parse(F4).print().simplify().print()
 
-#print(regex.match(r"[\+\-\*/\^]|[0-9]+|(?P<brackets>\((?:[^\(\)]|(?0))*\))|([A-Za-z][A-Za-z0-9]*(?P<funcapp>\((?:[^\(\)]|(?0))*\))?)", "").group())
+# print(regex.match(r"[\+\-\*/\^]|[0-9]+|(?P<brackets>\((?:[^\(\)]|(?0))*\))|
+# ([A-Za-z][A-Za-z0-9]*(?P<funcapp>\((?:[^\(\)]|(?0))*\))?)", "").group())
 
 # [sin(4+x), +, -1, *, (x^(3-y)), +, x, *, y, ^, 2, /, u, -, 6, *, tan(x)]
-
-#         _____ + ___________________________
-#    [sin(4+x)]                             + ___________________________
-#                        [-1, *, (x^(3-y))]             _______________ + _________
-#                                                  __ * ________          [-1, *, (6*tan(x))]
-#                                                 [x]   [y, ^, 2, /, u, /, y]
