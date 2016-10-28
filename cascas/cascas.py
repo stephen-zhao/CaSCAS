@@ -1,4 +1,5 @@
 import regex
+import math
 
 # Options flags consts (temporary)
 FLG_NORMAL = FLG_RESET = 0b000
@@ -319,9 +320,23 @@ class QNode(SyntaxNode):
             self.lsn = [primitiveValue, 1]
         elif type(primitiveValue) is float:
             self.lsn = list(primitiveValue.as_integer_ratio())
+        elif type(primitiveValue) is str:
+            if primitiveValue.find(".") == -1:
+                self.lsn = [int(primitiveValue), 1]
+            else:
+                self.lsn = self.getNumerOverDenom(primitiveValue)
         else:
             self.lsn = [int(primitiveValue), 1]
         self.nodeCount = 1
+
+    def getNumerOverDenom(self, s):
+        iDot = s.find(".")
+        numOfTens = len(s) - iDot - 1
+        denom = 10**numOfTens
+        ls = list(s)
+        ls.remove('.')
+        numer = int(''.join(ls))
+        return [numer, denom]
 
     def approxVal(self):
         return (1.0 * self.lsn[0]) / (1.0 * self.lsn[1])
@@ -349,14 +364,6 @@ class QNode(SyntaxNode):
         else:
             return -1
 
-    def __repr__(self):
-        if self.isExplicitlyZero():
-            return "0"
-        elif self.denominator() == 1:
-            return str(self.numerator())
-        else:
-            return str(self.numerator()) + "/" + str(self.denominator())
-
     def __str__(self):
         if self.isExplicitlyZero():
             return "0"
@@ -383,7 +390,7 @@ class Parser:
     def __init__(self):
         self.TOKENIZING_REGEX_STRING \
             = r"[\+\-\*/\^]"\
-            r"|[0-9]+"\
+            r"|([0-9]+(\.[0-9]+)?)"\
             r"|(?P<brackets>\((?:[^\(\)]|(?0))*\))"\
             r"|([A-Za-z][A-Za-z0-9]*(?P<funcapp>\((?:[^\(\)]|(?0))*\))?)"
 
@@ -437,7 +444,7 @@ class Parser:
             if lt[0][0] == '(' and lt[0][-1] == ')':
                 return self.parseTokens(self.tokenize(lt[0][1:-1]))
             # check for numerical numbers
-            if regex.match(r"[0-9]+", lt[0]):
+            if regex.match(r"([0-9]+(\.[0-9]+)?)", lt[0]):
                 return QNode(lt[0])
             # check for known functions
             for func in self.LIST_KNOWN_FUNCTION_NAMES:
@@ -601,6 +608,26 @@ if __name__ == "__main__":
         "0^e + 0^7",
         "0"
     ])
+    # QNode with fraction 01
+    ll_te.append([
+        "1.5",
+        "15/10"
+    ])
+    # QNode with fraction 02
+    ll_te.append([
+        "0.001",
+        "1/1000"
+    ])
+    # QNode with fraction
+    # ll_te.append([
+    #     "-24.56",
+    #     "-2456/100"
+    # ])
+    # randoms 01
+    ll_te.append([
+        "8 + 1 + 0 + (8 - 0 + 1) + sin(1 + 3)",
+        "(+ 8 (+ 1 (+ (+ 8 1) (sin (+ 1 3)))))"
+    ])
     # Bunch of stuff altogether
     ll_te.append([
         "sin(4+x)-x^(3-y)+x*y^2/u-6*tan(x)-2*x+y^(x)",
@@ -617,7 +644,10 @@ if __name__ == "__main__":
         "(+ 8 (+ 1 (+ (+ 8 1) (sin (+ 1 3)))))"
     ])
 
-    ll_terp = testSimplify(ll_te, True)
+    ll_terp = testSimplify(ll_te)
+    # P = Parser()
+    # P.parse("-24.56").print()
+    # "-2456/100"
 
 
     # print(regex.match(r"[\+\-\*/\^]|[0-9]+|(?P<brackets>\((?:[^\(\)]|(?0))*\))|
