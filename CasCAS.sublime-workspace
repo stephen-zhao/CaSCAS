@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"exp",
+				"expm1\tfunction"
+			],
+			[
 				"test",
 				"testSimplify\tfunction"
 			],
@@ -101,7 +105,7 @@
 			"file": "cascas/cascas.py",
 			"settings":
 			{
-				"buffer_size": 18053,
+				"buffer_size": 18780,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -569,9 +573,6 @@
 							"color_helper.file_palette":
 							[
 							],
-							"color_helper.preview_meta":
-							{
-							},
 							"color_helper.scan":
 							{
 								"allowed_colors":
@@ -636,9 +637,6 @@
 							"color_helper.file_palette":
 							[
 							],
-							"color_helper.preview_meta":
-							{
-							},
 							"color_helper.scan":
 							{
 								"current_ext": ".py",
@@ -680,9 +678,6 @@
 							"color_helper.file_palette":
 							[
 							],
-							"color_helper.preview_meta":
-							{
-							},
 							"color_helper.scan":
 							{
 								"current_ext": ".py",
@@ -747,15 +742,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 18053,
+						"buffer_size": 18780,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								10642,
-								10642
+								12628,
+								12628
 							]
 						],
 						"settings":
@@ -773,18 +768,18 @@
 								"current_ext": ".py",
 								"current_syntax": "Python/Python",
 								"enabled": false,
-								"last_updated": 1477626632.79
+								"last_updated": 1477633344.36
 							},
 							"color_scheme": "Packages/User/Color Highlighter/themes/Material Twilight (SL).tmTheme",
 							"syntax": "Packages/Python/Python.sublime-syntax",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 8461.0,
+						"translation.x": 33.0,
+						"translation.y": 8694.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 1,
 					"type": "text"
 				}
 			]
@@ -799,15 +794,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 18053,
+						"buffer_size": 18780,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								17302,
-								17302
+								18536,
+								18474
 							]
 						],
 						"settings":
@@ -825,7 +820,7 @@
 								"current_ext": ".py",
 								"current_syntax": "Python/Python",
 								"enabled": false,
-								"last_updated": 1477626632.79
+								"last_updated": 1477633344.36
 							},
 							"color_scheme": "Packages/User/Color Highlighter/themes/Material Twilight (SL).tmTheme",
 							"syntax": "Packages/Python/Python.sublime-syntax",
@@ -833,10 +828,10 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 13440.0,
+						"translation.y": 14793.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 0,
 					"type": "text"
 				}
 			]
@@ -882,7 +877,7 @@
 	"menu_visible": true,
 	"output.exec":
 	{
-		"height": 290.0
+		"height": 288.0
 	},
 	"output.find_results":
 	{
@@ -926,7 +921,7 @@
 		],
 		"width": 0.0
 	},
-	"selected_group": 0,
+	"selected_group": 1,
 	"settings":
 	{
 	},

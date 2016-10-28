@@ -421,7 +421,7 @@ class Parser:
         ci = 0          # current char index in s
         lt = []         # list of created tokens
         while ci < len(s):
-            if s[ci] == ' ':
+            if regex.match(r"\s", s[ci]):
                 ci += 1
                 continue
             rem = regex.match(self.TOKENIZING_REGEX_STRING, s[ci:])
@@ -518,7 +518,40 @@ class Parser:
             newlt += lt[iFirstAddSub:]
         return newlt
 
+
+def testTokenize(ll_te, b_verbose=False):
+    print("==== TestTokenize begin ====")
+    P = Parser()
+    ll_terp = []
+    i = 0
+    for test, expected in ll_te:
+        if b_verbose:
+            print("## TEST", i, "##")
+        res = P.tokenize(test)
+        if b_verbose:
+            print("test string:", test)
+        if b_verbose:
+            print("res  tokens:", res)
+        if b_verbose:
+            print("expt tokens:", expected)
+        passed = (res == expected)
+        if b_verbose:
+            print("test was", "SUCCESS" if passed else "FAIL")
+        ll_terp.append([test, expected, res, passed])
+        i += 1
+
+    print("==== TestTokenize end ====")
+
+    numPassed = sum(map(lambda x: x[3], ll_terp), 0)
+    numFailed = i - numPassed
+    print("tests passed:", numPassed)
+    print("tests failed:", numFailed)
+
+    return ll_terp
+
+
 def testSimplify(ll_te, b_verbose=False):
+    print("==== TestSimplify begin ====")
     P = Parser()
     ll_terp = []
     i = 0
@@ -539,6 +572,8 @@ def testSimplify(ll_te, b_verbose=False):
         ll_terp.append([test, expected, res, passed])
         i += 1
 
+    print("==== TestSimplify end ====")
+
     numPassed = sum(map(lambda x: x[3], ll_terp), 0)
     numFailed = i - numPassed
     print("tests passed:", numPassed)
@@ -549,12 +584,50 @@ def testSimplify(ll_te, b_verbose=False):
 
 # test code
 if __name__ == "__main__":
-    # test Parse ctor
+
     P = Parser()
-    # F = "sin(4+x)"
-    # print(P.tokenize(F))
-    # print(P.subtoplus(["-", "4", "*", "x", "/", "y", "^", "(2 + e)"]))
-    # pF = P.parse(F).printSyntaxTree(1)
+    # test tokenizer
+    ll_te = []  # list of list of str and tokens
+    # with simple binary ops
+    ll_te.append([
+        "5+37 +4/ 6- 7*8",
+        ["5", "+", "37", "+", "4", "/", "6", "-", "7", "*", "8"]
+    ])
+    # with brackets
+    ll_te.append([
+        "5-(5 + 6) /99*(22-8*2 )- (23 *2)",
+        ["5", "-", "(5 + 6)", "/", "99", "*",
+         "(22-8*2 )", "-", "(23 *2)"]
+    ])
+    # with random whitespace
+    ll_te.append([
+        "5  +   9    *10\n-22  /    2",
+        ["5", "+", "9", "*", "10", "-", "22", "/", "2"]
+    ])
+    # with funcapps
+    ll_te.append([
+        "sin(22 +  99)-22+9*arccos(22)/ln( 4 *2)",
+        ["sin(22 +  99)", "-", "22", "+", "9", "*",
+         "arccos(22)", "/", "ln( 4 *2)"]
+    ])
+    # with decimal numbers
+    ll_te.append([
+        "tan(22.8+6)-6.665/811.28",
+        ["tan(22.8+6)", "-", "6.665", "/", "811.28"]
+    ])
+    # with random symbols
+    ll_te.append([
+        "log(x)/csc(cooka)*k+88*j",
+        ["log(x)", "/", "csc(cooka)", "*", "k",
+         "+", "88", "*", "j"]
+    ])
+    # with negatives (unary op)
+    ll_te.append([
+        "sin(-2)+-4+-x*-k",
+        ["sin(-2)", "+", "-", "4", "+",
+         "-", "x", "*", "-", "k"]
+    ])
+    ll_terp = testTokenize(ll_te)
 
     ll_te = []  # list of list of test and expected
     # FuncNode
