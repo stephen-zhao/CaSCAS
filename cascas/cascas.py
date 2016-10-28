@@ -64,10 +64,10 @@ class SyntaxNode:
         return self
 
     def isExplicitlyZero(self):
-            return False
+        return False
 
     def isExplicitlyOne(self):
-            return False
+        return False
 
     # getUniqueSubNodeIndexThatIs
     # Gets the index of the only child node that is (pred)
@@ -120,10 +120,10 @@ class SyntaxTree(SyntaxNode):
     KEYWORD = "Tree"
 
     def __init__(self, root):
-        super(SyntaxTree, self).__init__()
+        super().__init__()
         self.keyword = SyntaxTree.KEYWORD
         self.lsn = [root]
-        super(SyntaxTree, self).initAsParent()
+        super().initAsParent()
 
     def __str__(self):
         return str(self.getRoot())
@@ -143,10 +143,10 @@ class SyntaxTree(SyntaxNode):
 # FuncNode represents a function application node in a syntax tree
 class FuncNode(SyntaxNode):
     def __init__(self, name, *args):
-        super(FuncNode, self).__init__()
+        super().__init__()
         self.keyword = name
         self.lsn = list(args)
-        super(FuncNode, self).initAsParent()
+        super().initAsParent()
 
     def name(self):
         return self.lsn[0]
@@ -165,10 +165,10 @@ class AddNode(SyntaxNode):
     KEYWORD = "+"
 
     def __init__(self, *addends):
-        super(AddNode, self).__init__()
+        super().__init__()
         self.keyword = AddNode.KEYWORD
         self.lsn = list(addends)
-        super(AddNode, self).initAsParent()
+        super().initAsParent()
 
     def addends(self):
         return self.lsn
@@ -176,9 +176,9 @@ class AddNode(SyntaxNode):
     def simplifyTrivials(self, iChild):
         self.simplifyTrivials__subnodes(iChild)
         if (self.isOneOrLessSubNodes(
-                lambda sn: not AddNode.isExplicitlyZero(sn))):
-            subNodeIndex = self.getSubNodeIndexThatIs(
-                lambda sn: not AddNode.isExplicitlyZero(sn)
+                lambda sn: not sn.isExplicitlyZero())):
+            subNodeIndex = self.getUniqueSubNodeIndexThatIs(
+                lambda sn: not sn.isExplicitlyZero()
             )
             self.parent.lsn[iChild] = self.addends()[
                 subNodeIndex if subNodeIndex != -1 else 0
@@ -193,10 +193,10 @@ class SubNode(SyntaxNode):
     KEYWORD = "-"
 
     def __init__(self, minuend, subtractend):
-        super(SubNode, self).__init__()
+        super().__init__()
         self.keyword = SubNode.KEYWORD
         self.lsn = [minuend, subtractend]
-        super(SubNode, self).initAsParent()
+        super().initAsParent()
 
     def minuend(self):
         return self.lsn[0]
@@ -218,10 +218,10 @@ class MultNode(SyntaxNode):
     KEYWORD = "*"
 
     def __init__(self, *multiplicands):
-        super(MultNode, self).__init__()
+        super().__init__()
         self.keyword = MultNode.KEYWORD
         self.lsn = list(multiplicands)
-        super(MultNode, self).initAsParent()
+        super().initAsParent()
 
     def multiplicands(self):
         return self.lsn
@@ -232,9 +232,9 @@ class MultNode(SyntaxNode):
             self.parent.lsn[iChild] = QNode(0)
 
         elif (self.isOneOrLessSubNodes(
-                lambda sn: not MultNode.isExplicitlyOne(sn))):
-            subNodeIndex = self.getSubNodeIndexThatIs(
-                lambda sn: not MultNode.isExplicitlyOne(sn)
+                lambda sn: not sn.isExplicitlyOne())):
+            subNodeIndex = self.getUniqueSubNodeIndexThatIs(
+                lambda sn: not sn.isExplicitlyOne()
             )
             self.parent.lsn[iChild] = self.multiplicands()[
                 subNodeIndex if subNodeIndex != -1 else 0
@@ -249,10 +249,10 @@ class DivNode(SyntaxNode):
     KEYWORD = "/"
 
     def __init__(self, dividend, divisor):
-        super(DivNode, self).__init__()
+        super().__init__()
         self.keyword = DivNode.KEYWORD
         self.lsn = [dividend, divisor]
-        super(DivNode, self).initAsParent()
+        super().initAsParent()
 
     def dividend(self):
         return self.lsn[0]
@@ -278,10 +278,10 @@ class ExpNode(SyntaxNode):
     KEYWORD = "expt" if g_optionFlags & FLG_LANG_RACKET else "^"
 
     def __init__(self, base, exponent):
-        super(ExpNode, self).__init__()
+        super().__init__()
         self.keyword = ExpNode.KEYWORD
         self.lsn = [base, exponent]
-        super(ExpNode, self).initAsParent()
+        super().initAsParent()
 
     def base(self):
         return self.lsn[0]
@@ -313,7 +313,7 @@ class QNode(SyntaxNode):
     KEYWORD = "QNode"
 
     def __init__(self, primitiveValue):
-        super(QNode, self).__init__()
+        super().__init__()
         self.keyword = QNode.KEYWORD
         if type(primitiveValue) is int:
             self.lsn = [primitiveValue, 1]
@@ -369,7 +369,7 @@ class QNode(SyntaxNode):
 # SymNode represents a symbol (variable or constant or ) in a syntax tree
 class SymNode(SyntaxNode):
     def __init__(self, symbol):
-        super(SymNode, self).__init__()
+        super().__init__()
         self.keyword = symbol
         self.lsn = []
         self.nodeCount = 1
@@ -511,20 +511,116 @@ class Parser:
             newlt += lt[iFirstAddSub:]
         return newlt
 
+def testSimplify(ll_te, b_verbose=False):
+    P = Parser()
+    ll_terp = []
+    i = 0
+    for test, expected in ll_te:
+        if b_verbose:
+            print("## TEST", i, "##")
+        f = P.parse(test)
+        if b_verbose:
+            print("test tree:", f)
+        res = f.simplify()
+        if b_verbose:
+            print("res  tree:", res)
+        if b_verbose:
+            print("expt tree:", expected)
+        passed = (str(res) == expected)
+        if b_verbose:
+            print("test was", "SUCCESS" if passed else "FAIL")
+        ll_terp.append([test, expected, res, passed])
+        i += 1
 
-P = Parser()
-# F1 = "sin(4+x)-x^(3-y)+x*y^2/u-6*tan(x)-2*x+y^(x)"
-# F = "sin(4+x)"
-# print(P.tokenize(F))
-# print(P.subtoplus(["-", "4", "*", "x", "/", "y", "^", "(2 + e)"]))
-# pF = P.parse(F).printSyntaxTree(1)
+    numPassed = sum(map(lambda x: x[3], ll_terp), 0)
+    numFailed = i - numPassed
+    print("tests passed:", numPassed)
+    print("tests failed:", numFailed)
 
-F2 = "1 +0"
-F3 = "8 + 1 + 0 + (8 - 0 + 1) + sin(1 + 3)"
-F4 = "e^0 + 5^0"
-pF = P.parse(F4).print().simplify().print()
+    return ll_terp
 
-# print(regex.match(r"[\+\-\*/\^]|[0-9]+|(?P<brackets>\((?:[^\(\)]|(?0))*\))|
-# ([A-Za-z][A-Za-z0-9]*(?P<funcapp>\((?:[^\(\)]|(?0))*\))?)", "").group())
 
-# [sin(4+x), +, -1, *, (x^(3-y)), +, x, *, y, ^, 2, /, u, -, 6, *, tan(x)]
+# test code
+if __name__ == "__main__":
+    # test Parse ctor
+    P = Parser()
+    # F = "sin(4+x)"
+    # print(P.tokenize(F))
+    # print(P.subtoplus(["-", "4", "*", "x", "/", "y", "^", "(2 + e)"]))
+    # pF = P.parse(F).printSyntaxTree(1)
+
+    ll_te = []  # list of list of test and expected
+    # FuncNode
+    ll_te.append([
+        "cos(5 + 3)",
+        "(cos (+ 5 3))"
+    ])
+    # AddNode with 0 addend
+    ll_te.append([
+        "2 + 3 + 0 + 4",
+        "(+ 2 (+ 3 4))"
+    ])
+    # AddNode with lots of 0 addend
+    ll_te.append([
+        "0 + 0 + 33 + 0 + 0 + 0",
+        "33"
+    ])
+    # SubNode with 0s
+    ll_te.append([
+        "3 - 0 + 5 - 8 + 99 * 20 - 0 + 99 + 0 - 11",
+        "(+ 3 (+ (- 5 8) (+ (* 99 20) (+ 99 (- 0 11)))))"
+    ])
+    # MultNode with 0s
+    ll_te.append([
+        "0 * 9 + 8 * 2 + 7 * 0 * 0 + 9 * 7 * 2 * 0",
+        "(* 8 2)"
+    ])
+    # MultNode with 1s
+    ll_te.append([
+        "1 * 2 * 3 * 5 * 1 * 1 * 6 * 1 * 1",
+        "(* 2 (* 3 (* 5 6)))"
+    ])
+    # DivNode with 1s
+    ll_te.append([
+        "x * 5 + 2 / 1 + 8 / 2 / 1 / 5",
+        "(+ (* x 5) (+ 2 (/ (/ 8 2) 5)))"
+    ])
+    # TODO: test case for divide by zero
+    # ExpNode with 0 exponent
+    ll_te.append([
+        "e^0 + 5^0",
+        "(+ 1 1)"
+    ])
+    # ExpNode with 1 exponent
+    ll_te.append([
+        "e^1 + 5^1",
+        "(+ e 5)"
+    ])
+    # ExpNode with 0 base
+    ll_te.append([
+        "0^e + 0^7",
+        "0"
+    ])
+    # Bunch of stuff altogether
+    ll_te.append([
+        "sin(4+x)-x^(3-y)+x*y^2/u-6*tan(x)-2*x+y^(x)",
+        "(+ (- (sin (+ 4 x)) (^ x (- 3 y))) (+ (- (- (* x (/ (^ y 2) u)) (* 6 (tan x))) (* 2 x)) (^ y x)))"
+    ])
+    # random AddNode
+    ll_te.append([
+        "1 +0 + 1",
+        "(+ 1 1)"
+    ])
+    # randoms 01
+    ll_te.append([
+        "8 + 1 + 0 + (8 - 0 + 1) + sin(1 + 3)",
+        "(+ 8 (+ 1 (+ (+ 8 1) (sin (+ 1 3)))))"
+    ])
+
+    ll_terp = testSimplify(ll_te, True)
+
+
+    # print(regex.match(r"[\+\-\*/\^]|[0-9]+|(?P<brackets>\((?:[^\(\)]|(?0))*\))|
+    # ([A-Za-z][A-Za-z0-9]*(?P<funcapp>\((?:[^\(\)]|(?0))*\))?)", "").group())
+
+    # [sin(4+x), +, -1, *, (x^(3-y)), +, x, *, y, ^, 2, /, u, -, 6, *, tan(x)]
