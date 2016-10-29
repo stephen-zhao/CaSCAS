@@ -241,6 +241,8 @@ class MultNode(SyntaxNode):
                 subNodeIndex if subNodeIndex != -1 else 0
             ]
 
+        # TODO: add trivial simplification for negative QNodes
+
         self.simplifyTrivials__after(iChild)
         return self
 
@@ -473,9 +475,16 @@ class Parser:
         # check for subtraction
         for ti in range(len(lt) - 1, -1, -1):
             if lt[ti] == "-":
-                return SubNode(
-                    self.parseTokens(lt[:ti]), self.parseTokens(lt[ti + 1:])
-                )
+                if ti == 0:
+                    return MultNode(
+                        QNode(-1),
+                        self.parseTokens(lt[ti + 1:])
+                    )
+                else:
+                    return SubNode(
+                        self.parseTokens(lt[:ti]),
+                        self.parseTokens(lt[ti + 1:])
+                    )
         # check for multiplication
         for ti in range(0, len(lt)):
             if lt[ti] == "*":
@@ -623,11 +632,14 @@ if __name__ == "__main__":
     ])
     # with negatives (unary op)
     ll_te.append([
-        "sin(-2)+-4+-x*-k",
-        ["sin(-2)", "+", "-", "4", "+",
-         "-", "x", "*", "-", "k"]
+        "sin(-2)+(-4)+(-x)*(-k)",
+        ["sin(-2)", "+", "(-4)", "+",
+         "(-x)", "*", "(-k)"]
     ])
-    ll_terp = testTokenize(ll_te)
+    ll_terp = testTokenize(
+        ll_te,
+        b_verbose=(g_optionFlags & FLG_DEBUG)
+    )
 
     ll_te = []  # list of list of test and expected
     # FuncNode
@@ -691,11 +703,16 @@ if __name__ == "__main__":
         "0.001",
         "1/1000"
     ])
-    # QNode with fraction
-    # ll_te.append([
-    #     "-24.56",
-    #     "-2456/100"
-    # ])
+    # Negative unary
+    ll_te.append([
+        "-24.56+(-x*9)+(-7^y)",
+        "(+ (* -1 2456/100) (+ (* -1 (* x 9)) (* -1 (^ 7 y))))"
+    ])
+    # Negative unary multiplication
+    ll_te.append([
+        "-7*(-6)",
+        "(* -1 (* 7 (* -1 6)))"
+    ])
     # randoms 01
     ll_te.append([
         "8 + 1 + 0 + (8 - 0 + 1) + sin(1 + 3)",
@@ -704,7 +721,9 @@ if __name__ == "__main__":
     # Bunch of stuff altogether
     ll_te.append([
         "sin(4+x)-x^(3-y)+x*y^2/u-6*tan(x)-2*x+y^(x)",
-        "(+ (- (sin (+ 4 x)) (^ x (- 3 y))) (+ (- (- (* x (/ (^ y 2) u)) (* 6 (tan x))) (* 2 x)) (^ y x)))"
+        "(+ (- (sin (+ 4 x)) (^ x (- 3 y))) "
+        "(+ (- (- (* x (/ (^ y 2) u)) (* 6 (tan x))) "
+        "(* 2 x)) (^ y x)))"
     ])
     # random AddNode
     ll_te.append([
@@ -717,7 +736,10 @@ if __name__ == "__main__":
         "(+ 8 (+ 1 (+ (+ 8 1) (sin (+ 1 3)))))"
     ])
 
-    ll_terp = testSimplify(ll_te)
+    ll_terp = testSimplify(
+        ll_te,
+        b_verbose=(g_optionFlags & FLG_DEBUG)
+    )
     # P = Parser()
     # P.parse("-24.56").print()
     # "-2456/100"

@@ -105,7 +105,7 @@
 			"file": "cascas/cascas.py",
 			"settings":
 			{
-				"buffer_size": 18780,
+				"buffer_size": 20897,
 				"encoding": "UTF-8",
 				"line_ending": "Windows"
 			}
@@ -246,6 +246,8 @@
 		"height": 181.0,
 		"history":
 		[
+			"dude",
+			"import socket; socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((\"localhost\", 11433))",
 			"print(t1,t2) for t1, t2 in ll",
 			"for t1, t2 in ll: print(t1,t2)",
 			"for t1, t2 in ll: ..",
@@ -742,15 +744,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 18780,
+						"buffer_size": 20897,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								12628,
-								12628
+								12142,
+								12142
 							]
 						],
 						"settings":
@@ -768,15 +770,15 @@
 								"current_ext": ".py",
 								"current_syntax": "Python/Python",
 								"enabled": false,
-								"last_updated": 1477633344.36
+								"last_updated": 1477669424.68
 							},
 							"color_scheme": "Packages/User/Color Highlighter/themes/Material Twilight (SL).tmTheme",
 							"syntax": "Packages/Python/Python.sublime-syntax",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 33.0,
-						"translation.y": 8694.0,
+						"translation.x": 0.0,
+						"translation.y": 8487.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 1,
@@ -794,15 +796,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 18780,
+						"buffer_size": 20897,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								18536,
-								18474
+								18421,
+								18421
 							]
 						],
 						"settings":
@@ -820,7 +822,7 @@
 								"current_ext": ".py",
 								"current_syntax": "Python/Python",
 								"enabled": false,
-								"last_updated": 1477633344.36
+								"last_updated": 1477669424.68
 							},
 							"color_scheme": "Packages/User/Color Highlighter/themes/Material Twilight (SL).tmTheme",
 							"syntax": "Packages/Python/Python.sublime-syntax",
@@ -828,7 +830,7 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 14793.0,
+						"translation.y": 13983.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -865,7 +867,7 @@
 		"cols":
 		[
 			0.0,
-			0.491706161137,
+			0.450236966824,
 			1.0
 		],
 		"rows":
