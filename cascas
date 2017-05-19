@@ -1,0 +1,2 @@
+CASCAS_VERSION=0.0.1
+scala -classpath "target/CaSCAS-${CASCAS_VERSION}.jar" org.cascas_project.cascas.App
