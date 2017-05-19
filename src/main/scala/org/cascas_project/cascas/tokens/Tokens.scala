@@ -15,9 +15,22 @@ extends Tokenizeable
   def lexeme: String
 }
 
+trait NumberTokenLike {
+}
+
+trait OperatorTokenLike {
+}
+
+trait BracketTokenLike {
+}
+
+trait RelationTokenLike {
+}
+
 case class IntegerToken(
   val lexeme: String
 ) extends Token
+  with NumberTokenLike
 
 object IntegerToken {
   val regex: UnanchoredRegex = raw"^(([0-9]_?)*[0-9])".r.unanchored
@@ -26,45 +39,16 @@ object IntegerToken {
 case class DecimalToken(
   val lexeme: String
 ) extends Token
+  with NumberTokenLike
 
 object DecimalToken {
   val regex: UnanchoredRegex = raw"^(([0-9]_?)*[0-9]?\.[0-9](_?[0-9])*)".r.unanchored
 }
 
-/*
-object OperatorType extends Enumeration {
-  type OperatorType = Value
-  val OperatorPlus  = Value
-  val OperatorMinus = Value
-  val OperatorMult  = Value
-  val OperatorDiv   = Value
-  val OperatorPow   = Value
-  val OperatorBang  = Value
-}
-import OperatorType._
-
-case class OperatorToken(
-  lexeme: String,
-  whichOperator: OperatorType
-) extends Token
-
-object OperatorToken {
-  val regex: UnanchoredRegex = raw"^([\+\-\*\/\^\!])".r.unanchored
-
-  def expectedLexeme(whichOperator: OperatorType) : String = whichOperator match {
-    case OperatorPlus   => "+"
-    case OperatorMinus  => "-"
-    case OperatorMult   => "*"
-    case OperatorDiv    => "/"
-    case OperatorPow    => "^"
-    case OperatorBang   => "!"
-  }
-}
-*/
-
 case class OperatorPlusToken(
   val lexeme: String = raw"+"
 ) extends Token
+  with OperatorTokenLike
 
 object OperatorPlusToken {
   val expected: String = raw"+"
@@ -74,6 +58,7 @@ object OperatorPlusToken {
 case class OperatorMinusToken(
   val lexeme: String = raw"-"
 ) extends Token
+  with OperatorTokenLike
 
 object OperatorMinusToken {
   val expected: String = raw"-"
@@ -83,6 +68,7 @@ object OperatorMinusToken {
 case class OperatorMultToken(
   val lexeme: String = raw"*"
 ) extends Token
+  with OperatorTokenLike
 
 object OperatorMultToken {
   val expected: String = raw"*"
@@ -92,6 +78,7 @@ object OperatorMultToken {
 case class OperatorDivToken(
   val lexeme: String = raw"/"
 ) extends Token
+  with OperatorTokenLike
 
 object OperatorDivToken {
   val expected: String = raw"/"
@@ -101,6 +88,7 @@ object OperatorDivToken {
 case class OperatorPowToken(
   val lexeme: String = raw"^"
 ) extends Token
+  with OperatorTokenLike
 
 object OperatorPowToken {
   val expected: String = raw"^"
@@ -110,73 +98,17 @@ object OperatorPowToken {
 case class OperatorBangToken(
   val lexeme: String = raw"!"
 ) extends Token
+  with OperatorTokenLike
 
 object OperatorBangToken {
   val expected: String = raw"!"
   val regex: UnanchoredRegex = raw"^(\!)".r.unanchored
 }
 
-/*
-object BracketEndType extends Enumeration {
-  type BracketEndType = Value
-  val BracketLeft     = Value
-  val BracketRight    = Value
-}
-import BracketEndType._
-
-trait BracketEndable {
-  def whichEnd: BracketEndType
-}
-
-case class RoundBracketToken(
-  lexeme: String,
-  whichEnd: BracketEndType
-) extends Token
-  with BracketEndable
-
-object RoundBracketToken {
-  val regex: UnanchoredRegex = raw"^([\(\)])".r.unanchored
-
-  def expectedLexeme(whichEnd: BracketEndType): String = whichEnd match {
-    case BracketLeft  => "("
-    case BracketRight => ")"
-  }
-}
-
-case class SquareBracketToken(
-  lexeme: String,
-  whichEnd: BracketEndType
-) extends Token
-  with BracketEndable
-
-object SquareBracketToken {
-  val regex: UnanchoredRegex = raw"^([\[\]])".r.unanchored
-
-  def expectedLexeme(whichEnd: BracketEndType): String = whichEnd match {
-    case BracketLeft  => "["
-    case BracketRight => "]"
-  }
-}
-
-case class CurlyBracketToken(
-  lexeme: String,
-  whichEnd: BracketEndType
-) extends Token
-  with BracketEndable
-
-object CurlyBracketToken {
-  val regex: UnanchoredRegex = raw"^([\{\}])".r.unanchored
-
-  def expectedLexeme(whichEnd: BracketEndType): String = whichEnd match {
-    case BracketLeft  => "{"
-    case BracketRight => "}"
-  }
-}
-*/
-
 case class LeftRoundBracketToken(
   val lexeme: String = raw"("
 ) extends Token
+  with BracketTokenLike
 
 object LeftRoundBracketToken {
   val expected: String = raw"("
@@ -186,6 +118,7 @@ object LeftRoundBracketToken {
 case class RightRoundBracketToken(
   val lexeme: String = raw")"
 ) extends Token
+  with BracketTokenLike
 
 object RightRoundBracketToken {
   val expected: String = raw")"
@@ -195,6 +128,7 @@ object RightRoundBracketToken {
 case class LeftSquareBracketToken(
   val lexeme: String = raw"["
 ) extends Token
+  with BracketTokenLike
 
 object LeftSquareBracketToken {
   val expected: String = raw"["
@@ -204,6 +138,7 @@ object LeftSquareBracketToken {
 case class RightSquareBracketToken(
   val lexeme: String = raw"]"
 ) extends Token
+  with BracketTokenLike
 
 object RightSquareBracketToken {
   val expected: String = raw"]"
@@ -213,6 +148,7 @@ object RightSquareBracketToken {
 case class LeftCurlyBracketToken(
   val lexeme: String = raw"{"
 ) extends Token
+  with BracketTokenLike
 
 object LeftCurlyBracketToken {
   val expected: String = raw"{"
@@ -222,10 +158,65 @@ object LeftCurlyBracketToken {
 case class RightCurlyBracketToken(
   val lexeme: String = raw"}"
 ) extends Token
+  with BracketTokenLike
 
 object RightCurlyBracketToken {
   val expected: String = raw"}"
   val regex: UnanchoredRegex = raw"^(\})".r.unanchored
+}
+
+case class RelationLessEqualToken(
+  val lexeme: String = raw"<="
+) extends Token
+  with RelationTokenLike
+
+object RelationLessEqualToken {
+  val regex: UnanchoredRegex = raw"^(<=)".r.unanchored
+}
+
+case class RelationGreaterEqualToken(
+  val lexeme: String = raw">="
+) extends Token
+  with RelationTokenLike
+
+object RelationGreaterEqualToken {
+  val regex: UnanchoredRegex = raw"^(>=)".r.unanchored
+}
+
+case class RelationEqualToken(
+  val lexeme: String = raw"="
+) extends Token
+  with RelationTokenLike
+
+object RelationEqualToken {
+  val regex: UnanchoredRegex = raw"^(=)".r.unanchored
+}
+
+case class RelationNotEqualToken(
+  val lexeme: String = raw"!="
+) extends Token
+  with RelationTokenLike
+
+object RelationNotEqualToken {
+  val regex: UnanchoredRegex = raw"^(!=)".r.unanchored
+}
+
+case class RelationLessToken(
+  val lexeme: String = raw"<"
+) extends Token
+  with RelationTokenLike
+
+object RelationLessToken {
+  val regex: UnanchoredRegex = raw"^(<)".r.unanchored
+}
+
+case class RelationGreaterToken(
+  val lexeme: String = raw">"
+) extends Token
+  with RelationTokenLike
+
+object RelationGreaterToken {
+  val regex: UnanchoredRegex = raw"^(>)".r.unanchored
 }
 
 case class WhitespaceToken(
@@ -236,11 +227,11 @@ object WhitespaceToken {
   val regex: UnanchoredRegex = raw"^(\s+)".r.unanchored
 }
 
-case class OtherToken(
+case class WordToken(
   val lexeme: String
 ) extends Token
 
-object OtherToken {
+object WordToken {
   val regex: UnanchoredRegex = raw"^([A-Za-z_](\w)*)".r.unanchored
 }
 
