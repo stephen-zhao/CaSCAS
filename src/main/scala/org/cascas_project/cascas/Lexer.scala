@@ -51,17 +51,21 @@ class Lexer {
     }
   }
 
-  def scan(): Option[Vector[Token]] = {
-    inputRead match {
+  def scan(getInput: () => String = () => inputRead): Option[Vector[Token]] = {
+    getInput() match {
       case null => None
       case line => Some(getAllTokens(line))
     }
   }
 
-  def scanUntilEOF(): Vector[Token] = {
-    scan match {
+  def scanLine(getInput: () => String = () => inputRead): Vector[Token] = {
+    scan(getInput).getOrElse(Vector[Token]())
+  }
+
+  def scanUntilEOF(getInput: () => String = () => inputRead): Vector[Token] = {
+    scan(getInput) match {
       case None                         => Vector[Token]()
-      case Some(tokens: Vector[Token])  => tokens ++ scanUntilEOF
+      case Some(tokens: Vector[Token])  => tokens ++ scanUntilEOF()
     }
   }
 }

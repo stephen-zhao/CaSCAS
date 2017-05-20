@@ -9,7 +9,7 @@ object App {
   
   def main(args : Array[String]) {
     val lexer: Lexer = new Lexer
-    println(lexer.scanUntilEOF)
+    println(lexer.scanUntilEOF())
   }
 
 }
