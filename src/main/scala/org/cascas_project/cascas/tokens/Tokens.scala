@@ -27,6 +27,9 @@ trait BracketTokenLike {
 trait RelationTokenLike {
 }
 
+trait KeywordTokenLike {
+}
+
 case class IntegerToken(
   val lexeme: String
 ) extends Token
@@ -259,3 +262,11 @@ object WordToken {
   val regex: UnanchoredRegex = raw"""^([A-Za-z_](\w)*)""".r.unanchored
 }
 
+case class KeywordDefToken(
+  val lexeme: String = raw"""def"""
+) extends Token
+  with KeywordTokenLike
+
+object KeywordDefToken {
+  val expected: String = raw"""def"""
+}

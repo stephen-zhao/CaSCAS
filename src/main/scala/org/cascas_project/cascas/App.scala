@@ -9,7 +9,8 @@ object App {
   
   def main(args : Array[String]) {
     val lexer: Lexer = new Lexer
-    println(lexer.scanUntilEOF())
+    val parser: Parser = new Parser
+    println(parser.withoutEsophagi(lexer.scanUntilEOF()))
   }
 
 }

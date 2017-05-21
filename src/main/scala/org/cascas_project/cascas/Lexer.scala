@@ -49,7 +49,10 @@ class Lexer {
         // Assignment operator token
         case AssignmentToken.regex(s)           => AssignmentToken()
         // WordTokens, i.e. identifiers, function names, symbols, variables, etc
-        case WordToken.regex(s, _*)             => WordToken(s)
+        case WordToken.regex(s, _*)             => s match {
+          case KeywordDefToken.expected => KeywordDefToken()
+          case _                        => WordToken(s)
+        }
         // Error case
         case _                                  => sys.error(f"ERROR: Cannot tokenize $line")
       }
