@@ -42,6 +42,12 @@ class Lexer {
         case RelationNotEqualToken.regex(s)     => RelationNotEqualToken()
         case RelationGreaterToken.regex(s)      => RelationGreaterToken()
         case RelationLessToken.regex(s)         => RelationLessToken()
+        // Comma tokens
+        case CommaToken.regex(s)                => CommaToken()
+        // Comments
+        case CommentToken.regex(s)              => CommentToken(s)
+        // Assignment operator token
+        case AssignmentToken.regex(s)           => AssignmentToken()
         // WordTokens, i.e. identifiers, function names, symbols, variables, etc
         case WordToken.regex(s, _*)             => WordToken(s)
         // Error case
