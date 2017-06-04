@@ -1,2 +1,5 @@
 CASCAS_VERSION=0.0.1
-scala -classpath "target/CaSCAS-${CASCAS_VERSION}.jar" org.cascas_project.cascas.App
+if [ -z "${CASCAS_PROJECT_DIR}" ]; then
+    CASCAS_PROJECT_DIR="."
+fi
+scala -classpath "${CASCAS_PROJECT_DIR}/target/CaSCAS-${CASCAS_VERSION}.jar" org.cascas_project.cascas.App

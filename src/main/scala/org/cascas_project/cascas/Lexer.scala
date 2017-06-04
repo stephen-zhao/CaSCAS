@@ -19,8 +19,8 @@ class Lexer {
         // Whitespace tokens
         case WhitespaceToken.regex(s, _*)       => WhitespaceToken(s)
         // NumberTokenLike tokens
-        case IntegerToken.regex(s, _*)          => IntegerToken(s)
         case DecimalToken.regex(s, _*)          => DecimalToken(s)
+        case IntegerToken.regex(s, _*)          => IntegerToken(s)
         // OperatorTokenLike tokens
         case OperatorPlusToken.regex(s)         => OperatorPlusToken()
         case OperatorMinusToken.regex(s)        => OperatorMinusToken()
@@ -50,7 +50,7 @@ class Lexer {
         case AssignmentToken.regex(s)           => AssignmentToken()
         // WordTokens, i.e. identifiers, function names, symbols, variables, etc
         case WordToken.regex(s, _*)             => s match {
-          case KeywordDefToken.expected => KeywordDefToken()
+          //case KeywordDefToken.expected => KeywordDefToken()
           case _                        => WordToken(s)
         }
         // Error case
