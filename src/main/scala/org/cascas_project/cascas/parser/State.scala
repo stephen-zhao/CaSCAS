@@ -1,8 +1,5 @@
 package org.cascas_project.cascas.parser
 
-import org.cascas_project.cascas.parser.CFG
-import org.cascas_project.cascas.parser.Item
-
 class State(
   val id: Int,
   val name: String,
@@ -10,15 +7,18 @@ class State(
 ) {
 
   var items: Set[Item] = Set[Item]()
-  var childStates: Map[Symbol, State] = Map[Symbol, State]();
+  var childStates: Map[Symbol, State] = Map[Symbol, State]()
 
   def generateChildStatesFromItems(): Unit = {
+    println(f"Start Generating child states for ${this.name}")
     var visitedSymbols = Set[Symbol]()
     for (item <- this.items) {
       item.nextSymbol match {
         case Some(nextSymbol) => {
           if (!(visitedSymbols contains nextSymbol)) {
-            makeNewChildState(nextSymbol)
+            println(f"  Generating child state for $item")
+            println(f"    with transition $nextSymbol")
+            this.childStates += (nextSymbol -> State.create(nextSymbol))
             visitedSymbols += nextSymbol
           }
           this.childStates(nextSymbol).addItemAndPopulate(item.advanceMarker)
@@ -26,21 +26,19 @@ class State(
         case None =>
       }
     }
-  }
-
-  def makeNewChildState(transition: Symbol): Unit = {
-    val id = State.getUniqueStateId
-    this.childStates += (transition -> new State(id, f"State_$id%4d", transition))
+    println(f"Finished Generateing child states for ${this.name}")
+    println(f"${this.childStates}")
   }
 
   def addItemAndPopulate(item: Item): Unit = {
     this.items += item
     item.nextSymbol match {
       case Some(nextSymbol) if (CFG.nonterminals contains nextSymbol) => {
-        val autoAddItems = getItemsWhereLHSIs(nextSymbol)
+        //val autoAddItems = this.getItemsWhereLHSIs(nextSymbol)
+        val autoAddItems = CFG.rules.collect{ case (nextSymbol, v: Vector[Symbol]) => new Item(nextSymbol, v, 0) }
         for (autoItem <- autoAddItems) {
           if (!(this.items contains autoItem)) {
-            addItemAndPopulate(autoItem)
+           this.addItemAndPopulate(autoItem)
           }
         }
       }
@@ -48,17 +46,26 @@ class State(
     }
   }
 
+  def reduceChildStates(lrmg: LRMachineGenerator): Unit = {
+    for ((transition, state) <- this.childStates) {
+      this.childStates += (transition -> lrmg.checkReduceRegisterReturnState(state))
+    }
+  }
+
   def isLastItemState(): Boolean = {
     this.items.head.isAtEnd
   }
 
-  def recursivelyGenerateChildStates(): Unit = {
+  def recursivelyGenerateChildStates(lrmg: LRMachineGenerator): Unit = {
+    println(f"Recursively generating child states for ${this.name}")
+    println(f"    Transition in is ${this.transition}")
     this.generateChildStatesFromItems
-    this.childStates.foreach(kvp => kvp._2.recursivelyGenerateChildStates)
+    this.reduceChildStates(lrmg)
+    this.childStates.foreach(kvp => kvp._2.recursivelyGenerateChildStates(lrmg))
   }
 
   def getItemsWhereLHSIs(nextSymbol: Symbol): Set[Item] = {
-    CFG.rules.collect{ case (nextSymbol, v: Vector[Symbol]) => Item(nextSymbol, v, 0) }
+    CFG.rules.collect{ case (nextSymbol, v: Vector[Symbol]) => new Item(nextSymbol, v, 0) }
   }
 
 }
@@ -72,17 +79,13 @@ object State {
     stateIdCounter
   }
 
-  def makeInitialState(): State = {
+  def create(transition: Symbol): State = {
     val id = State.getUniqueStateId
-    var res = new State(id, f"State_$id%4d", CFG.start)
-    res.items ++= CFG.getStartingItems
-    res
+    new State(id, f"State_$id%04d", transition)
   }
-
-  def makeStateGraph(): State = {
-    var res = State.makeInitialState
-    res.recursivelyGenerateChildStates
-    res
+  
+  def isContainSameItems(state1: State, state2: State): Boolean = {
+    false
   }
 
 }

@@ -1,7 +1,5 @@
 package org.cascas_project.cascas.parser
 
-import org.cascas_project.cascas.parser.Item
-
 object CFG {
   type Rule = (Symbol, Vector[Symbol])
   type RuleSet = Set[Rule]
@@ -49,8 +47,8 @@ object CFG {
     ('AParams,    Vector('Expr))
   )
 
-  def getStartingItems(): Set[Item] = {
-    rules.collect{ case ('Statement, v: Vector[Symbol]) => Item('Statement, v, 0) }
+  def getStartingRules(): Set[Rule] = {
+    rules.collect{ case rule @ ('Statement, v: Vector[Symbol]) => rule }
   }
 
   def start(): Symbol = {

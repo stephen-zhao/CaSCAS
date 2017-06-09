@@ -1,8 +1,5 @@
 package org.cascas_project.cascas.parser
 
-import org.cascas_project.cascas.parser.CFG
-import org.cascas_project.cascas.parser.ParseNode
-import org.cascas_project.cascas.parser.State
 import org.cascas_project.cascas.tokens.Token
 
 case class LRMachine(
@@ -28,11 +25,14 @@ case class LRMachine(
 
       currentState.childStates.get(input.symbol) match {
         case Some(nextState) => {
+          println(f"Transition from currentState ${currentState.id} with symbol ${input.symbol} exists!")
+          println(f"nextState=(${nextState.id}, ${nextState.transition})")
           expression = expression.tail
           stateStack = nextState :: stateStack
           derivStack = new TerminalNode(Symbol(input.lexeme), input) :: derivStack
         }
         case None => {
+          println(f"Transition from currentState ${currentState.id} with symbol ${input.symbol} does not exist!")
           if (currentState.isLastItemState) {
             var nodesToAdd: Vector[ParseNode] = Vector[ParseNode]()
             for (symbol <- currentState.items.head.rhs.reverse) {
