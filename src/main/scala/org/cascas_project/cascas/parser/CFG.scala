@@ -1,14 +1,21 @@
+//=============================================================================
+// CFG.scala : CaSCAS Project
+//=============================================================================
 package org.cascas_project.cascas.parser
 
 object CFG {
+
   type Rule = (Symbol, Vector[Symbol])
   type RuleSet = Set[Rule]
   
-  val nonterminals: Set[Symbol] = Set('Statement, 'Assign, 'Expr, 'Set, 'SetIn, 'MathExpr, 'Term, 'Factor, 'FnCall, 'Num, 'FParams, 'AParams)
+  val nonterminals: Set[Symbol] = 
+    Set('Statement, 'Assign, 'Expr, 'Set, 'SetIn, 'MathExpr, 'Term, 
+        'Factor, 'FnCall, 'Num, 'FParams, 'AParams)
   
-  val terminals: Set[Symbol] = Set('WORD, 'INT, 'FLOAT, 'COMMA, 'LRBRACK, 'RRBRACK, 'LCBRACK, 'RCBRACK, 'ASSIGN, 'EQ, 'NEQ, 'GT, 'LT, 'GTE, 'LTE, 'PLUS, 'MINUS, 'STAR, 'SLASH, 'BANG, 'POW)
-
-  //val terminals_: Set[Symbol] = terminals ++ Set('_, 'BOF, 'EOF)
+  val terminals: Set[Symbol] = 
+    Set('WORD, 'INT, 'FLOAT, 'COMMA, 'LRBRACK, 'RRBRACK, 'LCBRACK, 'RCBRACK, 
+        'ASSIGN, 'EQ, 'NEQ, 'GT, 'LT, 'GTE, 'LTE, 'PLUS, 'MINUS, 'STAR, 
+        'SLASH, 'BANG, 'POW)
 
   val rules: RuleSet = Set[Rule](
     ('Statement,  Vector('Assign)),

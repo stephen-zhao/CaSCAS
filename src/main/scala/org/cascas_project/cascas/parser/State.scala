@@ -1,4 +1,10 @@
+//=============================================================================
+// State.scala : CaSCAS Project
+//=============================================================================
+
 package org.cascas_project.cascas.parser
+
+import org.cascas_project.cascas.Logger
 
 class State(
   val id: Int,
@@ -10,14 +16,14 @@ class State(
   var childStates: Map[Symbol, State] = Map[Symbol, State]()
 
   def generateChildStatesFromItems(): Unit = {
-    println(f"Start Generating child states for ${this.name}")
+    Logger.info('LRMG, f"Start Generating child states for ${this.name}")
     var visitedSymbols = Set[Symbol]()
     for (item <- this.items) {
       item.nextSymbol match {
         case Some(nextSymbol) => {
           if (!(visitedSymbols contains nextSymbol)) {
-            println(f"  Generating child state for $item")
-            println(f"    with transition $nextSymbol")
+            Logger.info('LRMG, f"  Generating child state for $item")
+            Logger.info('LRMG, f"    with transition $nextSymbol")
             this.childStates += (nextSymbol -> State.create(nextSymbol))
             visitedSymbols += nextSymbol
           }
@@ -26,8 +32,8 @@ class State(
         case None =>
       }
     }
-    println(f"Finished Generateing child states for ${this.name}")
-    println(f"${this.childStates}")
+    Logger.info('LRMG, f"Finished Generateing child states for ${this.name}")
+    Logger.info('LRMG, f"${this.childStates}")
   }
 
   def addItemAndPopulate(item: Item): Unit = {
@@ -57,8 +63,8 @@ class State(
   }
 
   def recursivelyGenerateChildStates(lrmg: LRMachineGenerator): Unit = {
-    println(f"Recursively generating child states for ${this.name}")
-    println(f"    Transition in is ${this.transition}")
+    Logger.info('LRMG, f"Recursively generating child states for ${this.name}")
+    Logger.info('LRMG, f"    Transition in is ${this.transition}")
     this.generateChildStatesFromItems
     this.reduceChildStates(lrmg)
     this.childStates.foreach(kvp => kvp._2.recursivelyGenerateChildStates(lrmg))

@@ -1,3 +1,7 @@
+//=============================================================================
+// LRMachineGenerator.scala : CaSCAS Project
+//=============================================================================
+
 package org.cascas_project.cascas.parser
 
 import scala.collection.mutable.ArrayBuffer

@@ -1,3 +1,7 @@
+//=============================================================================
+// Parser.scala : CaSCAS Project
+//=============================================================================
+
 package org.cascas_project.cascas.parser
 
 import org.cascas_project.cascas.tokens._

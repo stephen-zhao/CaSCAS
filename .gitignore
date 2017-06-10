@@ -36,6 +36,12 @@ build.log
 # temporary files
 *.swp
 
+# log files
+log/
+
+# working files
+working/
+
 # switch to regexp syntax.
 #  syntax: regexp
 #  ^\.pc/
