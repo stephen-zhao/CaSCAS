@@ -101,18 +101,18 @@ class Lexer {
     StdIn.readLine()
   }
 
-  def scan(getInput: () => String = () => inputRead): Option[Vector[Token]] = {
-    getInput() match {
+  def scan(getInput: => String = inputRead): Option[Vector[Token]] = {
+    getInput match {
       case null => None
       case line => Some(getAllTokens(line))
     }
   }
 
-  def scanLine(getInput: () => String = () => inputRead): Vector[Token] = {
+  def scanLine(getInput: => String = inputRead): Vector[Token] = {
     scan(getInput).getOrElse(Vector[Token]())
   }
 
-  def scanUntilEOF(getInput: () => String = () => inputRead): Vector[Token] = {
+  def scanUntilEOF(getInput: => String = inputRead): Vector[Token] = {
     scan(getInput) match {
       case None                         => Vector[Token]()
       case Some(tokens: Vector[Token])  => tokens ++ scanUntilEOF()

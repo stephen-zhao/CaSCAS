@@ -32,6 +32,7 @@ case class LRMachine(
     // Make tokens mutable
     var mtokens: Seq[Token] = tokens
 
+
     def whenTokenInputBad(): Unit = {
       
       Logger.verbose('LRM, f"Checking deriv stack for input")
