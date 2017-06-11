@@ -4,6 +4,8 @@
 
 package org.cascas_project.cascas.parser
 
+import scala.collection.mutable.{Map => MMap}
+
 import org.cascas_project.cascas.Logger
 
 class State(
@@ -13,7 +15,11 @@ class State(
 {
 
   var items: Set[Item] = Set[Item]()
-  var childStates: Map[Symbol, State] = Map[Symbol, State]()
+  var childStates: MMap[Symbol, State] = MMap[Symbol, State]()
+
+  override def toString(): String = {
+    f"${this.transition} -> ${this.name}\nItems:\n  ${items.mkString("\n  ")}\nChildren:\n  ${childStates.map(kvp => f"${kvp._1} -> ${kvp._2.name}").mkString("\n  ")}"
+  }
 
   def generateChildStatesFromItems(): Unit = {
     Logger.info('LRMG, f"Start Generating child states for ${this.name}")
@@ -22,26 +28,30 @@ class State(
       item.nextSymbol match {
         case Some(nextSymbol) => {
           if (!(visitedSymbols contains nextSymbol)) {
-            Logger.info('LRMG, f"  Generating child state for $item")
-            Logger.info('LRMG, f"    with transition $nextSymbol")
+            Logger.verbose('LRMG, f"  Generating child state for $item")
+            Logger.verbose('LRMG, f"    with transition $nextSymbol")
             this.childStates += (nextSymbol -> State.create(nextSymbol))
             visitedSymbols += nextSymbol
+            Logger.verbose('LRMG, f"    and name #### ${this.childStates(nextSymbol).name}")
           }
           this.childStates(nextSymbol).addItemAndPopulate(item.advanceMarker)
         }
         case None =>
       }
     }
-    Logger.info('LRMG, f"Finished Generateing child states for ${this.name}")
-    Logger.info('LRMG, f"${this.childStates}")
+    Logger.verbose('LRMG, f"Finished Generating child states for ${this.name}")
   }
 
   def addItemAndPopulate(item: Item): Unit = {
+    Logger.verbose('LRMG, f"    Adding item $item to state ${this.name}")
     this.items += item
     item.nextSymbol match {
       case Some(nextSymbol) if (CFG.nonterminals contains nextSymbol) => {
-        //val autoAddItems = this.getItemsWhereLHSIs(nextSymbol)
-        val autoAddItems = CFG.rules.collect{ case (nextSymbol, v: Vector[Symbol]) => new Item(nextSymbol, v, 0) }
+        val autoAddItems = CFG.rules.collect { 
+          case (transition, v: Vector[Symbol]) if (transition == nextSymbol) => {
+            new Item(nextSymbol, v, 0)
+          }
+        }
         for (autoItem <- autoAddItems) {
           if (!(this.items contains autoItem)) {
            this.addItemAndPopulate(autoItem)
@@ -79,11 +89,11 @@ object State {
 
   def create(transition: Symbol): State = {
     val id = State.getUniqueStateId
-    new State(id, f"State_$id%04d", transition)
+    new State(id, f"State_$id%05d", transition)
   }
   
   def isContainSameItems(state1: State, state2: State): Boolean = {
-    false
+    state1.items == state2.items
   }
 
 }

@@ -17,6 +17,17 @@ object CFG {
         'ASSIGN, 'EQ, 'NEQ, 'GT, 'LT, 'GTE, 'LTE, 'PLUS, 'MINUS, 'STAR, 
         'SLASH, 'BANG, 'POW)
 
+  // A smaller set of rules to test LRMachine Generation
+  //val rules: RuleSet = Set[Rule](
+  //  ('Statement,  Vector('Assign)),
+  //  ('Statement,  Vector('Expr)),
+  //  ('Assign,     Vector('ID, 'ASSIGN, 'INT)),
+  //  ('Expr,       Vector('Factor, 'PLUS, 'Factor)),
+  //  ('Factor,     Vector('INT)),
+  //  ('Factor,     Vector('WORD)),
+  //  ('Factor,     Vector('LRBRACK, 'Statement, 'RRBRACK))
+  //)
+
   val rules: RuleSet = Set[Rule](
     ('Statement,  Vector('Assign)),
     ('Statement,  Vector('Expr)),
