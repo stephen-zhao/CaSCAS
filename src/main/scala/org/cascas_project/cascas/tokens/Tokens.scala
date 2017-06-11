@@ -288,6 +288,14 @@ object WordToken {
   val regex: UnanchoredRegex = raw"""^([A-Za-z_](\w)*)""".r.unanchored
 }
 
+case class EndOfLineToken(
+  val lexeme: String = "\n",
+  val symbol: Symbol = 'EOL
+) extends Token
+
+object EndOfLineToken {
+}
+
 //case class KeywordDefToken(
 //  val lexeme: String = raw"""def"""
 //) extends Token

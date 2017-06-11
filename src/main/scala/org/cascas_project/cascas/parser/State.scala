@@ -69,7 +69,7 @@ class State(
   }
 
   def isLastItemState(): Boolean = {
-    this.items.head.isAtEnd
+    this.items.exists(_.isAtEnd)
   }
 
   def getItemsWhereLHSIs(nextSymbol: Symbol): Set[Item] = {
@@ -89,7 +89,7 @@ object State {
 
   def create(transition: Symbol): State = {
     val id = State.getUniqueStateId
-    new State(id, f"State_$id%05d", transition)
+    new State(id, f"State_$id%04d", transition)
   }
   
   def isContainSameItems(state1: State, state2: State): Boolean = {

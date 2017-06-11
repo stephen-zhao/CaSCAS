@@ -30,6 +30,7 @@ object Logger {
         'CONFIG -> "CONFIG",
         'LEXER  -> "LEXER",
         'LRMG   -> "LRMG",
+        'LRM    -> "LRM",
         'PARSER -> "PARSER")
 
   class Logger {
