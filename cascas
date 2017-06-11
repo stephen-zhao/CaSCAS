@@ -9,7 +9,7 @@ if [ -z "${CASCAS_PROJECT_DIR}" ]; then
     export CASCAS_PROJECT_DIR="."
 fi
 
-# Checks if user config directory exists and set appropriately
+# Checks if cascas config directory exists and set appropriately
 if [ "${CASCAS_ENV}" == "develop" ]; then
     export CASCAS_CONFIG_DIR="${CASCAS_PROJECT_DIR}/config"
 elif [ "${CASCAS_ENV}" == "release" ]; then
@@ -24,6 +24,7 @@ fi
 if [ ! -d "${CASCAS_CONFIG_DIR}" ]; then
     mkdir "${CASCAS_CONFIG_DIR}"
 fi
+export CASCAS_CONFIG_INI="${CASCAS_CONFIG_DIR}/cascas.ini"
 
 # Sets the logging directory where all log files will be saved if it isn't defined
 if [ -z "${CASCAS_LOGGING_DIR}" ]; then
@@ -42,4 +43,4 @@ if [ ! -d "${CASCAS_WORKING_DIR}" ]; then
 fi
 
 # Run CaSCAS
-scala -classpath "${CASCAS_PROJECT_DIR}/target/CaSCAS-${CASCAS_VERSION}.jar" org.cascas_project.cascas.App | tee "${CASCAS_LOGGING_DIR}/cascas_"$(date +"%Y%m%d_%H%M%S")".log"
+scala -classpath "${CASCAS_PROJECT_DIR}/target/CaSCAS-${CASCAS_VERSION}.jar" org.cascas_project.cascas.App "$@" | tee "${CASCAS_LOGGING_DIR}/cascas_"$(date +"%Y%m%d_%H%M%S")".log"

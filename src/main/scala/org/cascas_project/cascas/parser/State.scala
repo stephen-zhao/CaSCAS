@@ -9,8 +9,8 @@ import org.cascas_project.cascas.Logger
 class State(
   val id: Int,
   val name: String,
-  val transition: Symbol
-) {
+  val transition: Symbol)
+{
 
   var items: Set[Item] = Set[Item]()
   var childStates: Map[Symbol, State] = Map[Symbol, State]()
@@ -60,14 +60,6 @@ class State(
 
   def isLastItemState(): Boolean = {
     this.items.head.isAtEnd
-  }
-
-  def recursivelyGenerateChildStates(lrmg: LRMachineGenerator): Unit = {
-    Logger.info('LRMG, f"Recursively generating child states for ${this.name}")
-    Logger.info('LRMG, f"    Transition in is ${this.transition}")
-    this.generateChildStatesFromItems
-    this.reduceChildStates(lrmg)
-    this.childStates.foreach(kvp => kvp._2.recursivelyGenerateChildStates(lrmg))
   }
 
   def getItemsWhereLHSIs(nextSymbol: Symbol): Set[Item] = {

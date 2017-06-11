@@ -26,26 +26,27 @@ object Logger {
 
   private val tagMap: Map[Tag, String] = 
     Map('APP    -> "CASCAS", 
+        'UTIL   -> "UTIL",
+        'CONFIG -> "CONFIG",
         'LEXER  -> "LEXER",
         'LRMG   -> "LRMG",
         'PARSER -> "PARSER")
 
   class Logger {
 
-    private var tagSeverityMap: Map[Tag, Severity] = Map[Tag, Severity]()
+    private var tagToMaxSeverity: Map[Tag, Severity] = Map[Tag, Severity]()
 
     private def isLoggingActiveFor(severity: Severity, tag: Tag): Boolean = {
-      if (this.tagSeverityMap.isEmpty) {
+      if (this.tagToMaxSeverity.isEmpty) {
         tag match {
-          case _ => {
-            severityMap(severity)._1 <= severityMap('WARNING)._1
-          }
+          case 'APP => severityMap(severity)._1 <= severityMap('INFO)._1
+          case _    => severityMap(severity)._1 <= severityMap('WARNING)._1
         }
       }
       else {
-        this.tagSeverityMap.get(tag) match {
+        this.tagToMaxSeverity.get(tag) match {
           case None => {
-            severityMap(tag)._1 <= severityMap('WARNING)._1
+            severityMap(severity)._1 <= severityMap('WARNING)._1
           }
           case Some(maxSeverity) => {
             severityMap(severity)._1 <= severityMap(maxSeverity)._1
@@ -56,7 +57,7 @@ object Logger {
 
     def setTagMaxSeverity(tag: Tag, severity: Severity): Unit = {
       require(tagMap contains tag)
-      this.tagSeverityMap += (tag -> severity)
+      this.tagToMaxSeverity += (tag -> severity)
     }
 
     def write(severity: Severity, tag: Tag, msg: String): Unit = {
@@ -75,7 +76,7 @@ object Logger {
 
   private def createDefaultInstance(): Logger = {
     var logger = new Logger()
-    
+    Config("Logger").foreach((kvp) => logger.setTagMaxSeverity(Symbol(kvp._1), Symbol(kvp._2)))
     logger
   }
  

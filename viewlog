@@ -1,0 +1,3 @@
+LOG_FILE="$(ls log -1 | tail -1)"
+
+$EDITOR "log/${LOG_FILE}"
