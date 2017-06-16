@@ -6,6 +6,7 @@ package org.cascas_project.cascas
 
 import scala.annotation._
 import scala.io.StdIn
+import scala.Console.{RESET, BOLD, UNDERLINED, println}
 import org.cascas_project.cascas.parser.Parser
 
 //=============================================================================
@@ -51,7 +52,7 @@ object App {
     lexer: Lexer = new Lexer,
     parser: Parser = new Parser
   ): Unit = {
-    print(f"[$lineNum]: ")
+    print(f"${RESET}${BOLD}${UNDERLINED}In[$lineNum]:${RESET} ")
     lexer.scanLine() match {
       case Vector() => Logger.info('APP, "Empty input")
       case lineAsTokens => {
@@ -59,7 +60,7 @@ object App {
         val lineAsParseTree = parser.parse(parser.withoutEsophagi(lineAsTokens))
         // TODO: Do stuff with the tokens
         // for now, the parse tree is just get printed to the screen
-        println(lineAsParseTree)
+        println(f"${RESET}${BOLD}${UNDERLINED}Out[$lineNum]:${RESET} $lineAsParseTree")
         
         // continue to the next iteration of the loop
         repl(lineNum + 1, lexer, parser)

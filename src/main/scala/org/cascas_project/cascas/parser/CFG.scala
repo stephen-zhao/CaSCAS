@@ -9,13 +9,13 @@ object CFG {
   type RuleSet = Set[Rule]
   
   val nonterminals: Set[Symbol] = 
-    Set('Statement, 'Assign, 'Expr, 'Set, 'SetIn, 'MathExpr, 'Term, 
+    Set('Statement, 'Assign, 'Expr, 'Set, 'SetIn, 'List, 'ListIn, 'MathExpr, 'Term, 
         'Factor, 'FnCall, 'Num, 'FParams, 'AParams)
   
   val terminals: Set[Symbol] = 
-    Set('WORD, 'INT, 'FLOAT, 'COMMA, 'LRBRACK, 'RRBRACK, 'LCBRACK, 'RCBRACK, 
-        'ASSIGN, 'EQ, 'NEQ, 'GT, 'LT, 'GTE, 'LTE, 'PLUS, 'MINUS, 'STAR, 
-        'SLASH, 'BANG, 'POW)
+    Set('WORD, 'INT, 'FLOAT, 'COMMA, 'LRBRACK, 'RRBRACK, 'LCBRACK, 'RCBRACK,
+        'LSBRACK, 'RSBRACK, 'ASSIGN, 'EQ, 'NEQ, 'GT, 'LT, 'GTE, 'LTE, 'PLUS,
+        'MINUS, 'STAR, 'SLASH, 'BANG, 'POW)
 
   // A smaller set of rules to test LRMachine Generation
   //val rules: RuleSet = Set[Rule](
@@ -39,12 +39,17 @@ object CFG {
     ('Expr,       Vector('MathExpr, 'LT, 'MathExpr)),
     ('Expr,       Vector('MathExpr, 'GE, 'MathExpr)),
     ('Expr,       Vector('MathExpr, 'LE, 'MathExpr)),
-    ('Expr,       Vector('MathExpr)),
     ('Expr,       Vector('Set)),
+    ('Expr,       Vector('List)),
+    ('Expr,       Vector('MathExpr)),
     ('Set,        Vector('LCBRACK, 'RCBRACK)),
     ('Set,        Vector('LCBRACK, 'SetIn, 'RCBRACK)),
-    ('SetIn,      Vector('Expr, 'COMMA, 'SetIn)),
+    ('SetIn,      Vector('SetIn, 'COMMA, 'Expr)),
     ('SetIn,      Vector('Expr)),
+    ('List,       Vector('LSBRACK, 'RSBRACK)),
+    ('List,       Vector('LSBRACK, 'ListIn, 'RSBRACK)),
+    ('ListIn,     Vector('ListIn, 'COMMA, 'Expr)),
+    ('ListIn,     Vector('Expr)),
     ('MathExpr,   Vector('MathExpr, 'PLUS, 'Term)),
     ('MathExpr,   Vector('MathExpr, 'MINUS, 'Term)),
     ('MathExpr,   Vector('Term)),
