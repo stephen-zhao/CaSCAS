@@ -27,10 +27,7 @@ object App {
     try {
       Logger.info('APP, "CaSCAS is starting up.")
 
-      val lexer: Lexer = new Lexer
-      val parser: Parser = new Parser
-      
-      repl()
+      (new Interpreter).repl()
 
       Logger.info('APP, "CaSCAS has terminated successfully.")
     }
@@ -39,31 +36,6 @@ object App {
       case e: Throwable => {
         Logger.exception('APP, e)
         Logger.error('APP, "CaSCAS has terminated unexpectedly.")
-      }
-    }
-  }
-
-  //===========================================================================
-  // REPL
-  //
-  @tailrec
-  def repl(
-    lineNum: Int = 0,
-    lexer: Lexer = new Lexer,
-    parser: Parser = new Parser
-  ): Unit = {
-    print(f"${RESET}${BOLD}${UNDERLINED}In[$lineNum]:${RESET} ")
-    lexer.scanLine() match {
-      case Vector() => Logger.info('APP, "Empty input")
-      case lineAsTokens => {
-
-        val lineAsParseTree = parser.parse(parser.withoutEsophagi(lineAsTokens))
-        // TODO: Do stuff with the tokens
-        // for now, the parse tree is just get printed to the screen
-        println(f"${RESET}${BOLD}${UNDERLINED}Out[$lineNum]:${RESET} $lineAsParseTree")
-        
-        // continue to the next iteration of the loop
-        repl(lineNum + 1, lexer, parser)
       }
     }
   }

@@ -31,7 +31,8 @@ object Logger {
         'LEXER  -> "LEXER",
         'LRMG   -> "LRMG",
         'LRM    -> "LRM",
-        'PARSER -> "PARSER")
+        'PARSER -> "PARSER",
+        'REPL   -> "REPL")
 
   class Logger {
 
