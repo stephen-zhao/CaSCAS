@@ -31,7 +31,8 @@ object Logger {
         'LEXER  -> "LEXER",
         'LRMG   -> "LRMG",
         'LRM    -> "LRM",
-        'PARSER -> "PARSER")
+        'PARSER -> "PARSER",
+        'REPL   -> "REPL")
 
   class Logger {
 
@@ -67,7 +68,7 @@ object Logger {
       if (this.isLoggingActiveFor(severity, tag)) {
         val now = Calendar.getInstance.getTime
         val time = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")).format(now)
-        println(f"[$time][${severityMap(severity)._2}][${tagMap(tag)}] $msg")
+        Console.err.println(f"[$time][${severityMap(severity)._2}][${tagMap(tag)}] $msg")
       }
     }
     
