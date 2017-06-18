@@ -7,15 +7,56 @@ package org.cascas_project.cascas
 import scala.annotation._
 import scala.io.StdIn
 import scala.Console.{RESET, BOLD, UNDERLINED, println}
-import org.cascas_project.cascas.parser.Parser
+import org.cascas_project.cascas.parser.{Parser, ParseNode}
 
+//=============================================================================
+// TopLevelInterpretable trait
+//
+// Objects with this trait can be interpreted by the top level interpreter
+//
+trait TopLevelInterpretable {
+  type TopLevelInterpretation = Symbol
+  def interpretAsKind: TopLevelInterpretation
+}
+
+//=============================================================================
+// Interpreter class
+//
+// Represents the interpreter, which works through a REP loop statement-by-
+// -statement.
+//
 class Interpreter {
 
   var lexer: Lexer = new Lexer
   var parser: Parser = new Parser
+  
+  var globalScope: Scope = new Scope
 
   def repl(): Unit = {
     replrec()
+  }
+
+  def interpret(parseTree: TopLevelInterpretable): String = parseTree match {
+    case _ if (parseTree.interpretAsKind == 'AssignmentInterpretation) => {
+      interpretAsAssignment(parseTree)
+    }
+    case _ if (parseTree.interpretAsKind == 'ExpressionInterpretation) => {
+      interpretAsExpression(parseTree)
+    }
+  }
+
+  def interpretAsAssignment(parseTree: TopLevelInterpretable): String = {
+    ""
+    //TODO: do assignment to Scope, then return human-readable form indicating
+    //      assignment was successful
+    //
+  }
+
+  def interpretAsExpression(parseTree: TopLevelInterpretable): String = {
+    ""
+    //TODO: evaluate the expression, then return human-readable form of the
+    //      evaluated expression
+    //
   }
 
   @tailrec
@@ -27,26 +68,28 @@ class Interpreter {
 
     print(f"${RESET}${BOLD}${UNDERLINED}In[$lineNum]:${RESET} ")
 
-    lexer.scanLine() match {
+    this.lexer.scanLine() match {
       case Vector() => Logger.info('REPL, "Empty input.")
       case lineAsTokens => {
 
         Logger.info('REPL, "Input string interpretted as tokens.")
         Logger.verbose('REPL, "Tokens are: \n" + lineAsTokens)
 
-        val lineAsParseTree = parser.parse(parser.withoutEsophagi(lineAsTokens))
+        val lineAsParseTree = this.parser.parse(parser.withoutUnparseables(lineAsTokens))
         
         Logger.info('REPL, "Input tokens parsed as tree")
         Logger.verbose('REPL, "Tree is:\n" + lineAsParseTree)
 
+        val resultAsString = this.interpret(lineAsParseTree)
+        
         // TODO: Do stuff with the tokens
         // for now, the parse tree is just get printed to the screen
-        println(f"${RESET}${BOLD}${UNDERLINED}Out[$lineNum]:${RESET} $lineAsParseTree")
+        println(f"${RESET}${BOLD}${UNDERLINED}Out[$lineNum]:${RESET} $resultAsString")
         
         Logger.info('REPL, "Continuuing to next line of input.")
 
         // continue to the next iteration of the loop
-        replrec(lineNum + 1)
+        this.replrec(lineNum + 1)
       }
     }
   }

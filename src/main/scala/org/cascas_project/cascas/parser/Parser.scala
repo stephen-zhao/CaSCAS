@@ -11,11 +11,11 @@ class Parser {
 
   val lrm: LRMachine = new LRMachineGenerator().generate
 
-  def parse(tokens: Seq[Token]): ParseNode = {
-    lrm.rightmostDerive(tokens)
+  def parse(tokens: Seq[Token]): ParseTree = {
+    new ParseTree(lrm.rightmostDerive(tokens))
   }
 
-  def withoutEsophagi(tokens: Vector[Token]): Vector[Token] = {
+  def withoutUnparseables(tokens: Vector[Token]): Vector[Token] = {
     tokens.filter(t => t match { 
       case _: WhitespaceToken   => false
       case _: CommentToken      => false
