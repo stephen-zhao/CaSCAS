@@ -19,7 +19,7 @@ object App {
   //
   def main(args : Array[String]): Unit = {
 
-    Logger.info('APP, f"""running "${("CaSCAS" /: args)((x,y) => " " + x + y)}"""")
+    Logger.info('APP, f"""running "CaSCAS${if (args.length > 0) (" " /: args)((x,y) => x + " " + y) else ""}"""")
     
     // Catch program level exceptions
     // Bad practice to use try blocks in Scala
