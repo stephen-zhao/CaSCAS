@@ -9,32 +9,102 @@ abstract class MathObj {
 	
 }
 
-class FunctionNode extends MathObj with Algebraic {
-	val fn: String,
-	val params: scala.collection.mutable[MathObj]
+/*
+generic free in template:
+
+def free (id : Identifier) : Boolean = {
+    for param in params {
+	    if not param.free(id)
+		return false
+	}
+	if current node is a id or num {
+	    if lookup (curr.name()) == id.name
+		return false
+	}
+	return true
 }
 
-class AddNode extends MathObj with Algebraic{
-	val summands: scala.collection.mutable[Algebraic]
+*/
+
+class Function extends MathObj with Algebraic {
+	private val fn: String,
+	private val params: scala.collection.mutable[MathObj]
+	
+	def operand (i : Int) : Algebraic = {
+	     params[i]
+	}
 }
 
-class MultNode extends MathObj with Algebraic{
-	val terms: scala.collection.mutable[Algebraic]
+class Addition extends MathObj with Algebraic{
+	private val params: scala.collection.mutable[Algebraic]
+	
+	def operand (i : Int) : Algebraic = {
+	     summands[i]
+	}
 }
 
-class ExpNode extends MathObj with Algebraic {
-	val terms: scala.collection.mutable[Algebraic]
+class Multiplication extends MathObj with Algebraic{
+	private val terms: scala.collection.mutable[Algebraic]
+	
+	def operand (i : Int) : Algebraic = {
+	     terms[i]
+	}
 }
 
-class NumNode extends MathObj with Algebraic{
-	val value: int
+class Exponentiation extends MathObj with Algebraic {
+	private val base: Algebraic
+	private val exponent: Algebraic
+
+	def operand (i : Int) : Algebraic = {
+	     if (i == 0) {
+		     base
+		 } else if (i == 1) {
+		     exponent
+		 }
+	}
+	
+	def base : Algebraic = {
+	    base
+	}
+	
+	def exponent : Algebraic = {
+	    exponent
+	}
 }
 
-class IdNode extends MathObj with Algebraic{
-	val name: String
+class Number extends MathObj with Algebraic{
+	private val value: Int
+	
+	def value : Int = {
+	    value
+	}
 }
 
-class Divnode extends mathObj with Algebraic {
+class Identifier extends MathObj with Algebraic{
+	val name : String
+	
+	def name : String = {
+	    name
+	}
+}
+
+class Division extends mathObj with Algebraic {
 	val numerator: Algebraic,
 	val denominator: Algebraic
+	
+	def operand (i : Int) : Algebraic = {
+	     if (i == 0) {
+		     numerator
+		 } else if (i == 1) {
+		     denominator
+		 }
+	}
+	
+	def numerator : Algebraic = {
+	    numerator
+	}
+	
+	def denominator : Algebraic = {
+	    denominator
+	}
 }
