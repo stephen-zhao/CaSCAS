@@ -27,7 +27,7 @@ def free (id : Identifier) : Boolean = {
 */
 
 class Function extends MathObj with Algebraic {
-	private val fn: String,
+	private val fn: String
 	private val params: scala.collection.mutable[MathObj]
 	
 	def operand (i : Int) : Algebraic = {
@@ -89,7 +89,7 @@ class Identifier extends MathObj with Algebraic{
 }
 
 class Division extends mathObj with Algebraic {
-	val numerator: Algebraic,
+	val numerator: Algebraic
 	val denominator: Algebraic
 	
 	def operand (i : Int) : Algebraic = {

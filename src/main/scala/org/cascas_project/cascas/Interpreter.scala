@@ -6,7 +6,7 @@ package org.cascas_project.cascas
 
 import scala.annotation._
 import scala.io.StdIn
-import scala.Console.{RESET, BOLD, UNDERLINED, println}
+import scala.Console.{RESET, BOLD, UNDERLINED, println, print}
 import org.cascas_project.cascas.parser.{Parser, ParseNode}
 
 //=============================================================================
@@ -66,21 +66,22 @@ class Interpreter {
 
     Logger.info('REPL, "Waiting for input.")
 
-    print(f"${RESET}${BOLD}${UNDERLINED}In[$lineNum]:${RESET} ")
+    val prompt = f"${RESET}${BOLD}${UNDERLINED}In[$lineNum]:${RESET} "
+    val promptCont = f"${RESET}${BOLD}..${RESET} "
 
-    this.lexer.scanLine() match {
+    this.lexer.scanExpression(prompt, promptCont) match {
       case Vector() => Logger.info('REPL, "Empty input.")
-      case lineAsTokens => {
+      case exprAsTokens => {
 
         Logger.info('REPL, "Input string interpretted as tokens.")
-        Logger.verbose('REPL, "Tokens are: \n" + lineAsTokens)
+        Logger.verbose('REPL, "Tokens are: \n" + exprAsTokens)
 
-        val lineAsParseTree = this.parser.parse(parser.withoutUnparseables(lineAsTokens))
+        val exprAsParseTree = this.parser.parse(parser.withoutUnparseables(exprAsTokens))
         
         Logger.info('REPL, "Input tokens parsed as tree")
-        Logger.verbose('REPL, "Tree is:\n" + lineAsParseTree)
+        Logger.verbose('REPL, "Tree is:\n" + exprAsParseTree)
 
-        val resultAsString = this.interpret(lineAsParseTree)
+        val resultAsString = this.interpret(exprAsParseTree)
         
         // TODO: Do stuff with the tokens
         // for now, the parse tree is just get printed to the screen
