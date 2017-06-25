@@ -32,6 +32,11 @@ class Lexer {
     case DecimalToken.regex(s, _*)          => DecimalToken(s)
     case IntegerToken.regex(s, _*)          => IntegerToken(s)
 
+    // BoolOperatorTokenLike tokens
+    case BoolOperatorAndToken.regex(s)      => BoolOperatorAndToken()
+    case BoolOperatorOrToken.regex(s)       => BoolOperatorOrToken()
+    case BoolOperatorNotToken.regex(s)      => BoolOperatorNotToken()
+
     // OperatorTokenLike tokens
     case OperatorPlusToken.regex(s)         => OperatorPlusToken()
     case OperatorMinusToken.regex(s)        => OperatorMinusToken()
@@ -39,10 +44,6 @@ class Lexer {
     case OperatorDivToken.regex(s)          => OperatorDivToken()
     case OperatorPowToken.regex(s)          => OperatorPowToken()
     case OperatorBangToken.regex(s)         => OperatorBangToken()
-
-    // BoolOperatorTokenLike tokens
-    case BoolOperatorAndToken.regex(s)      => BoolOperatorAndToken()
-    case BoolOperatorOrToken.regex(s)       => BoolOperatorOrToken()
 
     // BracketTokenLike tokens
     case LeftRoundBracketToken.regex(s)     => {

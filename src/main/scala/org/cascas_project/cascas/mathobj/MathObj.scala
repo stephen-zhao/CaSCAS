@@ -80,7 +80,6 @@ case class Exponentiation (
 	def getExponent : Algebraic = {
 	    exponent
 	}
-    */
 }
 
 case class Number (
@@ -90,7 +89,6 @@ case class Number (
 	def getValue : Int = {
 	    value
 	}
-    */
 }
 
 case class Identifier(
@@ -100,7 +98,6 @@ case class Identifier(
 	def getName : String = {
 	    name
 	}
-    */
 }
 
 case class Division(
@@ -125,5 +122,4 @@ case class Division(
 	def getDenominator : Algebraic = {
 	    denominator
 	}
-    */
 }

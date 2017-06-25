@@ -18,7 +18,7 @@ object CFG {
     Set('LET, 'IF, 'ELSIF, 'ELSE, 'WHILE, 'FOR, 'IN,
         'WORD, 'INT, 'FLOAT, 'COMMA, 'ASSIGN, 'NEWLINE,
         'LRBRACK, 'RRBRACK, 'LCBRACK, 'RCBRACK, 'LSBRACK, 'RSBRACK, 
-        'OR, 'AND, 'EQ, 'NEQ, 'GT, 'LT, 'GTE, 'LTE,
+        'OR, 'AND, 'NOT, 'EQ, 'NEQ, 'GT, 'LT, 'GTE, 'LTE,
         'PLUS, 'MINUS, 'STAR, 'SLASH, 'BANG, 'POW)
 
   // A smaller set of rules to test LRMachine Generation
@@ -84,6 +84,7 @@ object CFG {
 
     ('BoolAndend, Vector('LRBRACK, 'BoolExpr, 'RRBRACK)),
     ('BoolAndend, Vector('Relation)),
+    ('BoolAndend, Vector('NOT, 'BoolAndend)),
 
     ('Relation,   Vector('MathExpr, 'EQ, 'MathExpr)),
     ('Relation,   Vector('MathExpr, 'NEQ, 'MathExpr)),

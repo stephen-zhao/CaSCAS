@@ -143,6 +143,16 @@ object BoolOperatorOrToken{
   val regex: UnanchoredRegex = raw"""^(\\\/)""".r.unanchored
 }
 
+case class BoolOperatorNotToken(
+  val lexeme: String = raw"""~""",
+  val symbol: Symbol = 'NOT
+) extends Token
+  with BoolOperatorTokenLike
+
+object BoolOperatorNotToken{
+  val expected: String = raw"""~"""
+  val regex: UnanchoredRegex = raw"""^(~)""".r.unanchored
+}
 case class LeftRoundBracketToken(
   val lexeme: String = raw"""(""",
   val symbol: Symbol = 'LRBRACK
