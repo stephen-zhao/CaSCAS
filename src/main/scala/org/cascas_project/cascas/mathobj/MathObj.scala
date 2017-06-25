@@ -1,6 +1,8 @@
 //=============================================================================
 // MathObj.scala : CaSCAS Project
 //=============================================================================
+import scala.collection.mutable
+
 
 trait Algebraic {}
 
@@ -26,85 +28,92 @@ def free (id : Identifier) : Boolean = {
 
 */
 
-class Function extends MathObj with Algebraic {
-	private val fn: String
-	private val params: scala.collection.mutable[MathObj]
+case class Function(
+  fn: String,
+  parameters: List[MathObj]
+) extends MathObj with Algebraic {
+	
+  def param (i : Int) : MathObj = {
+	parameters(i)
+  }
+}
+
+case class Addition (
+  summands: List[Algebraic]
+) extends MathObj with Algebraic{
 	
 	def operand (i : Int) : Algebraic = {
-	     params[i]
+	  summands(i)
 	}
 }
 
-class Addition extends MathObj with Algebraic{
-	private val params: scala.collection.mutable[Algebraic]
-	
-	def operand (i : Int) : Algebraic = {
-	     summands[i]
-	}
+case class Multiplication(
+  terms: List[Algebraic]
+) extends MathObj with Algebraic{
+
+  def operand (i : Int) : Algebraic = {
+	terms(i)
+  }
 }
 
-class Multiplication extends MathObj with Algebraic{
-	private val terms: scala.collection.mutable[Algebraic]
-	
-	def operand (i : Int) : Algebraic = {
-	     terms[i]
-	}
-}
-
-class Exponentiation extends MathObj with Algebraic {
-	private val base: Algebraic
-	private val exponent: Algebraic
+case class Exponentiation (
+  base: Algebraic,
+  exponent: Algebraic
+) extends MathObj with Algebraic {
 
 	def operand (i : Int) : Algebraic = {
 	     if (i == 0) {
 		     base
-		 } else if (i == 1) {
+		 } else {
 		     exponent
 		 }
 	}
 	
-	def base : Algebraic = {
+	def getBase : Algebraic = {
 	    base
 	}
 	
-	def exponent : Algebraic = {
+	def getExponent : Algebraic = {
 	    exponent
 	}
 }
 
-class Number extends MathObj with Algebraic{
-	private val value: Int
+case class Number (
+  value: Int
+) extends MathObj with Algebraic{
 	
-	def value : Int = {
+	def getValue : Int = {
 	    value
 	}
 }
 
-class Identifier extends MathObj with Algebraic{
-	val name : String
+case class Identifier(
+  name : String
+) extends MathObj with Algebraic{
 	
-	def name : String = {
+	def getName : String = {
 	    name
 	}
 }
 
-class Division extends mathObj with Algebraic {
-	val numerator: Algebraic
-	val denominator: Algebraic
+case class Division(
+  numerator: Algebraic,
+  denominator: Algebraic
+) extends MathObj with Algebraic {
 	
 	def operand (i : Int) : Algebraic = {
 	     if (i == 0) {
 		     numerator
-		 } else if (i == 1) {
+		 } else {
 		     denominator
 		 }
 	}
 	
-	def numerator : Algebraic = {
+	def getNumerator : Algebraic = {
 	    numerator
 	}
 	
-	def denominator : Algebraic = {
+	def getDenominator : Algebraic = {
 	    denominator
 	}
 }
