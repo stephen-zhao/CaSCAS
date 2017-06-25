@@ -25,6 +25,7 @@ class Lexer {
 
   private def getToken(str: String): Token = str match {
     // Whitespace tokens
+    case NewlineToken.regex(s, _*)          => NewlineToken(s)
     case WhitespaceToken.regex(s, _*)       => WhitespaceToken(s)
 
     // NumberTokenLike tokens
@@ -38,6 +39,10 @@ class Lexer {
     case OperatorDivToken.regex(s)          => OperatorDivToken()
     case OperatorPowToken.regex(s)          => OperatorPowToken()
     case OperatorBangToken.regex(s)         => OperatorBangToken()
+
+    // BoolOperatorTokenLike tokens
+    case BoolOperatorAndToken.regex(s)      => BoolOperatorAndToken()
+    case BoolOperatorOrToken.regex(s)       => BoolOperatorOrToken()
 
     // BracketTokenLike tokens
     case LeftRoundBracketToken.regex(s)     => {
@@ -83,9 +88,15 @@ class Lexer {
     case AssignmentToken.regex(s)           => AssignmentToken()
 
     // WordTokens, i.e. identifiers, function names, symbols, variables, etc
-    case WordToken.regex(s, _*)             => s match {
-      //case KeywordDefToken.expected => KeywordDefToken()
-      case _                        => WordToken(s)
+    case WordToken.regex(s, _*)         => s match {
+      case KeywordLetToken.expected   => KeywordLetToken()
+      case KeywordIfToken.expected    => KeywordIfToken()
+      case KeywordElsifToken.expected => KeywordElsifToken()
+      case KeywordElseToken.expected  => KeywordElseToken()
+      case KeywordWhileToken.expected => KeywordWhileToken()
+      case KeywordForToken.expected   => KeywordForToken()
+      case KeywordInToken.expected    => KeywordInToken()
+      case _                          => WordToken(s)
     }
 
     // Error up-to-whitespace case

@@ -5,7 +5,6 @@
 package org.cascas_project.cascas.parser
 
 import org.cascas_project.cascas.Logger
-import org.cascas_project.cascas.tokens.EndOfLineToken
 import org.cascas_project.cascas.tokens.Token
 
 case class LRMachine(
@@ -55,8 +54,8 @@ case class LRMachine(
           val item: Item = currentState.items.collectFirst {
             case x if x.isAtEnd => x
           }.getOrElse({
-            val err = "Not at ending item!"
-            Logger.error('LRM, err)
+            val err = "Not at state with ending item!"
+            Logger.error('LRM, err + f" Current state is: $currentState")
             throw new Exception(err)
           })
 
@@ -65,6 +64,8 @@ case class LRMachine(
 
           var nodesToAdd: Vector[ParseNode] = Vector[ParseNode]()
           for (symbol <- item.rhs.reverse) {
+            Logger.verbose('LRM, "Reducing with transition:")
+            Logger.verbose('LRM, f"${stateStack.head.name} -> ${symbol} -> ${stateStack.tail.head.name}")
             stateStack = stateStack.tail
             nodesToAdd = derivStack.head +: nodesToAdd
             derivStack = derivStack.tail
@@ -87,6 +88,9 @@ case class LRMachine(
 
             }
             case Some(nextState) => {
+
+              Logger.verbose('LRM, "And finally shift with transition:")
+              Logger.verbose('LRM, f"${stateStack.head.name} -> ${item.lhs} -> ${nextState.name}")
               
               stateStack = nextState :: stateStack
               derivStack = new NonTerminalNode(item.lhs, nodesToAdd) :: derivStack

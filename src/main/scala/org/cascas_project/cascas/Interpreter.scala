@@ -10,13 +10,11 @@ import scala.Console.{RESET, BOLD, UNDERLINED, println, print}
 import org.cascas_project.cascas.parser.{Parser, ParseNode}
 
 //=============================================================================
-// TopLevelInterpretable trait
+// Interpretable trait
 //
-// Objects with this trait can be interpreted by the top level interpreter
+// Objects with this trait can be interpreted by the interpreter
 //
-trait TopLevelInterpretable {
-  type TopLevelInterpretation = Symbol
-  def interpretAsKind: TopLevelInterpretation
+trait Interpretable {
 }
 
 //=============================================================================
@@ -36,27 +34,8 @@ class Interpreter {
     replrec()
   }
 
-  def interpret(parseTree: TopLevelInterpretable): String = parseTree match {
-    case _ if (parseTree.interpretAsKind == 'AssignmentInterpretation) => {
-      interpretAsAssignment(parseTree)
-    }
-    case _ if (parseTree.interpretAsKind == 'ExpressionInterpretation) => {
-      interpretAsExpression(parseTree)
-    }
-  }
-
-  def interpretAsAssignment(parseTree: TopLevelInterpretable): String = {
+  def interpret(parseTree: Interpretable): String = {
     ""
-    //TODO: do assignment to Scope, then return human-readable form indicating
-    //      assignment was successful
-    //
-  }
-
-  def interpretAsExpression(parseTree: TopLevelInterpretable): String = {
-    ""
-    //TODO: evaluate the expression, then return human-readable form of the
-    //      evaluated expression
-    //
   }
 
   @tailrec

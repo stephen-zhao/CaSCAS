@@ -11,8 +11,8 @@ class Parser {
 
   val lrm: LRMachine = new LRMachineGenerator().generate
 
-  def parse(tokens: Seq[Token]): ParseTree = {
-    new ParseTree(lrm.rightmostDerive(tokens))
+  def parse(tokens: Seq[Token]): ParseNode = {
+    lrm.rightmostDerive(tokens)
   }
 
   def withoutUnparseables(tokens: Vector[Token]): Vector[Token] = {

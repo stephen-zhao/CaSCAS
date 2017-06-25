@@ -2,18 +2,13 @@ package org.cascas_project.cascas.tokens
 
 import scala.util.matching._
 
-trait Tokenizeable {
-  def lexeme: String
-  def length(): Int = {
-    lexeme.length
-  }
-}
-
 abstract class Token
-extends Tokenizeable
 {
   def lexeme: String
   def symbol: Symbol
+  def length(): Int = {
+    lexeme.length
+  }
 }
 
 trait NumberTokenLike {
@@ -22,10 +17,19 @@ trait NumberTokenLike {
 trait OperatorTokenLike {
 }
 
+trait BoolOperatorTokenLike{
+}
+
 trait BracketTokenLike {
 }
 
 trait RelationTokenLike {
+}
+
+trait WhitespaceTokenLike {
+}
+
+trait KeywordTokenLike {
 }
 
 //trait KeywordTokenLike {
@@ -115,6 +119,28 @@ case class OperatorBangToken(
 object OperatorBangToken {
   val expected: String = raw"""!"""
   val regex: UnanchoredRegex = raw"""^(\!)""".r.unanchored
+}
+
+case class BoolOperatorAndToken(
+  val lexeme: String = raw"""/\\""",
+  val symbol: Symbol = 'AND
+) extends Token
+  with BoolOperatorTokenLike
+
+object BoolOperatorAndToken{
+  val expected: String = raw"""/\\"""
+  val regex: UnanchoredRegex = raw"""^(\/\\)""".r.unanchored
+}
+
+case class BoolOperatorOrToken(
+  val lexeme: String = raw"""\\/""",
+  val symbol: Symbol = 'OR
+) extends Token
+  with BoolOperatorTokenLike
+
+object BoolOperatorOrToken{
+  val expected: String = raw"""\\/"""
+  val regex: UnanchoredRegex = raw"""^(\\\/)""".r.unanchored
 }
 
 case class LeftRoundBracketToken(
@@ -245,11 +271,22 @@ object RelationGreaterToken {
 
 case class WhitespaceToken(
   val lexeme: String,
-  val symbol: Symbol = 'WS
+  val symbol: Symbol = 'WHITESPACE
 ) extends Token
+  with WhitespaceTokenLike
 
 object WhitespaceToken {
   val regex: UnanchoredRegex = raw"""^(\s+)""".r.unanchored
+}
+
+case class NewlineToken(
+  val lexeme: String,
+  val symbol: Symbol = 'NEWLINE
+) extends Token
+  with WhitespaceTokenLike
+
+object NewlineToken {
+  val regex: UnanchoredRegex = raw"""^(\n+)""".r.unanchored
 }
 
 case class CommaToken(
@@ -288,19 +325,80 @@ object WordToken {
   val regex: UnanchoredRegex = raw"""^([A-Za-z_](\w)*)""".r.unanchored
 }
 
-case class EndOfLineToken(
-  val lexeme: String = "\n",
-  val symbol: Symbol = 'EOL
-) extends Token
+//case class EndOfLineToken(
+//  val lexeme: String = "\n",
+//  val symbol: Symbol = 'EOL
+//) extends Token
+//
+//object EndOfLineToken {
+//}
 
-object EndOfLineToken {
+case class KeywordLetToken(
+  val lexeme: String = raw"""let""",
+  val symbol: Symbol = 'LET
+) extends Token
+  with KeywordTokenLike
+
+object KeywordLetToken {
+  val expected: String = raw"""let"""
 }
 
-//case class KeywordDefToken(
-//  val lexeme: String = raw"""def"""
-//) extends Token
-//  with KeywordTokenLike
-//
-//object KeywordDefToken {
-//  val expected: String = raw"""def"""
-//}
+case class KeywordIfToken(
+  val lexeme: String = raw"""if""",
+  val symbol: Symbol = 'IF
+) extends Token
+  with KeywordTokenLike
+
+object KeywordIfToken {
+  val expected: String = raw"""if"""
+}
+
+case class KeywordElsifToken(
+  val lexeme: String = raw"""elsif""",
+  val symbol: Symbol = 'ELSIF
+) extends Token
+  with KeywordTokenLike
+
+object KeywordElsifToken {
+  val expected: String = raw"""elsif"""
+}
+
+case class KeywordElseToken(
+  val lexeme: String = raw"""else""",
+  val symbol: Symbol = 'ELSE
+) extends Token
+  with KeywordTokenLike
+
+object KeywordElseToken {
+  val expected: String = raw"""else"""
+}
+
+case class KeywordWhileToken(
+  val lexeme: String = raw"""while""",
+  val symbol: Symbol = 'WHILE
+) extends Token
+  with KeywordTokenLike
+
+object KeywordWhileToken {
+  val expected: String = raw"""while"""
+}
+
+case class KeywordForToken(
+  val lexeme: String = raw"""for""",
+  val symbol: Symbol = 'FOR
+) extends Token
+  with KeywordTokenLike
+
+object KeywordForToken {
+  val expected: String = raw"""for"""
+}
+
+case class KeywordInToken(
+  val lexeme: String = raw"""in""",
+  val symbol: Symbol = 'IN
+) extends Token
+  with KeywordTokenLike
+
+object KeywordInToken {
+  val expected: String = raw"""in"""
+}

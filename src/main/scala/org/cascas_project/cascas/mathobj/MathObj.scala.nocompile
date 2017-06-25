@@ -26,35 +26,42 @@ def free (id : Identifier) : Boolean = {
 
 */
 
-class Function extends MathObj with Algebraic {
-	private val fn: String
-	private val params: scala.collection.mutable[MathObj]
-	
+class FunctionForm extends MathObj with Algebraic {
+	var fn: String
+	var params: Vector[Algebraic]
+    
+    /*
 	def operand (i : Int) : Algebraic = {
-	     params[i]
+	     params(i)
 	}
+    */
 }
 
 class Addition extends MathObj with Algebraic{
-	private val params: scala.collection.mutable[Algebraic]
+	var params: Vector[Algebraic]
 	
+    /*
 	def operand (i : Int) : Algebraic = {
-	     summands[i]
+	     params(i)
 	}
+    */
 }
 
 class Multiplication extends MathObj with Algebraic{
-	private val terms: scala.collection.mutable[Algebraic]
+	var terms: Vector[Algebraic]
 	
+    /*
 	def operand (i : Int) : Algebraic = {
-	     terms[i]
+	     terms(i)
 	}
+    */
 }
 
 class Exponentiation extends MathObj with Algebraic {
-	private val base: Algebraic
-	private val exponent: Algebraic
+	var base: Algebraic
+	var exponent: Algebraic
 
+    /*
 	def operand (i : Int) : Algebraic = {
 	     if (i == 0) {
 		     base
@@ -62,7 +69,9 @@ class Exponentiation extends MathObj with Algebraic {
 		     exponent
 		 }
 	}
+    */
 	
+    /*
 	def base : Algebraic = {
 	    base
 	}
@@ -70,28 +79,34 @@ class Exponentiation extends MathObj with Algebraic {
 	def exponent : Algebraic = {
 	    exponent
 	}
+    */
 }
 
 class Number extends MathObj with Algebraic{
-	private val value: Int
+	var value: Int
 	
+    /*
 	def value : Int = {
 	    value
 	}
+    */
 }
 
 class Identifier extends MathObj with Algebraic{
-	val name : String
+	var name : String
 	
+    /*
 	def name : String = {
 	    name
 	}
+    */
 }
 
-class Division extends mathObj with Algebraic {
-	val numerator: Algebraic
-	val denominator: Algebraic
+class Division extends MathObj with Algebraic {
+	var numerator: Algebraic
+	var denominator: Algebraic
 	
+    /*
 	def operand (i : Int) : Algebraic = {
 	     if (i == 0) {
 		     numerator
@@ -99,7 +114,9 @@ class Division extends mathObj with Algebraic {
 		     denominator
 		 }
 	}
+    */
 	
+    /*
 	def numerator : Algebraic = {
 	    numerator
 	}
@@ -107,4 +124,5 @@ class Division extends mathObj with Algebraic {
 	def denominator : Algebraic = {
 	    denominator
 	}
+    */
 }

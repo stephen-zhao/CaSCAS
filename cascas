@@ -53,9 +53,9 @@ export CASCAS_LOGGING_FILE="${CASCAS_LOGGING_DIR}/cascas_"$(date +"%Y%m%d_%H%M%S
 if [ "$CASCAS_ENV" == "develop" ]; then
     echo "CaSCAS running with $CASCAS_ENV environment settings."
     echo "Logging to file $CASCAS_LOGGING_FILE and to screen."
-    { scala -classpath "${CASCAS_JAR}" ${CASCAS_MAIN} "$@" | tee "${CASCAS_LOGGING_FILE}"; }
+    scala -classpath "${CASCAS_JAR}" ${CASCAS_MAIN} "$@" 2>&1 | tee "${CASCAS_LOGGING_FILE}"
 else
     echo "CaSCAS running with $CASCAS_ENV environment settings."
     echo "Logging to file $CASCAS_LOGGING_FILE."
-    { scala -classpath "${CASCAS_JAR}" ${CASCAS_MAIN} "$@" 2>"${CASCAS_LOGGING_FILE}"; }
+    scala -classpath "${CASCAS_JAR}" ${CASCAS_MAIN} "$@" 2>"${CASCAS_LOGGING_FILE}"
 fi
