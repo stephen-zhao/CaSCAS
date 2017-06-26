@@ -4,6 +4,7 @@
 
 package org.cascas_project.cascas.parser
 
+import scala.annotation._
 import org.cascas_project.cascas.Logger
 import org.cascas_project.cascas.tokens.Token
 
@@ -39,11 +40,13 @@ case class LRMachine(
     this.readTokens = List[Token]()
   }
 
-  // The public function to perform a rightmost derivation
+  // The public function to perform a rightmost derivation, given new tokens to
+  // work with and whether to start from scratch or to continue with the previous
+  // derivation.
   def rightmostDerive(
     tokens: Seq[Token],
     isNewDerivation: Boolean = true
-  ): ParseNode = {
+  ): Option[ParseNode] = {
 
     Logger.info('LRM,  "Starting LR Rightmost Derivation")
     Logger.info('LRM, f"  on tokens:\n${tokens}")
@@ -53,20 +56,41 @@ case class LRMachine(
       this.resetMachineState
     }
 
-    // Make tokens mutable
-    var mtokens: Seq[Token] = tokens
+    val result = this.workOnTokenInput(tokens)
 
-    // While there are still states 
-    while (!this.stateStack.isEmpty) {
+    result match {
+      case None => {
+
+        Logger.warning('LRM, f"LR Rightmost Derivation hit a problem!")
+
+        None
+
+      }
+      case Some(tree) => {
+        
+        Logger.info('LRM, f"LR Rightmost Derivation complete!")
+        Logger.info('LRM, f"Generated parse tree:\n${tree}")
+
+        result
+
+      }
+    }
+  }
+
+
+  @tailrec
+  private def workOnTokenInput(tokens: Seq[Token]): Option[ParseNode] = {
+    if (!this.stateStack.isEmpty) {
 
       Logger.verbose('LRM, "Checking tokens for input")
 
-      mtokens.headOption match {
+      tokens.headOption match {
         case None => {
 
           Logger.verbose('LRM, f"No more tokens.")
 
-          this.whenTokenInputBad
+          this.workOnDerivStackInput()
+          this.workOnTokenInput(tokens)
 
         }
         case Some(input) => {
@@ -78,7 +102,8 @@ case class LRMachine(
 
               Logger.verbose('LRM, f"No transition with token.")
 
-              this.whenTokenInputBad
+              this.workOnDerivStackInput()
+              this.workOnTokenInput(tokens)
 
             }
             case Some(nextState) => {
@@ -89,32 +114,30 @@ case class LRMachine(
 
               Logger.info('LRM, f"LR operation: SHIFT")
 
-              this.readTokens = mtokens.head :: this.readTokens
-              mtokens         = mtokens.tail
+              this.readTokens = tokens.head :: this.readTokens
               this.stateStack = nextState :: this.stateStack
               this.derivStack = new TerminalNode(Symbol(input.lexeme), input) :: this.derivStack
 
               Logger.verbose('LRM, f"Terminal Node generated")
               Logger.verbose('LRM, f"Done working on token $input")
+
+              this.workOnTokenInput(tokens.tail)
+            
             }
           }
         }
       }
     }
+    else {
+      Logger.info('LRM, f"LR Rightmost Derivation complete!")
+      Logger.info('LRM, f"Generated parse tree:\n${this.derivStack.head}")
 
-    Logger.info('LRM, f"LR Rightmost Derivation complete!")
-    Logger.info('LRM, f"Generated parse tree:\n${this.derivStack.head}")
-
-    this.derivStack.head
+      Some(this.derivStack.head)
+    }
   }
 
 
-  // When input by token is bad (e.g. EOF), the derivation will proceed to check 
-  // the derivation stack for non-terminal nodes to process. Eventually, all the
-  // terminal nodes will be processed by the fn "rightmostDerivation" and all of
-  // the non-terminal nodes will be processed by this fn until only the start
-  // non-terminal node remains.
-  private def whenTokenInputBad(): Unit = {
+  private def workOnDerivStackInput(): Unit = {
     
     Logger.verbose('LRM, f"Checking deriv stack for input")
     Logger.verbose('LRM, f"Current Deriv stack:\n${this.derivStack}")

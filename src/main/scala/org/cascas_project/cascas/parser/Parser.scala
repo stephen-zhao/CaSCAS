@@ -12,7 +12,15 @@ class Parser {
   val lrm: LRMachine = new LRMachineGenerator().generate
 
   def parse(tokens: Seq[Token]): ParseNode = {
-    lrm.rightmostDerive(tokens)
+    lrm.rightmostDerive(tokens) match {
+      case None => {
+        // TODO: placeholder for type-checkiness
+        new TerminalNode('EMPTY, WhitespaceToken(" "))
+      }
+      case Some(tree) => {
+        tree
+      }
+    }
   }
 
   def withoutUnparseables(tokens: Vector[Token]): Vector[Token] = {
