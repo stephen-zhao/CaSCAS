@@ -20,88 +20,88 @@ class Lexer {
 
   private var bracketStack: BracketStack = new BracketStack
 
-  private val errorTokenRegex: UnanchoredRegex =
-    raw"""^([^/s]+)""".r.unanchored
+  private val errorTokenRegex: Regex =
+    raw"""^([^/s]+)(.*)""".r
 
-  private def getToken(str: String): Token = str match {
+  private def takeToken(str: String): (Token, String) = str match {
     // Whitespace tokens
-    case NewlineToken.regex(s, _*)          => NewlineToken(s)
-    case WhitespaceToken.regex(s, _*)       => WhitespaceToken(s)
+    case WhitespaceToken.regex(s, r)           => (WhitespaceToken(s), r)
 
     // NumberTokenLike tokens
-    case DecimalToken.regex(s, _*)          => DecimalToken(s)
-    case IntegerToken.regex(s, _*)          => IntegerToken(s)
+    case DecimalToken.regex(s, r)              => (DecimalToken(s), r)
+    case IntegerToken.regex(s, r)              => (IntegerToken(s), r)
 
     // BoolOperatorTokenLike tokens
-    case BoolOperatorAndToken.regex(s)      => BoolOperatorAndToken()
-    case BoolOperatorOrToken.regex(s)       => BoolOperatorOrToken()
-    case BoolOperatorNotToken.regex(s)      => BoolOperatorNotToken()
+    case BoolOperatorAndToken.regex(s, r)      => (BoolOperatorAndToken(), r)
+    case BoolOperatorOrToken.regex(s, r)       => (BoolOperatorOrToken(), r)
+    case BoolOperatorNotToken.regex(s, r)      => (BoolOperatorNotToken(), r)
 
     // OperatorTokenLike tokens
-    case OperatorPlusToken.regex(s)         => OperatorPlusToken()
-    case OperatorMinusToken.regex(s)        => OperatorMinusToken()
-    case OperatorMultToken.regex(s)         => OperatorMultToken()
-    case OperatorDivToken.regex(s)          => OperatorDivToken()
-    case OperatorPowToken.regex(s)          => OperatorPowToken()
-    case OperatorBangToken.regex(s)         => OperatorBangToken()
+    case OperatorPlusToken.regex(s, r)         => (OperatorPlusToken(), r)
+    case OperatorMinusToken.regex(s, r)        => (OperatorMinusToken(), r)
+    case OperatorMultToken.regex(s, r)         => (OperatorMultToken(), r)
+    case OperatorDivToken.regex(s, r)          => (OperatorDivToken(), r)
+    case OperatorPowToken.regex(s, r)          => (OperatorPowToken(), r)
+    case OperatorBangToken.regex(s, r)         => (OperatorBangToken(), r)
 
     // BracketTokenLike tokens
-    case LeftRoundBracketToken.regex(s)     => {
+    case LeftRoundBracketToken.regex(s, r)     => {
       this.bracketStack.push('RBracket)
-      LeftRoundBracketToken()
+      (LeftRoundBracketToken(), r)
     }
-    case RightRoundBracketToken.regex(s)    => {
+    case RightRoundBracketToken.regex(s, r)    => {
       this.bracketStack.pop('RBracket)
-      RightRoundBracketToken()
+      (RightRoundBracketToken(), r)
     }
-    case LeftSquareBracketToken.regex(s)    => {
+    case LeftSquareBracketToken.regex(s, r)    => {
       this.bracketStack.push('SBracket)
-      LeftSquareBracketToken()
+      (LeftSquareBracketToken(), r)
     }
-    case RightSquareBracketToken.regex(s)   => {
+    case RightSquareBracketToken.regex(s, r)   => {
       this.bracketStack.pop('SBracket)
-      RightSquareBracketToken()
+      (RightSquareBracketToken(), r)
     }
-    case LeftCurlyBracketToken.regex(s)     => {
+    case LeftCurlyBracketToken.regex(s, r)     => {
       this.bracketStack.push('CBracket)
-      LeftCurlyBracketToken()
+      (LeftCurlyBracketToken(), r)
     }
-    case RightCurlyBracketToken.regex(s)    => {
+    case RightCurlyBracketToken.regex(s, r)    => {
       this.bracketStack.pop('CBracket)
-      RightCurlyBracketToken()
+      (RightCurlyBracketToken(), r)
     }
 
     // RelationTokenLike tokens
-    case RelationLessEqualToken.regex(s)    => RelationLessEqualToken()
-    case RelationGreaterEqualToken.regex(s) => RelationGreaterEqualToken()
-    case RelationEqualToken.regex(s)        => RelationEqualToken()
-    case RelationNotEqualToken.regex(s)     => RelationNotEqualToken()
-    case RelationGreaterToken.regex(s)      => RelationGreaterToken()
-    case RelationLessToken.regex(s)         => RelationLessToken()
+    case RelationLessEqualToken.regex(s, r)    => (RelationLessEqualToken(), r)
+    case RelationGreaterEqualToken.regex(s, r) => (RelationGreaterEqualToken(), r)
+    case RelationEqualToken.regex(s, r)        => (RelationEqualToken(), r)
+    case RelationNotEqualToken.regex(s, r)     => (RelationNotEqualToken(), r)
+    case RelationGreaterToken.regex(s, r)      => (RelationGreaterToken(), r)
+    case RelationLessToken.regex(s, r)         => (RelationLessToken(), r)
 
-    // Comma tokens
-    case CommaToken.regex(s)                => CommaToken()
+    // Punctuation tokens
+    case SemicolonToken.regex(s, r)            => (SemicolonToken(s), r)
+    case CommaToken.regex(s, r)                => (CommaToken(), r)
 
     // Comments
-    case CommentToken.regex(s)              => CommentToken(s)
+    case CommentToken.regex(s, r)              => (CommentToken(s), r)
 
     // Assignment operator token
-    case AssignmentToken.regex(s)           => AssignmentToken()
+    case AssignmentToken.regex(s, r)           => (AssignmentToken(), r)
 
     // WordTokens, i.e. identifiers, function names, symbols, variables, etc
-    case WordToken.regex(s, _*)         => s match {
-      case KeywordLetToken.expected   => KeywordLetToken()
-      case KeywordIfToken.expected    => KeywordIfToken()
-      case KeywordElsifToken.expected => KeywordElsifToken()
-      case KeywordElseToken.expected  => KeywordElseToken()
-      case KeywordWhileToken.expected => KeywordWhileToken()
-      case KeywordForToken.expected   => KeywordForToken()
-      case KeywordInToken.expected    => KeywordInToken()
-      case _                          => WordToken(s)
+    case WordToken.regex(s, r)                 => s match {
+      case KeywordLetToken.expected   => (KeywordLetToken(), r)
+      case KeywordIfToken.expected    => (KeywordIfToken(), r)
+      case KeywordElsifToken.expected => (KeywordElsifToken(), r)
+      case KeywordElseToken.expected  => (KeywordElseToken(), r)
+      case KeywordWhileToken.expected => (KeywordWhileToken(), r)
+      case KeywordForToken.expected   => (KeywordForToken(), r)
+      case KeywordInToken.expected    => (KeywordInToken(), r)
+      case _                          => (WordToken(s), r)
     }
 
     // Error up-to-whitespace case
-    case line @ this.errorTokenRegex(s, _*) => {
+    case line @ this.errorTokenRegex(s, r) => {
       val err = f"""Invalid token: \"$s\" at beginning of line \"$line\""""
       Logger.error('LEXER, err)
       throw new Exception(err)
@@ -124,8 +124,10 @@ class Lexer {
       accuTokens
     }
     else {
-      val token: Token = this.getToken(line)
-      this.getAllTokens(line.drop(token.length), accuTokens :+ token)
+      this.takeToken(line) match {
+        case (token, rest) =>
+          this.getAllTokens(rest, accuTokens :+ token)
+      }
     }
   }
   

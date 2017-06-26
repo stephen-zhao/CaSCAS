@@ -16,7 +16,7 @@ object CFG {
   
   val terminals: Set[Symbol] = 
     Set('LET, 'IF, 'ELSIF, 'ELSE, 'WHILE, 'FOR, 'IN,
-        'WORD, 'INT, 'FLOAT, 'COMMA, 'ASSIGN, 'NEWLINE,
+        'WORD, 'INT, 'FLOAT, 'COMMA, 'ASSIGN, 'SEMICOLON,
         'LRBRACK, 'RRBRACK, 'LCBRACK, 'RCBRACK, 'LSBRACK, 'RSBRACK, 
         'OR, 'AND, 'NOT, 'EQ, 'NEQ, 'GT, 'LT, 'GTE, 'LTE,
         'PLUS, 'MINUS, 'STAR, 'SLASH, 'BANG, 'POW)
@@ -35,7 +35,7 @@ object CFG {
   val rules: RuleSet = Set[Rule](
     ('Program,    Vector('Statements)),
 
-    ('Statements, Vector('Statements, 'NEWLINE, 'Statement)),
+    ('Statements, Vector('Statements, 'SEMICOLON, 'Statement)),
     ('Statements, Vector('Statement)),
 
     ('Statement,  Vector('Assign)),

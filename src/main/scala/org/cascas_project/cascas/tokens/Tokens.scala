@@ -12,6 +12,8 @@ abstract class Token
 }
 
 trait NumberTokenLike {
+//  val wholePart: String
+//  val fractionalPart: String
 }
 
 trait OperatorTokenLike {
@@ -42,7 +44,7 @@ case class IntegerToken(
   with NumberTokenLike
 
 object IntegerToken {
-  val regex: UnanchoredRegex = raw"""^(([0-9]_?)*[0-9])""".r.unanchored
+  val regex: Regex = raw"""^((?:[0-9]_?)*[0-9])(.*)""".r
 }
 
 case class DecimalToken(
@@ -52,7 +54,7 @@ case class DecimalToken(
   with NumberTokenLike
 
 object DecimalToken {
-  val regex: UnanchoredRegex = raw"""^(([0-9]_?)*[0-9]?\.[0-9](_?[0-9])*)""".r.unanchored
+  val regex: Regex = raw"""^((?:[0-9]_?)*[0-9]?\.[0-9](?:_?[0-9])*)(.*)""".r
 }
 
 case class OperatorPlusToken(
@@ -63,7 +65,7 @@ case class OperatorPlusToken(
 
 object OperatorPlusToken {
   val expected: String = raw"""+"""
-  val regex: UnanchoredRegex = raw"""^(\+)""".r.unanchored
+  val regex: Regex = raw"""^(\+)(.*)""".r
 }
 
 case class OperatorMinusToken(
@@ -74,7 +76,7 @@ case class OperatorMinusToken(
 
 object OperatorMinusToken {
   val expected: String = raw"""-"""
-  val regex: UnanchoredRegex = raw"""^(\-)""".r.unanchored
+  val regex: Regex = raw"""^(\-)(.*)""".r
 }
 
 case class OperatorMultToken(
@@ -85,7 +87,7 @@ case class OperatorMultToken(
 
 object OperatorMultToken {
   val expected: String = raw"""*"""
-  val regex: UnanchoredRegex = raw"""^(\*)""".r.unanchored
+  val regex: Regex = raw"""^(\*)(.*)""".r
 }
 
 case class OperatorDivToken(
@@ -96,7 +98,7 @@ case class OperatorDivToken(
 
 object OperatorDivToken {
   val expected: String = raw"""/"""
-  val regex: UnanchoredRegex = raw"""^(\/)""".r.unanchored
+  val regex: Regex = raw"""^(\/)(.*)""".r
 }
 
 case class OperatorPowToken(
@@ -107,7 +109,7 @@ case class OperatorPowToken(
 
 object OperatorPowToken {
   val expected: String = raw"""^"""
-  val regex: UnanchoredRegex = raw"""^(\^)""".r.unanchored
+  val regex: Regex = raw"""^(\^)(.*)""".r
 }
 
 case class OperatorBangToken(
@@ -118,7 +120,7 @@ case class OperatorBangToken(
 
 object OperatorBangToken {
   val expected: String = raw"""!"""
-  val regex: UnanchoredRegex = raw"""^(\!)""".r.unanchored
+  val regex: Regex = raw"""^(\!)(.*)""".r
 }
 
 case class BoolOperatorAndToken(
@@ -129,7 +131,7 @@ case class BoolOperatorAndToken(
 
 object BoolOperatorAndToken{
   val expected: String = raw"""/\\"""
-  val regex: UnanchoredRegex = raw"""^(\/\\)""".r.unanchored
+  val regex: Regex = raw"""^(\/\\)(.*)""".r
 }
 
 case class BoolOperatorOrToken(
@@ -140,7 +142,7 @@ case class BoolOperatorOrToken(
 
 object BoolOperatorOrToken{
   val expected: String = raw"""\\/"""
-  val regex: UnanchoredRegex = raw"""^(\\\/)""".r.unanchored
+  val regex: Regex = raw"""^(\\\/)(.*)""".r
 }
 
 case class BoolOperatorNotToken(
@@ -151,7 +153,7 @@ case class BoolOperatorNotToken(
 
 object BoolOperatorNotToken{
   val expected: String = raw"""~"""
-  val regex: UnanchoredRegex = raw"""^(~)""".r.unanchored
+  val regex: Regex = raw"""^(~)(.*)""".r
 }
 case class LeftRoundBracketToken(
   val lexeme: String = raw"""(""",
@@ -161,7 +163,7 @@ case class LeftRoundBracketToken(
 
 object LeftRoundBracketToken {
   val expected: String = raw"""("""
-  val regex: UnanchoredRegex = raw"""^(\()""".r.unanchored
+  val regex: Regex = raw"""^(\()(.*)""".r
 }
 
 case class RightRoundBracketToken(
@@ -172,7 +174,7 @@ case class RightRoundBracketToken(
 
 object RightRoundBracketToken {
   val expected: String = raw""")"""
-  val regex: UnanchoredRegex = raw"""^(\))""".r.unanchored
+  val regex: Regex = raw"""^(\))(.*)""".r
 }
 
 case class LeftSquareBracketToken(
@@ -183,7 +185,7 @@ case class LeftSquareBracketToken(
 
 object LeftSquareBracketToken {
   val expected: String = raw"""["""
-  val regex: UnanchoredRegex = raw"""^(\[)""".r.unanchored
+  val regex: Regex = raw"""^(\[)(.*)""".r
 }
 
 case class RightSquareBracketToken(
@@ -194,7 +196,7 @@ case class RightSquareBracketToken(
 
 object RightSquareBracketToken {
   val expected: String = raw"""]"""
-  val regex: UnanchoredRegex = raw"""^(\])""".r.unanchored
+  val regex: Regex = raw"""^(\])(.*)""".r
 }
 
 case class LeftCurlyBracketToken(
@@ -205,7 +207,7 @@ case class LeftCurlyBracketToken(
 
 object LeftCurlyBracketToken {
   val expected: String = raw"""{"""
-  val regex: UnanchoredRegex = raw"""^(\{)""".r.unanchored
+  val regex: Regex = raw"""^(\{)(.*)""".r
 }
 
 case class RightCurlyBracketToken(
@@ -216,7 +218,7 @@ case class RightCurlyBracketToken(
 
 object RightCurlyBracketToken {
   val expected: String = raw"""}"""
-  val regex: UnanchoredRegex = raw"""^(\})""".r.unanchored
+  val regex: Regex = raw"""^(\})(.*)""".r
 }
 
 case class RelationLessEqualToken(
@@ -226,7 +228,7 @@ case class RelationLessEqualToken(
   with RelationTokenLike
 
 object RelationLessEqualToken {
-  val regex: UnanchoredRegex = raw"""^(<=)""".r.unanchored
+  val regex: Regex = raw"""^(<=)(.*)""".r
 }
 
 case class RelationGreaterEqualToken(
@@ -236,7 +238,7 @@ case class RelationGreaterEqualToken(
   with RelationTokenLike
 
 object RelationGreaterEqualToken {
-  val regex: UnanchoredRegex = raw"""^(>=)""".r.unanchored
+  val regex: Regex = raw"""^(>=)(.*)""".r
 }
 
 case class RelationEqualToken(
@@ -246,7 +248,7 @@ case class RelationEqualToken(
   with RelationTokenLike
 
 object RelationEqualToken {
-  val regex: UnanchoredRegex = raw"""^(=)""".r.unanchored
+  val regex: Regex = raw"""^(=)(.*)""".r
 }
 
 case class RelationNotEqualToken(
@@ -256,7 +258,7 @@ case class RelationNotEqualToken(
   with RelationTokenLike
 
 object RelationNotEqualToken {
-  val regex: UnanchoredRegex = raw"""^(!=)""".r.unanchored
+  val regex: Regex = raw"""^(!=)(.*)""".r
 }
 
 case class RelationLessToken(
@@ -266,7 +268,7 @@ case class RelationLessToken(
   with RelationTokenLike
 
 object RelationLessToken {
-  val regex: UnanchoredRegex = raw"""^(<)""".r.unanchored
+  val regex: Regex = raw"""^(<)(.*)""".r
 }
 
 case class RelationGreaterToken(
@@ -276,7 +278,7 @@ case class RelationGreaterToken(
   with RelationTokenLike
 
 object RelationGreaterToken {
-  val regex: UnanchoredRegex = raw"""^(>)""".r.unanchored
+  val regex: Regex = raw"""^(>)(.*)""".r
 }
 
 case class WhitespaceToken(
@@ -286,17 +288,16 @@ case class WhitespaceToken(
   with WhitespaceTokenLike
 
 object WhitespaceToken {
-  val regex: UnanchoredRegex = raw"""^(\s+)""".r.unanchored
+  val regex: Regex = raw"""^(\s+)(.*)""".r
 }
 
-case class NewlineToken(
-  val lexeme: String,
-  val symbol: Symbol = 'NEWLINE
+case class SemicolonToken(
+  val lexeme: String = raw""";""",
+  val symbol: Symbol = 'SEMICOLON
 ) extends Token
-  with WhitespaceTokenLike
 
-object NewlineToken {
-  val regex: UnanchoredRegex = raw"""^(\n+)""".r.unanchored
+object SemicolonToken {
+  val regex: Regex = raw"""^(;)(.*)""".r
 }
 
 case class CommaToken(
@@ -305,7 +306,7 @@ case class CommaToken(
 ) extends Token
 
 object CommaToken {
-  val regex: UnanchoredRegex = raw"""^(,)""".r.unanchored
+  val regex: Regex = raw"""^(,)(.*)""".r
 }
 
 case class AssignmentToken(
@@ -314,7 +315,7 @@ case class AssignmentToken(
 ) extends Token
 
 object AssignmentToken {
-  val regex: UnanchoredRegex = raw"""^(:=)""".r.unanchored
+  val regex: Regex = raw"""^(:=)(.*)""".r
 }
 
 case class CommentToken(
@@ -323,7 +324,7 @@ case class CommentToken(
 ) extends Token
 
 object CommentToken {
-  val regex: UnanchoredRegex = raw"""^(;.*)$$""".r.unanchored
+  val regex: Regex = raw"""^(;.*)$$(.*)""".r
 }
 
 case class WordToken(
@@ -332,7 +333,7 @@ case class WordToken(
 ) extends Token
 
 object WordToken {
-  val regex: UnanchoredRegex = raw"""^([A-Za-z_](\w)*)""".r.unanchored
+  val regex: Regex = raw"""^([A-Za-z_](?:\w)*)(.*)""".r
 }
 
 //case class EndOfLineToken(
