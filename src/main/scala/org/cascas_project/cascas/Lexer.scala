@@ -131,11 +131,11 @@ class Lexer {
     }
   }
   
-  def inputRead(): String = {
+  protected def inputRead(): String = {
     StdIn.readLine()
   }
 
-  def scan(getInput: => String = inputRead): Option[Vector[Token]] = {
+  private def scan(getInput: => String = inputRead): Option[Vector[Token]] = {
     getInput match {
       case null => None
       case line => Some(this.getAllTokens(line))
@@ -147,7 +147,7 @@ class Lexer {
   }
 
   @tailrec
-  private def scanExpressionRec(
+  private def scanProgramRec(
     promptCont: => String     = ".. ",
     getInput: => String       = inputRead,
     accuTokens: Vector[Token] = Vector[Token]()
@@ -158,17 +158,17 @@ class Lexer {
     }
     else {
       print(promptCont)
-      this.scanExpressionRec(promptCont, getInput, tokens)
+      this.scanProgramRec(promptCont, getInput, tokens)
     }
   }
 
-  def scanExpression(
+  def scanProgram(
     prompt: => String          = "In: ",
     promptCont: => String      = ".. ",
     getInput: => String        = inputRead
   ): Vector[Token] = {
     print(prompt)
-    this.scanExpressionRec(promptCont)
+    this.scanProgramRec(promptCont)
   }
 
   def scanUntilEOF(getInput: => String = inputRead): Vector[Token] = {

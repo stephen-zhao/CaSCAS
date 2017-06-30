@@ -26,7 +26,7 @@ trait Interpretable {
 class Interpreter {
 
   var lexer: Lexer = new Lexer
-  var parser: Parser = new Parser
+  var parser: Parser = new Parser(this.lexer)
   
   var globalScope: Scope = new Scope
 
@@ -48,30 +48,30 @@ class Interpreter {
     val prompt = f"${RESET}${BOLD}${UNDERLINED}In[$lineNum]:${RESET} "
     val promptCont = f"${RESET}${BOLD}..${RESET} "
 
-    this.lexer.scanExpression(prompt, promptCont) match {
-      case Vector() => Logger.info('REPL, "Empty input.")
-      case exprAsTokens => {
-
-        Logger.info('REPL, "Input string interpretted as tokens.")
-        Logger.verbose('REPL, "Tokens are: \n" + exprAsTokens)
-
-        val exprAsParseTree = this.parser.parse(parser.withoutUnparseables(exprAsTokens))
+    this.parser.parse match {
+      case None => {
         
-        Logger.info('REPL, "Input tokens parsed as tree")
-        Logger.verbose('REPL, "Tree is:\n" + exprAsParseTree)
+        Logger.info('REPL, "Bad input.")
 
-        val resultAsString = this.interpret(exprAsParseTree)
+      }
+      case Some(tree) => {
+
+        Logger.info('REPL, "Input tokens parsed as tree")
+        Logger.verbose('REPL, "Tree is:\n" + tree)
+
+        val resultAsString = this.interpret(tree)
         
         // TODO: Do stuff with the tokens
         // for now, the parse tree is just get printed to the screen
         println(f"${RESET}${BOLD}${UNDERLINED}Out[$lineNum]:${RESET} $resultAsString")
-        
-        Logger.info('REPL, "Continuuing to next line of input.")
-
-        // continue to the next iteration of the loop
-        this.replrec(lineNum + 1)
       }
     }
+
+    Logger.info('REPL, "Continuuing to next line of input.")
+
+    // continue to the next iteration of the loop
+    this.replrec(lineNum + 1)
+
   }
 
 }

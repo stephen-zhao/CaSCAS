@@ -8,9 +8,34 @@ import scala.annotation._
 import org.cascas_project.cascas.Logger
 import org.cascas_project.cascas.tokens.Token
 
+
+object LRMachine {
+  
+  // LR Machine Derivation Status Enum
+  sealed trait DerivationStatus { def name: String }
+  case object NotStarted extends DerivationStatus { val name = "NotStarted" }
+  case object Deriving extends DerivationStatus { val name = "Deriving" }
+  case object NeedsTokens extends DerivationStatus { val name = "NeedsTokens" }
+  case object Success extends DerivationStatus { val name = "Success" }
+  case object Failure extends DerivationStatus { val name = "Failure" }
+
+}
+
+//=============================================================================
+// LRMachine class
+//
+// This class represents a Left-to-Right Rightmost Parsing Finite State
+// Machine. It holds the machine's internal state and provides public methods
+// to perform derivations on sequences of tokens that produce parse trees
+//
 case class LRMachine(
   val start: State
 ) {
+
+  // Holds the status of the current derivation if one is in progress, or of
+  // the last derivation if there isn't one in progress.
+  private var derivationStatus: LRMachine.DerivationStatus = LRMachine.NotStarted
+  def getDerivationStatus() = { this.derivationStatus }
 
   // Stack to hold the path of states being traversed
   // ** A state is a step in the process of collecting the terminals/nonterminals
@@ -20,24 +45,25 @@ case class LRMachine(
   //    been satisfied, i.e. states containing each of the items along the way
   //    have been added to the stack, all of these states are popped from the
   //    stack and a derivation is produced.
-  var stateStack: List[State] = List[State](start)
+  private var stateStack: List[State] = List[State](start)
 
   // the current state of the derivation
-  def currentState(): State = {
+  private def currentState(): State = {
     this.stateStack.head
   }
 
   // Stack to hold the current derivation
-  var derivStack: List[ParseNode] = List[ParseNode]()
+  private var derivStack: List[ParseNode] = List[ParseNode]()
 
   // list of tokens that have been read in the current derivation instance
-  var readTokens: List[Token] = List[Token]()
+  private var readTokens: List[Token] = List[Token]()
 
   // Resets the LRMachine's internal state, readying for a new derivation instance
-  def resetMachineState(): Unit = {
+  private def resetMachineState(): Unit = {
     this.stateStack = List[State](start)
     this.derivStack = List[ParseNode]()
     this.readTokens = List[Token]()
+    this.derivationStatus = LRMachine.NotStarted
   }
 
   // The public function to perform a rightmost derivation, given new tokens to
@@ -55,6 +81,8 @@ case class LRMachine(
       Logger.info('LRM, "New derivation, so resetting LRMachine state.")
       this.resetMachineState
     }
+
+    this.derivationStatus = LRMachine.Deriving
 
     val result = this.workOnTokenInput(tokens)
 
@@ -79,65 +107,72 @@ case class LRMachine(
 
 
   @tailrec
-  private def workOnTokenInput(tokens: Seq[Token]): Option[ParseNode] = {
-    if (!this.stateStack.isEmpty) {
+  private def workOnTokenInput(
+    tokens: Seq[Token]
+  ): Option[ParseNode] = this.derivationStatus match {
+    case LRMachine.Deriving => {
+      if (!this.stateStack.isEmpty) {
 
-      Logger.verbose('LRM, "Checking tokens for input")
+        Logger.verbose('LRM, "Checking tokens for input")
 
-      tokens.headOption match {
-        case None => {
+        tokens.headOption match {
+          case None => {
 
-          Logger.verbose('LRM, f"No more tokens.")
+            Logger.verbose('LRM, f"No more tokens.")
 
-          this.workOnDerivStackInput()
-          this.workOnTokenInput(tokens)
+            this.workOnDerivStackInput(None)
+            this.workOnTokenInput(tokens)
 
-        }
-        case Some(input) => {
+          }
+          case Some(input) => {
 
-          Logger.verbose('LRM, f"Working on next token: $input")
+            Logger.verbose('LRM, f"Working on next token: $input")
 
-          this.currentState.childStates.get(input.symbol) match {
-            case None => {
+            this.currentState.childStates.get(input.symbol) match {
+              case None => {
 
-              Logger.verbose('LRM, f"No transition with token.")
+                Logger.verbose('LRM, f"No transition with token.")
 
-              this.workOnDerivStackInput()
-              this.workOnTokenInput(tokens)
+                this.workOnDerivStackInput(Some(input))
+                this.workOnTokenInput(tokens)
 
-            }
-            case Some(nextState) => {
+              }
+              case Some(nextState) => {
 
-              Logger.verbose('LRM, f"Working on transition:")
-              Logger.verbose('LRM, f"${this.currentState.name} -> " + 
-                                   f"${input.symbol} -> ${nextState.name}")
+                Logger.verbose('LRM, f"Working on transition:")
+                Logger.verbose('LRM, f"${this.currentState.name} -> " + 
+                                     f"${input.symbol} -> ${nextState.name}")
 
-              Logger.info('LRM, f"LR operation: SHIFT")
+                Logger.info('LRM, f"LR operation: SHIFT")
 
-              this.readTokens = tokens.head :: this.readTokens
-              this.stateStack = nextState :: this.stateStack
-              this.derivStack = new TerminalNode(Symbol(input.lexeme), input) :: this.derivStack
+                this.readTokens = tokens.head :: this.readTokens
+                this.stateStack = nextState :: this.stateStack
+                this.derivStack = new TerminalNode(Symbol(input.lexeme), input) :: this.derivStack
 
-              Logger.verbose('LRM, f"Terminal Node generated")
-              Logger.verbose('LRM, f"Done working on token $input")
+                Logger.verbose('LRM, f"Terminal Node generated")
+                Logger.verbose('LRM, f"Done working on token $input")
 
-              this.workOnTokenInput(tokens.tail)
-            
+                this.workOnTokenInput(tokens.tail)
+              
+              }
             }
           }
         }
       }
-    }
-    else {
-      Logger.info('LRM, f"LR Rightmost Derivation complete!")
-      Logger.info('LRM, f"Generated parse tree:\n${this.derivStack.head}")
+      else {
+        Logger.info('LRM, f"LR Rightmost Derivation complete!")
+        Logger.info('LRM, f"Generated parse tree:\n${this.derivStack.head}")
 
-      Some(this.derivStack.head)
+        this.derivationStatus = LRMachine.Success
+
+        Some(this.derivStack.head)
+      }
     }
+    case _ => None
   }
 
 
-  private def workOnDerivStackInput(): Unit = {
+  private def workOnDerivStackInput(badTokenOption: Option[Token]): Unit = {
     
     Logger.verbose('LRM, f"Checking deriv stack for input")
     Logger.verbose('LRM, f"Current Deriv stack:\n${this.derivStack}")
@@ -147,67 +182,89 @@ case class LRMachine(
 
         val err = f"LRMachine is in invalid situation! Nothing on deriv stack."
         Logger.error('LRM, err)
-        throw new Exception(err)
+        
+        this.derivationStatus = LRMachine.Failure
 
       }
       case Some(input) => {
 
         Logger.verbose('LRM, f"Working on next node: $input")
 
-        val item: Item = this.currentState.items.collectFirst {
+        this.currentState.items.collectFirst {
           case x if x.isAtEnd => x
-        }.getOrElse({
-          val err = "Not at state with ending item!"
-          Logger.error('LRM, err + f" Current state is: ${this.currentState}")
-          throw new Exception(err)
-        })
-
-        Logger.verbose('LRM, f"Using item: $item to reduce stacks.")
-        Logger.info('LRM, "LR operation: REDUCE")
-
-        var nodesToAdd: Vector[ParseNode] = Vector[ParseNode]()
-
-        for (symbol <- item.rhs.reverse) {
-          Logger.verbose('LRM, "Reducing with transition:")
-          Logger.verbose('LRM, f"${this.currentState.name} -> " +
-                               f"${symbol} -> ${this.stateStack.tail.head.name}")
-
-          this.stateStack = this.stateStack.tail
-          nodesToAdd      = this.derivStack.head +: nodesToAdd
-          this.derivStack = this.derivStack.tail
-
-        }
-
-        this.currentState.childStates.get(item.lhs) match {
+        } match {
           case None => {
 
-            if (item.lhs != this.start.transition) {
-              val err = f"LR Machine is in invalid situation!" +
-                        f"No state with required transition: ${item.lhs}"
-              Logger.error('LRM, err)
-              throw new Exception(err)
+            val err = "Not at state with ending item! "
+
+            badTokenOption match {
+              case Some(badToken) => {
+
+                Logger.error('LRM, err + f"And next token is bad: $badToken. " +
+                                   f"Current state is: ${this.currentState}")
+
+                this.derivationStatus = LRMachine.Failure
+
+              }
+              case None => {
+
+                Logger.info('LRM, err + f"Current state is: ${this.currentState}")
+
+                this.derivationStatus = LRMachine.NeedsTokens
+
+              }
             }
-            else {
+          }
+          case Some(item) => {
+
+            Logger.verbose('LRM, f"Using ending item: $item to reduce stacks.")
+            Logger.info('LRM, "LR operation: REDUCE")
+
+            var nodesToAdd: Vector[ParseNode] = Vector[ParseNode]()
+
+            for (symbol <- item.rhs.reverse) {
+              Logger.verbose('LRM, "Reducing with transition:")
+              Logger.verbose('LRM, f"${this.currentState.name} -> " +
+                                   f"${symbol} -> ${this.stateStack.tail.head.name}")
+
               this.stateStack = this.stateStack.tail
-              this.derivStack = new NonTerminalNode(this.start.transition, nodesToAdd) ::
-                                this.derivStack
+              nodesToAdd      = this.derivStack.head +: nodesToAdd
+              this.derivStack = this.derivStack.tail
+
             }
 
+            this.currentState.childStates.get(item.lhs) match {
+              case None => {
+
+                if (item.lhs != this.start.transition) {
+                  val err = f"LR Machine is in invalid situation!" +
+                            f"No state with required transition: ${item.lhs}"
+                  Logger.error('LRM, err)
+                  throw new Exception(err)
+                }
+                else {
+                  this.stateStack = this.stateStack.tail
+                  this.derivStack = new NonTerminalNode(this.start.transition, nodesToAdd) ::
+                                    this.derivStack
+                }
+
+              }
+              case Some(nextState) => {
+
+                Logger.verbose('LRM, "And finally shift with transition:")
+                Logger.verbose('LRM, f"${this.currentState.name} -> " +
+                                     f"${item.lhs} -> ${nextState.name}")
+                
+                this.stateStack = nextState :: this.stateStack
+                this.derivStack = new NonTerminalNode(item.lhs, nodesToAdd) :: this.derivStack
+
+              }
+
+              Logger.verbose('LRM, f"Non Terminal Node generated")
+              Logger.verbose('LRM, f"Done backtracking for item $item")
+
+            }
           }
-          case Some(nextState) => {
-
-            Logger.verbose('LRM, "And finally shift with transition:")
-            Logger.verbose('LRM, f"${this.currentState.name} -> " +
-                                 f"${item.lhs} -> ${nextState.name}")
-            
-            this.stateStack = nextState :: this.stateStack
-            this.derivStack = new NonTerminalNode(item.lhs, nodesToAdd) :: this.derivStack
-
-          }
-
-          Logger.verbose('LRM, f"Non Terminal Node generated")
-          Logger.verbose('LRM, f"Done backtracking for item $item")
-
         }
       }
     }
