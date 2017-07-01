@@ -5,10 +5,12 @@
 package org.cascas_project.cascas.parser
 
 import scala.annotation._
+import scala.Console.{RESET, println, print}
 import org.cascas_project.cascas.Lexer
 import org.cascas_project.cascas.Logger
 import org.cascas_project.cascas.tokens._
 import org.cascas_project.cascas.parser._
+
 
 object Parser {
 
@@ -20,17 +22,38 @@ object Parser {
 }
 
 
-class Parser(
-  val lexer: Lexer
-) {
+class Parser {
 
   val lrm: LRMachine = new LRMachineGenerator().generate
 
-  var numParseCalls: Int = 0
+  val lexer: Lexer = new Lexer
+
+  private var numParseCalls: Int = 0
+
+  protected val isIgnoredTokenDefault: Boolean = false
+
+  protected val isIgnoredTokenFn: PartialFunction[Token, Boolean] = {
+    case WhitespaceToken(_, _) => true
+    case CommentToken(_, _)    => true
+  }
+
+  protected def displayPrompt(lineNum: Int): Unit = {}
+
+  protected def displayContinuedPrompt(lineNum: Int): Unit = {}
+
+  protected def scanTokens(
+    lineNum: Int,
+    isContinuedScan: Boolean
+  ): Vector[Token] = this.lexer.scanProgram(
+    displayPrompt=this.displayPrompt(lineNum),
+    displayContPrompt=this.displayContinuedPrompt(lineNum),
+    useContPrompt=isContinuedScan
+  )
 
   def parse(): Option[ParseNode] = {
-    this.numParseCalls += 1
-    this.parseUntilValidProgram()
+    val result = this.parseUntilValidProgram()
+    this.numParseCalls = this.numParseCalls + 1
+    result
   }
 
   @tailrec
@@ -38,7 +61,8 @@ class Parser(
     isFirst: Boolean = true
   ): Option[ParseNode] = {
 
-    val tokens = this.withoutUnparseables(this.lexer.scanProgram())
+    val tokens = this.scanTokens(this.numParseCalls,!isFirst).
+                 filter(this.isNotIgnoredToken)
 
     this.lrm.rightmostDerive(tokens, isFirst) match {
       case None => {
@@ -63,13 +87,29 @@ class Parser(
     }
   }
 
-  private def withoutUnparseables(tokens: Vector[Token]): Vector[Token] = {
-    tokens.filter(t => t match { 
-      case _: WhitespaceToken   => false
-      case _: CommentToken      => false
-      case _                    => true
-    })
+  private def isNotIgnoredToken(token: Token): Boolean = {
+    !( if (this.isIgnoredTokenFn.isDefinedAt(token)) {
+        this.isIgnoredTokenFn(token)
+      }
+      else {
+        this.isIgnoredTokenDefault
+      }
+    )
   }
 
+}
+
+
+class InteractiveParser(
+  val promptStyle: String
+) extends Parser {
+
+  protected override def displayPrompt(lineNum: Int): Unit = {
+    print(f"${RESET}" + this.promptStyle + f"In[$lineNum]:${RESET} ")
+  }
+
+  protected override def displayContinuedPrompt(lineNum: Int): Unit = {
+    print(f"${RESET}" + this.promptStyle + f"..${RESET} ")
+  }
 
 }

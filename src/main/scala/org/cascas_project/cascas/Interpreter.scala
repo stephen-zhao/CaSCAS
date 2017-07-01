@@ -5,9 +5,9 @@
 package org.cascas_project.cascas
 
 import scala.annotation._
+import scala.Console.{BOLD, RESET, UNDERLINED, println, print}
 import scala.io.StdIn
-import scala.Console.{RESET, BOLD, UNDERLINED, println, print}
-import org.cascas_project.cascas.parser.{Parser, ParseNode}
+import org.cascas_project.cascas.parser.{InteractiveParser, Parser, ParseNode}
 
 //=============================================================================
 // Interpretable trait
@@ -25,8 +25,9 @@ trait Interpretable {
 //
 class Interpreter {
 
-  var lexer: Lexer = new Lexer
-  var parser: Parser = new Parser(this.lexer)
+  val promptStyle = f"${BOLD}${UNDERLINED}"
+
+  var parser: Parser = new InteractiveParser(this.promptStyle)
   
   var globalScope: Scope = new Scope
 
@@ -45,16 +46,13 @@ class Interpreter {
 
     Logger.info('REPL, "Waiting for input.")
 
-    val prompt = f"${RESET}${BOLD}${UNDERLINED}In[$lineNum]:${RESET} "
-    val promptCont = f"${RESET}${BOLD}..${RESET} "
-
     this.parser.parse match {
       case None => {
         
         Logger.info('REPL, "Bad input.")
 
       }
-      case Some(tree) => {
+      case Some(tree: Interpretable) => {
 
         Logger.info('REPL, "Input tokens parsed as tree")
         Logger.verbose('REPL, "Tree is:\n" + tree)
@@ -63,8 +61,9 @@ class Interpreter {
         
         // TODO: Do stuff with the tokens
         // for now, the parse tree is just get printed to the screen
-        println(f"${RESET}${BOLD}${UNDERLINED}Out[$lineNum]:${RESET} $resultAsString")
+        println(f"${RESET}" + this.promptStyle + f"Out[$lineNum]:${RESET} $resultAsString")
       }
+
     }
 
     Logger.info('REPL, "Continuuing to next line of input.")

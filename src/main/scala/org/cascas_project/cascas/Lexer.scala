@@ -148,7 +148,7 @@ class Lexer {
 
   @tailrec
   private def scanProgramRec(
-    promptCont: => String     = ".. ",
+    displayPrompt: => Unit    = Unit,
     getInput: => String       = inputRead,
     accuTokens: Vector[Token] = Vector[Token]()
   ): Vector[Token] = {
@@ -157,18 +157,19 @@ class Lexer {
       tokens
     }
     else {
-      print(promptCont)
-      this.scanProgramRec(promptCont, getInput, tokens)
+      displayPrompt
+      this.scanProgramRec(displayPrompt, getInput, tokens)
     }
   }
 
   def scanProgram(
-    prompt: => String          = "In: ",
-    promptCont: => String      = ".. ",
-    getInput: => String        = inputRead
+    displayPrompt: => Unit     = Unit,
+    displayContPrompt: => Unit = Unit,
+    getInput: => String        = inputRead,
+    useContPrompt: Boolean     = false
   ): Vector[Token] = {
-    print(prompt)
-    this.scanProgramRec(promptCont)
+    if (useContPrompt) displayContPrompt else displayPrompt
+    this.scanProgramRec(displayContPrompt)
   }
 
   def scanUntilEOF(getInput: => String = inputRead): Vector[Token] = {
