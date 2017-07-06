@@ -74,7 +74,7 @@ case class LRMachine(
     isNewDerivation: Boolean = true
   ): Option[ParseNode] = {
 
-    Logger.info('LRM,  "Starting LR Rightmost Derivation")
+    Logger.info('LRM,  "Starting LR Derivation")
     Logger.info('LRM, f"  on tokens:\n${tokens}")
 
     if (isNewDerivation) {
@@ -89,14 +89,12 @@ case class LRMachine(
     result match {
       case None => {
 
-        Logger.warning('LRM, f"LR Rightmost Derivation hit a problem!")
-
         None
 
       }
       case Some(tree) => {
         
-        Logger.info('LRM, f"LR Rightmost Derivation complete!")
+        Logger.info('LRM, f"LR Derivation complete!")
         Logger.info('LRM, f"Generated parse tree:\n${tree}")
 
         result
@@ -140,7 +138,7 @@ case class LRMachine(
               case Some(nextState) => {
 
                 Logger.verbose('LRM, f"Working on transition:")
-                Logger.verbose('LRM, f"${this.currentState.name} -> " + 
+                Logger.verbose('LRM, f"${this.currentState.name} -> " +
                                      f"${input.symbol} -> ${nextState.name}")
 
                 Logger.info('LRM, f"LR operation: SHIFT")
@@ -160,12 +158,28 @@ case class LRMachine(
         }
       }
       else {
-        Logger.info('LRM, f"LR Rightmost Derivation complete!")
-        Logger.info('LRM, f"Generated parse tree:\n${this.derivStack.head}")
+        if (tokens.isEmpty) {
+          
+          Logger.info('LRM, f"LR Derivation token input parsing is successful!")
 
-        this.derivationStatus = LRMachine.Success
+          this.derivationStatus = LRMachine.Success
+          
+          Logger.info('LRM, f"derivationStatus=${this.derivationStatus}")
 
-        Some(this.derivStack.head)
+          Some(this.derivStack.head)
+        
+        }
+        else {
+
+          Logger.error('LRM, f"LR Derivation token input parsing not successful! Extra tokens: $tokens")
+
+          this.derivationStatus = LRMachine.Failure
+
+          Logger.error('LRM, f"derivationStatus=${this.derivationStatus}")
+          
+          None
+
+        }
       }
     }
     case _ => None
@@ -180,11 +194,13 @@ case class LRMachine(
     this.derivStack.headOption match {
       case None => {
 
-        val err = f"LRMachine is in invalid situation! Nothing on deriv stack."
-        Logger.error('LRM, err)
+        Logger.error('LRM, f"LRMachine is in invalid situation! Nothing on deriv stack.")
         
         this.derivationStatus = LRMachine.Failure
 
+        Logger.info('LRM, f"derivationStatus=${this.derivationStatus}")
+        Logger.error('LRM, f"LR Derivation hit a problem!")
+      
       }
       case Some(input) => {
 
@@ -204,6 +220,9 @@ case class LRMachine(
                                    f"Current state is: ${this.currentState}")
 
                 this.derivationStatus = LRMachine.Failure
+        
+                Logger.info('LRM, f"derivationStatus=${this.derivationStatus}")
+                Logger.error('LRM, f"LR Derivation hit a problem!")
 
               }
               case None => {
@@ -212,6 +231,9 @@ case class LRMachine(
 
                 this.derivationStatus = LRMachine.NeedsTokens
 
+                Logger.info('LRM, f"derivationStatus=${this.derivationStatus}")
+                Logger.info('LRM, f"LR Derivation needs more tokens!")
+              
               }
             }
           }

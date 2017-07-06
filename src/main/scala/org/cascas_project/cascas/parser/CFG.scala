@@ -42,9 +42,10 @@ object CFG {
     ('Statement,  Vector('ReAssign)),
     ('Statement,  Vector('Expr)),
 
-    ('Assign,     Vector('LET, 'ReAssign)),
+    ('Assign,     Vector('LET, 'WORD, 'ASSIGN, 'Expr)),
+    ('Assign,     Vector('LET, 'WORD, 'LRBRACK, 'FParams, 'RRBRACK, 'ASSIGN, 'Expr)),
+
     ('ReAssign,   Vector('WORD, 'ASSIGN, 'Expr)),
-    ('ReAssign,   Vector('WORD, 'LRBRACK, 'FParams, 'RRBRACK, 'ASSIGN, 'Expr)),
 
     ('Expr,       Vector('Control)),
     ('Expr,       Vector('Collection)),
@@ -55,13 +56,16 @@ object CFG {
     ('Control,    Vector('WhileControl)),
     ('Control,    Vector('ForControl)),
     
-    ('IfControl,  Vector('IF, 'LRBRACK, 'Expr, 'RRBRACK, 'LRBRACK, 'Statements, 'RRBRACK)),
-    ('IfControl,  Vector('IF, 'LRBRACK, 'Expr, 'RRBRACK, 'LRBRACK, 'Statements, 'RRBRACK, 'ElControl)),
-    ('ElControl,  Vector('ELSIF, 'LRBRACK, 'Expr, 'RRBRACK, 'LRBRACK, 'Statements, 'RRBRACK, 'ElControl)),
+    ('IfControl,  Vector('IF, 'LRBRACK, 'Expr, 'RRBRACK, 'LRBRACK, 
+                        'Statements, 'RRBRACK, 'ElControl)),
+    ('ElControl,  Vector('ELSIF, 'LRBRACK, 'Expr, 'RRBRACK, 'LRBRACK, 
+                         'Statements, 'RRBRACK, 'ElControl)),
     ('ElControl,  Vector('ELSE, 'LRBRACK, 'Statements, 'RRBRACK)),
 
-    ('WhileControl, Vector('WHILE, 'LRBRACK, 'Expr, 'RRBRACK, 'LRBRACK, 'Statements, 'RRBRACK)),
-    ('ForControl, Vector('FOR, 'LRBRACK, 'WORD, 'IN, 'Collection, 'RRBRACK, 'LRBRACK, 'Statements, 'RRBRACK)),
+    ('WhileControl, Vector('WHILE, 'LRBRACK, 'Expr, 'RRBRACK, 
+                         'LRBRACK, 'Statements, 'RRBRACK)),
+    ('ForControl, Vector('FOR, 'LRBRACK, 'WORD, 'IN, 'Collection, 
+                         'RRBRACK, 'LRBRACK, 'Statements, 'RRBRACK)),
 
     ('Collection, Vector('Set)),
     ('Collection, Vector('List)),
