@@ -24,9 +24,9 @@ object Parser {
 
 class Parser {
 
-  val lrm: LRMachine = new LRMachineGenerator().generate
+  private val lrm: LRMachine = new LRMachineGenerator().generate
 
-  val lexer: Lexer = new Lexer
+  private val lexer: Lexer = new Lexer
 
   private var numParseCalls: Int = 0
 
@@ -64,26 +64,46 @@ class Parser {
     val tokens = this.scanTokens(this.numParseCalls,!isFirst).
                  filter(this.isNotIgnoredToken)
 
-    this.lrm.rightmostDerive(tokens, isFirst) match {
-      case None => {
-        this.lrm.getDerivationStatus match {
-          case LRMachine.Failure => {
-            None
-          }
-          case LRMachine.NeedsTokens => {
-            this.parseUntilValidProgram(false)
-          }
-          case others => {
-            val err = "Invalid LRMachine status for no parse tree returned." +
-                      f" Status=${others.name}"
-            Logger.error('PARSER, err)
-            throw new Exception(err)
+    if (tokens.isEmpty) {
+      
+      Logger.info('PARSER, "No tokens parsed.")
+      
+      None
+
+    }
+    else {
+
+      this.lrm.rightmostDerive(tokens, isFirst) match {
+        case None => {
+          this.lrm.getDerivationStatus match {
+            case LRMachine.Failure => {
+              
+              Logger.error('PARSER, "Tokens failed to parse.")
+              None
+
+            }
+            case LRMachine.NeedsTokens => {
+
+              Logger.info('PARSER, "Tokens are parsing. Need more to continue...")
+              this.parseUntilValidProgram(false)
+
+            }
+            case others => {
+              val err = "Invalid LRMachine status for no parse tree returned." +
+                        f" Status=${others.name}"
+              Logger.error('PARSER, err)
+              throw new Exception(err)
+            }
           }
         }
+        case Some(tree) => {
+
+          Logger.info('PARSER, "Tokens successfully parsed.")
+          Some(tree)
+
+        }
       }
-      case Some(tree) => {
-        Some(tree)
-      }
+
     }
   }
 

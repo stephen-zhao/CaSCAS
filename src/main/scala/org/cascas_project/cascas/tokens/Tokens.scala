@@ -324,7 +324,7 @@ case class CommentToken(
 ) extends Token
 
 object CommentToken {
-  val regex: Regex = raw"""^(;.*)$$(.*)""".r
+  val regex: Regex = raw"""^(#.*)$$(.*)""".r
 }
 
 case class WordToken(
