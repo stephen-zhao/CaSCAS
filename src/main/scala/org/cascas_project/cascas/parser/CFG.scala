@@ -106,6 +106,7 @@ object CFG {
     ('Term,       Vector('Factor)),
 
     ('Factor,     Vector('LRBRACK, 'MathExpr, 'RRBRACK)),
+    ('Factor,     Vector('MINUS, 'Factor)),
     ('Factor,     Vector('Factor, 'BANG)),
     ('Factor,     Vector('Factor, 'POW, 'Factor)),
     ('Factor,     Vector('WORD)),
