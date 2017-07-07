@@ -10,9 +10,7 @@ trait Algebraic {}
 
 
 abstract class MathObj {
-	def flatten (type :Symbol) = {
-	  this
-	}
+	
 }
 
 /*
@@ -51,20 +49,6 @@ case class Addition (
 	def operand (i : Int) : Algebraic = {
 	  summands(i)
 	}
-	
-	override def flatten(type: Symbol) : MutableList[MathObj] = {
-	  val terms = new MutableList[MathObj]
-	  type match {
-	    case 'PLUS =>
-		  summands.foreach (((i) => ( 
-			terms ++ i.flatten('PLUS)
-			)))
-		  terms
-		case 'STAR =>
-		   terms ++ this
-		   terms
-	  }
-	}
 }
 
 case class Multiplication(
@@ -74,20 +58,6 @@ case class Multiplication(
   def operand (i : Int) : Algebraic = {
 	terms(i)
   }
-  
-  override def flatten(type: Symbol) : MutableList[MathObj] = {
-	  val terms = new MutableList[MathObj]
-	  type match {
-	    case 'STAR =>
-		  summands.foreach (((i) => ( 
-			terms ++ i.flatten('STAR)
-			)))
-		  terms
-		case 'PLUS =>
-		   terms ++ this
-		   terms
-	  }
-	}
 }
 
 case class Exponentiation (
