@@ -1,15 +1,15 @@
 //=============================================================================
-// Util.scala : CaSCAS Project
+// util/package.scala : CaSCAS Project
 //=============================================================================
 
-package org.cascas_project.cascas
+package org.cascas_project.cascas.util
 
 //=============================================================================
-// Util object
+// util package object
 //
 // Collection of arbitrary utility functions
 //
-object Util {
+package object util {
   
   def toInt(s: String): Option[Int] = {
     try {
