@@ -8,7 +8,7 @@ import scala.collection.mutable.{Map => MMap}
 import scala.io.Source
 import scala.util.matching._
 
-import org.cascas_project.cascas.Util._
+import org.cascas_project.cascas.util._
 
 //=============================================================================
 // Config object
