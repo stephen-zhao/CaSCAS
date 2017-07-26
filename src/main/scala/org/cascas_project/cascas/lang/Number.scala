@@ -7,6 +7,6 @@ package org.cascas_project.cascas.lang
 //=============================================================================
 // EvaluatedType -> Number
 //
-abstract class Number {
+abstract class Number extends EvaluatedType {
   // TODO
 }
