@@ -6,8 +6,7 @@ package org.cascas_project.cascas.parser
 
 import org.cascas_project.cascas.Interpretable
 import org.cascas_project.cascas.Logger
-import org.cascas_project.lang.EvaluatedType
-import org.cascas_project.shared.Enumerated
+import org.cascas_project.cascas.lang.EvaluatedTypeEnum
 import org.cascas_project.cascas.tokens._
 
 abstract class ParseNode {
@@ -27,18 +26,18 @@ case class TerminalNode(
 
 sealed abstract class TypedParseNode 
     extends Interpretable {
-  val rep: Symbol,
-  val typesAs: EvaluatedType with Enumerated.Value[EvaluatedType]
+  val rep: Symbol
+  val typesAs: EvaluatedTypeEnum
 }
 
 final case class TypedNonTerminalNode(
   val rep: Symbol,
   val derivs: Vector[TypedParseNode],
-  val typesAs: EvaluatedType with Enumerated.Value[EvaluatedType]
+  val typesAs: EvaluatedTypeEnum
 ) extends TypedParseNode
 
 final case class TypedTerminalNode(
   val rep: Symbol,
   val token: Token,
-  val typesAs: EvaluatedType with Enumerated.Value[EvaluatedType]
+  val typesAs: EvaluatedTypeEnum
 ) extends TypedParseNode
