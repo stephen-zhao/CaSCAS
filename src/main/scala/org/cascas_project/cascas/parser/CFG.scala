@@ -9,7 +9,7 @@ object CFG {
   type RuleSet = Set[Rule]
   
   val nonterminals: Set[Symbol] = 
-    Set('Program, 'Statements, 'Statement, 'Assign, 'ReAssign, 'Expr, 
+    Set('Program, 'Statements, 'Statement, 'Assign, 'ReAssign, 'Expr, 'Control,
         'IfControl, 'ElControl, 'WhileControl, 'ForControl, 'Collection,
         'Set, 'SetIn, 'List, 'ListIn, 'BoolExpr, 'BoolOrend, 'BoolAndend,
         'Relation, 'MathExpr, 'Term, 'Factor, 'Exponent, 'Base, 'Lambda, 
