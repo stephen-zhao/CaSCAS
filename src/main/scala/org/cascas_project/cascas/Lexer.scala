@@ -73,8 +73,8 @@ class Lexer {
     // RelationTokenLike tokens
     case RelationLessEqualToken.regex(s, r)    => (RelationLessEqualToken(), r)
     case RelationGreaterEqualToken.regex(s, r) => (RelationGreaterEqualToken(), r)
-    case RelationEqualToken.regex(s, r)        => (RelationEqualToken(), r)
     case RelationNotEqualToken.regex(s, r)     => (RelationNotEqualToken(), r)
+    case RelationEqualToken.regex(s, r)        => (RelationEqualToken(), r)
     case RelationGreaterToken.regex(s, r)      => (RelationGreaterToken(), r)
     case RelationLessToken.regex(s, r)         => (RelationLessToken(), r)
 

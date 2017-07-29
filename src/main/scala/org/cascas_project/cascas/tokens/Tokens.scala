@@ -252,13 +252,13 @@ object RelationEqualToken {
 }
 
 case class RelationNotEqualToken(
-  val lexeme: String = raw"""!=""",
+  val lexeme: String = raw"""=/=""",
   val symbol: Symbol = 'NEQ
 ) extends Token
   with RelationTokenLike
 
 object RelationNotEqualToken {
-  val regex: Regex = raw"""^(!=)(.*)""".r
+  val regex: Regex = raw"""^(=\/=)(.*)""".r
 }
 
 case class RelationLessToken(
