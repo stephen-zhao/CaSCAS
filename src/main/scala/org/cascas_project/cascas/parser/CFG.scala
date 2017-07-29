@@ -1,13 +1,45 @@
 //=============================================================================
 // CFG.scala : CaSCAS Project
 //=============================================================================
+// This file contains the necessary modules used to describe a generic context-
+// free grammar and to instantiate specifically a CaSCAS context-free grammar.
+
 package org.cascas_project.cascas.parser
 
-object CFG {
+// This class represents a context free grammar definition
+case class ContextFreeGrammar(
+  val nonterminals: Set[Symbol],
+  val terminals:    Set[Symbol],
+  val start:        Symbol,
+  val rules:        CFGRuleSet
+) {
+  // Throw compile-time error if the lefthand-side of any rule is not a
+  // nonterminal symbol.
+  require(this.rules forall (this.nonterminals contains _._1))
 
-  type Rule = (Symbol, Vector[Symbol])
-  type RuleSet = Set[Rule]
+  // Union containing all symbols
+  val allSymbols:   Set[Symbol] = this.nonterminals ++ this.terminals
   
+  // Throw compile-time error if the righthand-side of any rule contains
+  // symbols not defined as either a nonterminal or a terminal
+  require(this.rules forall (_._2 forall (this.allSymbols contains _)))
+
+  // Throw compile-time error if the starting symbol is not in the set of
+  // nonterminals
+  require(this.nonterminals contains this.start)
+
+  // Returns a set of all the rules originating from the start symbol
+  def getStartingRules(): CFGRuleSet = {
+    this.rules.collect {
+      case rule @ (lhs, rhs) if (lhs == this.start) => rule 
+    }
+  }
+}
+
+// Static object to hold the specific definitions for the elements used in
+// CaSCAS's context-free grammar.
+private[parser] object CaSCASCFGElements {
+
   val nonterminals: Set[Symbol] = 
     Set('Program, 'Statements, 'Statement, 'Assign, 'ReAssign, 'Expr, 'Control,
         'IfControl, 'ElControl, 'WhileControl, 'ForControl, 'Collection,
@@ -22,6 +54,8 @@ object CFG {
         'OR, 'AND, 'NOT, 'EQ, 'NEQ, 'GT, 'LT, 'GTE, 'LTE,
         'PLUS, 'MINUS, 'STAR, 'SLASH, 'BANG, 'POW, 'LAMBDA)
 
+  val start: Symbol = 'Program
+
   // A smaller set of rules to test LRMachine Generation
   //val rules: RuleSet = Set[Rule](
   //  ('Statement,  Vector('Assign)),
@@ -33,7 +67,7 @@ object CFG {
   //  ('Factor,     Vector('LRBRACK, 'Statement, 'RRBRACK))
   //)
 
-  val rules: RuleSet = Set[Rule](
+  val rules: CFGRuleSet = Set[CFGRule](
     ('Program,    Vector('Statements)),
 
     ('Statements, Vector('Statements, 'SEMICOLON, 'Statement)),
@@ -133,13 +167,5 @@ object CFG {
     ('ListIn,     Vector('ListIn, 'COMMA, 'Expr)),
     ('ListIn,     Vector('Expr))
   )
-
-  def getStartingRules(): Set[Rule] = {
-    rules.collect{ case rule @ ('Program, v: Vector[Symbol]) => rule }
-  }
-
-  def start(): Symbol = {
-    'Program
-  }
 
 }
