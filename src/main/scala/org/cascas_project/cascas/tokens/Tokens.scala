@@ -223,7 +223,7 @@ object RightCurlyBracketToken {
 
 case class RelationLessEqualToken(
   val lexeme: String = raw"""<=""",
-  val symbol: Symbol = 'LE
+  val symbol: Symbol = 'LTE
 ) extends Token
   with RelationTokenLike
 
@@ -233,7 +233,7 @@ object RelationLessEqualToken {
 
 case class RelationGreaterEqualToken(
   val lexeme: String = raw""">=""",
-  val symbol: Symbol = 'GE
+  val symbol: Symbol = 'GTE
 ) extends Token
   with RelationTokenLike
 

@@ -13,14 +13,14 @@ case class ContextFreeGrammar(
   val start:        Symbol,
   val rules:        CFGRuleSet
 ) {
-  // Throw compile-time error if the lefthand-side of any rule is not a
-  // nonterminal symbol.
+  // Throw runtime error if the lefthand-side of any rule is not a
+  // nonterminal symbol
   require(this.rules forall (this.nonterminals contains _._1))
 
   // Union containing all symbols
   val allSymbols:   Set[Symbol] = this.nonterminals ++ this.terminals
   
-  // Throw compile-time error if the righthand-side of any rule contains
+  // Throw runtime error if the righthand-side of any rule contains
   // symbols not defined as either a nonterminal or a terminal
   require(this.rules forall (_._2 forall (this.allSymbols contains _)))
 
@@ -93,12 +93,12 @@ private[parser] object CaSCASCFGElements {
     ('BoolAndend, Vector('NOT, 'BoolAndend)),
     ('BoolAndend, Vector('Relation)),
 
-    ('Relation,   Vector('Relation, 'EQ, 'MathExpr)),
+    ('Relation,   Vector('Relation, 'EQ,  'MathExpr)),
     ('Relation,   Vector('Relation, 'NEQ, 'MathExpr)),
-    ('Relation,   Vector('Relation, 'GT, 'MathExpr)),
-    ('Relation,   Vector('Relation, 'LT, 'MathExpr)),
-    ('Relation,   Vector('Relation, 'GE, 'MathExpr)),
-    ('Relation,   Vector('Relation, 'LE, 'MathExpr)),
+    ('Relation,   Vector('Relation, 'GT,  'MathExpr)),
+    ('Relation,   Vector('Relation, 'LT,  'MathExpr)),
+    ('Relation,   Vector('Relation, 'GTE, 'MathExpr)),
+    ('Relation,   Vector('Relation, 'LTE, 'MathExpr)),
     ('Relation,   Vector('MathExpr)),
 
     ('MathExpr,   Vector('MathExpr, 'PLUS, 'Term)),
