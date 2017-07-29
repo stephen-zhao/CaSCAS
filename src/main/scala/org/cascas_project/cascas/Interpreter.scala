@@ -25,28 +25,33 @@ trait Interpretable {
 //
 class Interpreter {
 
-  val promptStyle = f"${BOLD}${UNDERLINED}"
+  private val promptStyle = f"${BOLD}${UNDERLINED}"
 
-  var parser: Parser = new InteractiveParser(this.promptStyle)
-  
-  var globalScope: Scope = new Scope
+  private var parser: Parser = new InteractiveParser(this)
+
+  private var inputNum: Int = 0
+
+  private var globalScope: Scope = new Scope
 
   def repl(): Unit = {
     replrec()
   }
 
-  def interpret(parseTree: Interpretable): String = {
+  private def interpret(parseTree: Interpretable): String = {
     ""
   }
 
   @tailrec
-  private def replrec(
-    lineNum: Int = 0
-  ): Unit = {
+  private def replrec(resetState: Boolean = true): Unit = {
+
+    if (resetState) {
+      this.inputNum = 0
+      //TODO: reset the internal state
+    }
 
     Logger.info('REPL, "Waiting for input.")
 
-    this.parser.parse match {
+    this.parser.parseOption match {
       case None => {
         
         Logger.info('REPL, "Bad input.")
@@ -61,16 +66,24 @@ class Interpreter {
         
         // TODO: Do stuff with the tokens
         // for now, the parse tree is just get printed to the screen
-        println(f"${RESET}" + this.promptStyle + f"Out[$lineNum]:${RESET} $resultAsString")
+        println(f"${RESET}" + this.promptStyle + f"Out[${this.inputNum}]:${RESET} $resultAsString")
       }
 
     }
 
     Logger.info('REPL, "Continuuing to next line of input.")
 
+    this.inputNum += 1
+
     // continue to the next iteration of the loop
-    this.replrec(lineNum + 1)
+    this.replrec(false)
 
   }
+
+  def displayInputPrompt(): Unit =
+    print(f"${RESET}" + this.promptStyle + f"In[${this.inputNum}]:${RESET} ")
+
+  def displayContinuedInputPrompt(): Unit =
+    print(f"${RESET}" + this.promptStyle + f"..${RESET} ")
 
 }

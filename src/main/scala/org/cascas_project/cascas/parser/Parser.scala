@@ -4,8 +4,8 @@
 
 package org.cascas_project.cascas.parser
 
-import scala.annotation._
-import scala.Console.{RESET, println, print}
+import scala.annotation.tailrec
+import org.cascas_project.cascas.Interpreter
 import org.cascas_project.cascas.Lexer
 import org.cascas_project.cascas.Logger
 import org.cascas_project.cascas.tokens._
@@ -37,23 +37,32 @@ class Parser {
     case CommentToken(_, _)    => true
   }
 
-  protected def displayPrompt(lineNum: Int): Unit = {}
+  protected def displayPrompt(): Unit = {}
 
-  protected def displayContinuedPrompt(lineNum: Int): Unit = {}
+  protected def displayContinuedPrompt(): Unit = {}
 
   protected def scanTokens(
     lineNum: Int,
     isContinuedScan: Boolean
   ): Vector[Token] = this.lexer.scanProgram(
-    displayPrompt=this.displayPrompt(lineNum),
-    displayContPrompt=this.displayContinuedPrompt(lineNum),
+    displayPrompt=this.displayPrompt,
+    displayContPrompt=this.displayContinuedPrompt,
     useContPrompt=isContinuedScan
   )
 
-  def parse(): Option[ParseNode] = {
+  def parseOption(): Option[ParseNode] = {
     val result = this.parseUntilValidProgram()
     this.numParseCalls = this.numParseCalls + 1
     result
+  }
+
+  def parse(): ParseNode = {
+    val result = this.parseUntilValidProgram()
+    this.numParseCalls = this.numParseCalls + 1
+    result match {
+      case None       => throw new Exception("Bad parse!")
+      case Some(tree) => tree
+    }
   }
 
   @tailrec
@@ -61,8 +70,7 @@ class Parser {
     isFirst: Boolean = true
   ): Option[ParseNode] = {
 
-    val tokens = this.scanTokens(this.numParseCalls,!isFirst).
-                 filter(this.isNotIgnoredToken)
+    val tokens = this.scanTokens(0, !isFirst).filter(this.isNotIgnoredToken)
 
     if (tokens.isEmpty) {
       
@@ -121,15 +129,15 @@ class Parser {
 
 
 class InteractiveParser(
-  val promptStyle: String
+  interpreter: Interpreter
 ) extends Parser {
 
-  protected override def displayPrompt(lineNum: Int): Unit = {
-    print(f"${RESET}" + this.promptStyle + f"In[$lineNum]:${RESET} ")
+  protected override def displayPrompt(): Unit = {
+    this.interpreter.displayInputPrompt
   }
 
-  protected override def displayContinuedPrompt(lineNum: Int): Unit = {
-    print(f"${RESET}" + this.promptStyle + f"..${RESET} ")
+  protected override def displayContinuedPrompt(): Unit = {
+    this.interpreter.displayContinuedInputPrompt
   }
 
 }

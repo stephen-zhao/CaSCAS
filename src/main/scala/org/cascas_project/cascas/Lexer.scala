@@ -73,8 +73,8 @@ class Lexer {
     // RelationTokenLike tokens
     case RelationLessEqualToken.regex(s, r)    => (RelationLessEqualToken(), r)
     case RelationGreaterEqualToken.regex(s, r) => (RelationGreaterEqualToken(), r)
-    case RelationEqualToken.regex(s, r)        => (RelationEqualToken(), r)
     case RelationNotEqualToken.regex(s, r)     => (RelationNotEqualToken(), r)
+    case RelationEqualToken.regex(s, r)        => (RelationEqualToken(), r)
     case RelationGreaterToken.regex(s, r)      => (RelationGreaterToken(), r)
     case RelationLessToken.regex(s, r)         => (RelationLessToken(), r)
 
@@ -90,6 +90,7 @@ class Lexer {
 
     // WordTokens, i.e. identifiers, function names, symbols, variables, etc
     case WordToken.regex(s, r)                 => s match {
+      case KeywordLambdaToken.regex(ss, _) => (KeywordLambdaToken(ss), r)
       case KeywordLetToken.expected   => (KeywordLetToken(), r)
       case KeywordIfToken.expected    => (KeywordIfToken(), r)
       case KeywordElsifToken.expected => (KeywordElsifToken(), r)

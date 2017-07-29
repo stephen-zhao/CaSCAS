@@ -223,7 +223,7 @@ object RightCurlyBracketToken {
 
 case class RelationLessEqualToken(
   val lexeme: String = raw"""<=""",
-  val symbol: Symbol = 'LE
+  val symbol: Symbol = 'LTE
 ) extends Token
   with RelationTokenLike
 
@@ -233,7 +233,7 @@ object RelationLessEqualToken {
 
 case class RelationGreaterEqualToken(
   val lexeme: String = raw""">=""",
-  val symbol: Symbol = 'GE
+  val symbol: Symbol = 'GTE
 ) extends Token
   with RelationTokenLike
 
@@ -252,13 +252,13 @@ object RelationEqualToken {
 }
 
 case class RelationNotEqualToken(
-  val lexeme: String = raw"""!=""",
+  val lexeme: String = raw"""=/=""",
   val symbol: Symbol = 'NEQ
 ) extends Token
   with RelationTokenLike
 
 object RelationNotEqualToken {
-  val regex: Regex = raw"""^(!=)(.*)""".r
+  val regex: Regex = raw"""^(=\/=)(.*)""".r
 }
 
 case class RelationLessToken(
@@ -333,7 +333,7 @@ case class WordToken(
 ) extends Token
 
 object WordToken {
-  val regex: Regex = raw"""^([A-Za-z_](?:\w)*)(.*)""".r
+  val regex: Regex = raw"""^([A-Za-z_\u03bb](?:\w)*)(.*)""".r
 }
 
 //case class EndOfLineToken(
@@ -343,6 +343,16 @@ object WordToken {
 //
 //object EndOfLineToken {
 //}
+
+case class KeywordLambdaToken(
+  val lexeme: String,
+  val symbol: Symbol = 'LAMBDA
+) extends Token
+  with KeywordTokenLike
+
+object KeywordLambdaToken {
+  val regex: Regex = (raw"""^(lambda|""" + '\u03bb'.toString + raw""")(.*)""").r
+}
 
 case class KeywordLetToken(
   val lexeme: String = raw"""let""",

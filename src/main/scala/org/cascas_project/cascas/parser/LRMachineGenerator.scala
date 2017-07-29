@@ -30,7 +30,7 @@ class LRMachineGenerator() {
   }
 
   private def createStateGraph(): State = {
-    Logger.info('LRMG, "Creating LR State Graph")
+    Logger.info('LRMG, f"Creating LR State Graph from starting symbol ${CFG.start}")
     var initialState = State.create(CFG.start)
     CFG.getStartingRules.collect{
       case (lhs, rhs) => new Item(lhs, rhs)
