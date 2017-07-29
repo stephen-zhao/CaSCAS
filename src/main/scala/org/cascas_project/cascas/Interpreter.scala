@@ -10,14 +10,6 @@ import scala.io.StdIn
 import org.cascas_project.cascas.parser.{InteractiveParser, Parser, ParseNode}
 
 //=============================================================================
-// Interpretable trait
-//
-// Objects with this trait can be interpreted by the interpreter
-//
-trait Interpretable {
-}
-
-//=============================================================================
 // Interpreter class
 //
 // Represents the interpreter, which works through a REP loop statement-by-
@@ -37,10 +29,6 @@ class Interpreter {
     replrec()
   }
 
-  private def interpret(parseTree: Interpretable): String = {
-    ""
-  }
-
   @tailrec
   private def replrec(resetState: Boolean = true): Unit = {
 
@@ -57,12 +45,12 @@ class Interpreter {
         Logger.info('REPL, "Bad input.")
 
       }
-      case Some(tree: Interpretable) => {
+      case Some(tree) => {
 
         Logger.info('REPL, "Input tokens parsed as tree")
         Logger.verbose('REPL, "Tree is:\n" + tree)
 
-        val resultAsString = this.interpret(tree)
+        val resultAsString = "" //this.interpret(tree)
         
         // TODO: Do stuff with the tokens
         // for now, the parse tree is just get printed to the screen

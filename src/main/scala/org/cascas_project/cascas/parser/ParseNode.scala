@@ -4,7 +4,6 @@
 
 package org.cascas_project.cascas.parser
 
-import org.cascas_project.cascas.Interpretable
 import org.cascas_project.cascas.Logger
 import org.cascas_project.cascas.lang.EvaluatedTypeEnum
 import org.cascas_project.cascas.tokens._
@@ -24,8 +23,7 @@ case class TerminalNode(
 ) extends ParseNode
 
 
-sealed abstract class TypedParseNode 
-    extends Interpretable {
+sealed abstract class TypedParseNode {
   val rep: Symbol
   val typesAs: EvaluatedTypeEnum
 }
