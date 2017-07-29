@@ -90,6 +90,7 @@ class Lexer {
 
     // WordTokens, i.e. identifiers, function names, symbols, variables, etc
     case WordToken.regex(s, r)                 => s match {
+      case KeywordLambdaToken.regex(ss, _) => (KeywordLambdaToken(ss), r)
       case KeywordLetToken.expected   => (KeywordLetToken(), r)
       case KeywordIfToken.expected    => (KeywordIfToken(), r)
       case KeywordElsifToken.expected => (KeywordElsifToken(), r)

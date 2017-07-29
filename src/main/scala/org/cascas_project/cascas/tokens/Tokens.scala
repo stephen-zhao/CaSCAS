@@ -333,7 +333,7 @@ case class WordToken(
 ) extends Token
 
 object WordToken {
-  val regex: Regex = raw"""^([A-Za-z_](?:\w)*)(.*)""".r
+  val regex: Regex = raw"""^([A-Za-z_\u03bb](?:\w)*)(.*)""".r
 }
 
 //case class EndOfLineToken(
@@ -343,6 +343,16 @@ object WordToken {
 //
 //object EndOfLineToken {
 //}
+
+case class KeywordLambdaToken(
+  val lexeme: String,
+  val symbol: Symbol = 'LAMBDA
+) extends Token
+  with KeywordTokenLike
+
+object KeywordLambdaToken {
+  val regex: Regex = (raw"""^(lambda|""" + '\u03bb'.toString + raw""")(.*)""").r
+}
 
 case class KeywordLetToken(
   val lexeme: String = raw"""let""",
