@@ -32,6 +32,21 @@ case class LRMachine(
   val start: State
 ) {
 
+  // The parser that is using this LRMachine
+  private var parserOption: Option[Parser] = None
+
+  // Use this public function to attach a parser to this LRMachine
+  def attachParser(parser: Parser): LRMachine = {
+    this.parserOption = Some(parser)
+    this
+  }
+
+  // Use this public function to detach the currently attached parser
+  def detachParser(): LRMachine = {
+    this.parserOption = None
+    this
+  }
+
   // Holds the status of the current derivation if one is in progress, or of
   // the last derivation if there isn't one in progress.
   private var derivationStatus: LRMachine.DerivationStatus = LRMachine.NotStarted
@@ -64,6 +79,35 @@ case class LRMachine(
     this.derivStack = List[ParseNode]()
     this.readTokens = List[Token]()
     this.derivationStatus = LRMachine.NotStarted
+  }
+
+  // This private function creates a generic node. It delegates work to the
+  // factory method in the parser
+  private def createNode(
+    lhs: Symbol,
+    rhs: Vector[ParseNode]
+  ): ParseNode = {
+    this.parserOption match {
+      case Some(parser) => parser.generateNode(lhs, rhs)
+      case None => {
+        val err = "No parser attached to LRMachine! Cannot create a nonterminal node!"
+        Logger.error('LRM, err)
+        throw new Exception(err)
+      }
+    }
+  }
+
+  // This private function creates a terminal node specifically. It delegates
+  // work to the factory method in the parser
+  private def createTerminalNode(lhs: Symbol, token: Token): TerminalNode = {
+    this.parserOption match {
+      case Some(parser) => parser.createTerminalNode(token)
+      case None => {
+        val err = "No parser attached to LRMachine! Cannot create a terminal node!"
+        Logger.error('LRM, err)
+        throw new Exception(err)
+      }
+    }
   }
 
   // The public function to perform a rightmost derivation, given new tokens to
@@ -145,7 +189,10 @@ case class LRMachine(
 
                 this.readTokens = tokens.head :: this.readTokens
                 this.stateStack = nextState :: this.stateStack
-                this.derivStack = new TerminalNode(Symbol(input.lexeme), input) :: this.derivStack
+                // Make the terminal node
+                this.derivStack = this.createTerminalNode(
+                  Symbol(input.lexeme), input
+                ) :: this.derivStack
 
                 Logger.verbose('LRM, f"Terminal Node generated")
                 Logger.verbose('LRM, f"Done working on token $input")
@@ -266,8 +313,9 @@ case class LRMachine(
                 }
                 else {
                   this.stateStack = this.stateStack.tail
-                  this.derivStack = new NonTerminalNode(this.start.transition, nodesToAdd) ::
-                                    this.derivStack
+                  this.derivStack = this.createNode(
+                    this.start.transition, nodesToAdd
+                  ) :: this.derivStack
                 }
 
               }
@@ -278,7 +326,9 @@ case class LRMachine(
                                      f"${item.lhs} -> ${nextState.name}")
                 
                 this.stateStack = nextState :: this.stateStack
-                this.derivStack = new NonTerminalNode(item.lhs, nodesToAdd) :: this.derivStack
+                this.derivStack = this.createNode(
+                  item.lhs, nodesToAdd
+                ) :: this.derivStack
 
               }
 
