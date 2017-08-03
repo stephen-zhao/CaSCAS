@@ -57,13 +57,12 @@ class Parser {
   ): ParseNode = {
     (lhs, rhs.length) match {
 
-      //case ('Base, 3) => WrapperNode(rhs(1))(lhs)
       // This is Statements within some brackets, just use the Statements node
       case ('Base, 3) => rhs(1)
 
       // Treat all function applications as a unary operator on a single list
       // of parameters.
-      case ('Apply, 4) => UnaryOperatorNode(rhs(0), rhs(2))(lhs)
+      case ('Apply, 4) => UnaryOperatorNode(lhs, rhs(0), rhs(2))
 
       // Treat all of these nodes as binary operators, even if they are chained
       case ('BoolExpr | 
@@ -71,64 +70,64 @@ class Parser {
             'Relation | 
             'MathExpr |
             'Term |
-            'Exponent, 3) => BinaryOperatorNode(rhs(1), (rhs(0), rhs(2)))(lhs)
+            'Exponent, 3) => BinaryOperatorNode(lhs, rhs(1), (rhs(0), rhs(2)))
       
       // This is a boolean NOT
-      case ('BoolAndend, 2) => UnaryOperatorNode(rhs(0), rhs(1))(lhs)
+      case ('BoolAndend, 2) => UnaryOperatorNode(lhs, rhs(0), rhs(1))
       
       // This is either an algebraic negation or a factorial
-      case ('Factor, 2) => if (rhs(0) == 'Factor) {
-                             UnaryOperatorNode(rhs(1), rhs(0))(lhs)
+      case ('Factor, 2) => if (rhs(0).kind == 'Factor) {
+                             UnaryOperatorNode(lhs, rhs(1), rhs(0))
                            }
                            else {
-                             UnaryOperatorNode(rhs(0), rhs(1))(lhs)
+                             UnaryOperatorNode(lhs, rhs(0), rhs(1))
                            }
 
       // Assignment to a name, without a parameter list (although the
       // expression being assigned may be a lambda, in which case the parameter
       // list will be dealt with later.
-      case ('Assign, 4) => AssignNode(rhs(1), rhs(3))(lhs)
+      case ('Assign, 4) => AssignNode(lhs, rhs(1), rhs(3))
       
       // Assignment to a name with a parameter list, i.e. an operator
       // definition.
-      case ('Assign, 7) => OperatorAssignNode(rhs(1), rhs(3), rhs(6))(lhs)
+      case ('Assign, 7) => OperatorAssignNode(lhs, rhs(1), rhs(3), rhs(6))
 
       // Reassignment to a name (no parameter list allowed)
-      case ('ReAssign, 3) => ReAssignNode(rhs(0), rhs(2))(lhs)
+      case ('ReAssign, 3) => ReAssignNode(lhs, rhs(0), rhs(2))
 
       // A sequence of statements will need a different form of analysis later,
       // so it should be parsed differently from other sequences. Flatten the
       // statements tree here, during the parse.
-      case ('Statements, 3) => StatementsNode(
+      case ('Statements, 3) => StatementsNode(lhs,
         rhs(0).asInstanceOf[StatementsNode].statements :+ rhs(2)
-      )(lhs)
+      )
 
       // Due to the above type assumption, a single RHS node should still be
       // properly wrapped within a statements node
-      case ('Statements, 1) => StatementsNode(
+      case ('Statements, 1) => StatementsNode(lhs,
         Vector[ParseNode](rhs(0))
-      )(lhs)
+      )
 
       // Lambdas get their own special node
-      case ('Lambda, 7) => LambdaNode(rhs(2), rhs(5))(lhs)
+      case ('Lambda, 7) => LambdaNode(lhs, rhs(2), rhs(5))
 
       // For all other sequenced types (comma delimited), flatten the sequences
       // right here during the parse.
       case ('FParams |
             'AParams |
             'SetIn |
-            'ListIn, 3) => SequenceNode(
+            'ListIn, 3) => SequenceNode(lhs,
               rhs(0).asInstanceOf[SequenceNode].sequence :+ rhs(2)
-            )(lhs)
+            )
 
       // Due to the above assumption, a single RHS node must be properly
       // wrapped within a sequence node
       case ('FParams |
             'AParams |
             'SetIn |
-            'ListIn, 1) => SequenceNode(
+            'ListIn, 1) => SequenceNode(lhs,
               Vector[ParseNode](rhs(0))
-            )(lhs)
+            )
 
       // For non-empty collections, just use the sequence node directly
       case ('Set |
@@ -136,18 +135,18 @@ class Parser {
 
       // For empty collections, make an empty sequence node
       case ('Set |
-            'List, 2) => SequenceNode(Vector[ParseNode]())(lhs)
+            'List, 2) => SequenceNode(lhs, Vector[ParseNode]())
 
       // While loops get a special node type
-      case ('WhileControl, 7) => WhileNode(rhs(2), rhs(5))(lhs)
+      case ('WhileControl, 7) => WhileNode(lhs, rhs(2), rhs(5))
       
       // For loops get a special node type
-      case ('ForControl, 9) => ForNode(rhs(1), rhs(4), rhs(7))(lhs)
+      case ('ForControl, 9) => ForNode(lhs, rhs(1), rhs(4), rhs(7))
 
       // If/Elsif get a special node type. Elsifs just become nested if
       // statements.
       case ('IfControl |
-            'ElControl, 8) => IfNode(rhs(2), rhs(5), rhs(7))(lhs)
+            'ElControl, 8) => IfNode(lhs, rhs(2), rhs(5), rhs(7))
 
       // Else is the same as a statements node, so just use the node without
       // any special wrapper
@@ -163,7 +162,7 @@ class Parser {
   def createTerminalNode(
     token: Token
   ): TerminalNode = {
-    TerminalNode(token)(token.symbol)
+    TerminalNode(token.symbol, token)
   }
 
   def parse(): ParseNode = {

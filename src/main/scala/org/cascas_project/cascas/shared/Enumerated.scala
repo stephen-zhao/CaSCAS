@@ -31,6 +31,7 @@ object Enumerated {
     def enumByValue: Map[Value[E], Int] = enum.zipWithIndex.toMap
     def apply(i: Int): E = enum.lift(i).getOrElse(throw new OutOfRangeException)
     def apply(e: Value[E]): Int = enumByValue(e)
+    def apply(s: String): E = enum.find(_.name == s).getOrElse(throw new OutOfRangeException)
     def cardinality = enum.length
   }
 
