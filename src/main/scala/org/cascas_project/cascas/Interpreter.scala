@@ -7,7 +7,7 @@ package org.cascas_project.cascas
 import scala.annotation._
 import scala.Console.{BOLD, RESET, UNDERLINED, println, print}
 import scala.io.StdIn
-import org.cascas_project.cascas.parser.{InteractiveParser, Parser, ParseNode}
+import org.cascas_project.cascas.parser.{InteractiveParser, Parser}
 
 //=============================================================================
 // Interpreter class

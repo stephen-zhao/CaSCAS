@@ -53,8 +53,8 @@ class Parser {
   //TODO: get rid of all the asInstanceOf calls. It's bad programming.
   def generateNode(
     lhs: Symbol,
-    rhs: Vector[ParseNode]
-  ): ParseNode = {
+    rhs: Vector[ParseNodeLike]
+  ): ParseNodeLike = {
     (lhs, rhs.length) match {
 
       // This is Statements within some brackets, just use the Statements node
@@ -90,7 +90,9 @@ class Parser {
       
       // Assignment to a name with a parameter list, i.e. an operator
       // definition.
-      case ('Assign, 7) => OperatorAssignNode(lhs, rhs(1), rhs(3), rhs(6))
+      case ('Assign, 7) => OperatorAssignNode(lhs, rhs(1),
+        rhs(3).asInstanceOf[SequenceNode],
+        rhs(6))
 
       // Reassignment to a name (no parameter list allowed)
       case ('ReAssign, 3) => ReAssignNode(lhs, rhs(0), rhs(2))
@@ -105,7 +107,7 @@ class Parser {
       // Due to the above type assumption, a single RHS node should still be
       // properly wrapped within a statements node
       case ('Statements, 1) => StatementsNode(lhs,
-        Vector[ParseNode](rhs(0))
+        Vector[ParseNodeLike](rhs(0))
       )
 
       // Lambdas get their own special node
@@ -126,7 +128,7 @@ class Parser {
             'AParams |
             'SetIn |
             'ListIn, 1) => SequenceNode(lhs,
-              Vector[ParseNode](rhs(0))
+              Vector[ParseNodeLike](rhs(0))
             )
 
       // For non-empty collections, just use the sequence node directly
@@ -135,7 +137,7 @@ class Parser {
 
       // For empty collections, make an empty sequence node
       case ('Set |
-            'List, 2) => SequenceNode(lhs, Vector[ParseNode]())
+            'List, 2) => SequenceNode(lhs, Vector[ParseNodeLike]())
 
       // While loops get a special node type
       case ('WhileControl, 7) => WhileNode(lhs, rhs(2), rhs(5))
@@ -165,7 +167,7 @@ class Parser {
     TerminalNode(token.symbol, token)
   }
 
-  def parse(): ParseNode = {
+  def parse(): ParseNodeLike = {
     val result = this.parseUntilValidProgram()
     this.numParseCalls = this.numParseCalls + 1
     result match {
@@ -174,7 +176,7 @@ class Parser {
     }
   }
 
-  def parseOption(): Option[ParseNode] = {
+  def parseOption(): Option[ParseNodeLike] = {
     val result = this.parseUntilValidProgram()
     this.numParseCalls = this.numParseCalls + 1
     result
@@ -183,7 +185,7 @@ class Parser {
   @tailrec
   private def parseUntilValidProgram(
     isFirst: Boolean = true
-  ): Option[ParseNode] = {
+  ): Option[ParseNodeLike] = {
 
     val tokens = this.scanTokens(0, !isFirst).filter(this.isNotIgnoredToken)
 

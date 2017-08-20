@@ -4,7 +4,7 @@
 
 package org.cascas_project.cascas.parser
 
-import scala.annotation._
+import scala.annotation.tailrec
 import org.cascas_project.cascas.Logger
 import org.cascas_project.cascas.tokens.Token
 
@@ -68,7 +68,7 @@ case class LRMachine(
   }
 
   // Stack to hold the current derivation
-  private var derivStack: List[ParseNode] = List[ParseNode]()
+  private var derivStack: List[ParseNodeLike] = List[ParseNodeLike]()
 
   // list of tokens that have been read in the current derivation instance
   private var readTokens: List[Token] = List[Token]()
@@ -76,7 +76,7 @@ case class LRMachine(
   // Resets the LRMachine's internal state, readying for a new derivation instance
   private def resetMachineState(): Unit = {
     this.stateStack = List[State](start)
-    this.derivStack = List[ParseNode]()
+    this.derivStack = List[ParseNodeLike]()
     this.readTokens = List[Token]()
     this.derivationStatus = LRMachine.NotStarted
   }
@@ -85,8 +85,8 @@ case class LRMachine(
   // factory method in the parser
   private def createNode(
     lhs: Symbol,
-    rhs: Vector[ParseNode]
-  ): ParseNode = {
+    rhs: Vector[ParseNodeLike]
+  ): ParseNodeLike = {
     this.parserOption match {
       case Some(parser) => parser.generateNode(lhs, rhs)
       case None => {
@@ -116,7 +116,7 @@ case class LRMachine(
   def rightmostDerive(
     tokens: Seq[Token],
     isNewDerivation: Boolean = true
-  ): Option[ParseNode] = {
+  ): Option[ParseNodeLike] = {
 
     Logger.info('LRM,  "Starting LR Derivation")
     Logger.info('LRM, f"  on tokens:\n${tokens}")
@@ -151,7 +151,7 @@ case class LRMachine(
   @tailrec
   private def workOnTokenInput(
     tokens: Seq[Token]
-  ): Option[ParseNode] = this.derivationStatus match {
+  ): Option[ParseNodeLike] = this.derivationStatus match {
     case LRMachine.Deriving => {
       if (!this.stateStack.isEmpty) {
 
@@ -289,7 +289,7 @@ case class LRMachine(
             Logger.verbose('LRM, f"Using ending item: $item to reduce stacks.")
             Logger.info('LRM, "LR operation: REDUCE")
 
-            var nodesToAdd: Vector[ParseNode] = Vector[ParseNode]()
+            var nodesToAdd: Vector[ParseNodeLike] = Vector[ParseNodeLike]()
 
             for (symbol <- item.rhs.reverse) {
               Logger.verbose('LRM, "Reducing with transition:")
