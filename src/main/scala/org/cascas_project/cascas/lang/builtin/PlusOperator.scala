@@ -3,7 +3,7 @@ package org.cascas_project.cascas.lang.builtin
 //import org.cascas_project.cascas.util.ImplicitConversions
 import org.cascas_project.cascas.lang._
 
-object PlusOperator extends BuiltInDefObj {
+object PlusOperator extends BuiltInDefinition {
 
   def onApply(ctx: Context): Evaluation = {
 
