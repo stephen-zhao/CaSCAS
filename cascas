@@ -1,0 +1,61 @@
+# Sets the CaSCAS Version
+export CASCAS_VERSION=0.0.1
+
+# Sets the environment to developer environment if not already set
+if [ -z "${CASCAS_ENV}" ]; then
+    export CASCAS_ENV=develop
+fi
+
+# Sets the project directory if it isn't defined
+if [ -z "${CASCAS_PROJECT_DIR}" ]; then
+    export CASCAS_PROJECT_DIR="."
+fi
+
+# Checks if cascas config directory exists and set appropriately
+if [ "${CASCAS_ENV}" == "develop" ]; then
+    export CASCAS_CONFIG_DIR="${CASCAS_PROJECT_DIR}/config"
+elif [ "${CASCAS_ENV}" == "release" ]; then
+    if [ -d "${HOME}/.CaSCAS" ]; then
+        export CASCAS_CONFIG_DIR="${HOME}/.cascas"
+    else
+        export CASCAS_CONFIG_DIR="/etc/cascas"
+    fi
+else
+    export CASCAS_CONFIG_DIR="/etc/cascas"
+fi
+if [ ! -d "${CASCAS_CONFIG_DIR}" ]; then
+    mkdir "${CASCAS_CONFIG_DIR}"
+fi
+export CASCAS_CONFIG_INI="${CASCAS_CONFIG_DIR}/cascas.ini"
+
+# Sets the logging directory where all log files will be saved if it isn't defined
+if [ -z "${CASCAS_LOGGING_DIR}" ]; then
+    export CASCAS_LOGGING_DIR="${CASCAS_PROJECT_DIR}/log"
+fi
+if [ ! -d "${CASCAS_LOGGING_DIR}" ]; then
+    mkdir "${CASCAS_LOGGING_DIR}"
+fi
+
+# Sets the working directory where all working files will be saved if it isn't defined
+if [ -z "${CASCAS_WORKING_DIR}" ]; then
+    export CASCAS_WORKING_DIR="${CASCAS_PROJECT_DIR}/working"
+fi
+if [ ! -d "${CASCAS_WORKING_DIR}" ]; then
+    mkdir "${CASCAS_WORKING_DIR}"
+fi
+
+# parameters to scala run
+export CASCAS_JAR="${CASCAS_PROJECT_DIR}/target/CaSCAS-${CASCAS_VERSION}.jar"
+export CASCAS_MAIN="org.cascas_project.cascas.App"
+export CASCAS_LOGGING_FILE="${CASCAS_LOGGING_DIR}/cascas_"$(date +"%Y%m%d_%H%M%S")".log"
+
+# Run CaSCAS
+if [ "$CASCAS_ENV" == "develop" ]; then
+    echo "CaSCAS running with $CASCAS_ENV environment settings."
+    echo "Logging to file $CASCAS_LOGGING_FILE and to screen."
+    scala -classpath "${CASCAS_JAR}" ${CASCAS_MAIN} "$@" 2>&1 | tee "${CASCAS_LOGGING_FILE}"
+else
+    echo "CaSCAS running with $CASCAS_ENV environment settings."
+    echo "Logging to file $CASCAS_LOGGING_FILE."
+    scala -classpath "${CASCAS_JAR}" ${CASCAS_MAIN} "$@" 2>"${CASCAS_LOGGING_FILE}"
+fi
