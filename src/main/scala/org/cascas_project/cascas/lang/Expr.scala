@@ -63,10 +63,11 @@ case class OperatorExpr(args: Vector[FormalParameter], body: Object) extends Exp
 case class BuiltInExpr(
   args: Vector[FormalParameter],
   onApply: (Context) => Evaluation,
-  ret: TypeIdentifier
+  ret: TypeIdentifier,
+  onEval: (Context) => Evaluation = Evaluation(this, ContextMutationSet.empty
 ) extends Expr {
 
-  def eval(ctx: Context): Evaluation = onApply(ctx).keepOnlyReassignments
+  def eval(ctx: Context): Evaluation = this.onEval
 
   def checkType(ctx: Context, tpe: TypeIdentifier): Boolean = {
     tpe match {
@@ -107,10 +108,10 @@ case class ApplyExpr(op: Object, params: Vector[Object]) extends Expr {
     val evaldOpCtxDelta = evaldOpRes.ctxDelta.onlyReassignments
 
     evaldOp match {
-      case builtInOp @ BuiltInExpr(args, _, _) => {
+      case BuiltInExpr(args, onApply, _, _) => {
         val (subCtxDelta, leftOverParams) = this.subInRec(args, params)
         if (leftOverParams.isEmpty) {
-          builtInOp.eval(
+          onApply(
             ctx.consolidatedWith(evaldOpCtxDelta ++ subCtxDelta)
           ).keepOnlyReassignments
         }
