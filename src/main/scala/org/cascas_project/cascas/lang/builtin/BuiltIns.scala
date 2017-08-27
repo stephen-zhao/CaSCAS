@@ -7,7 +7,7 @@ package object builtin {
 
   private var builtInContextMutationSet: ContextMutationSet = ContextMutationSet.empty
 
-  builtInContextMutationSet.assign(Identifier("+"), PlusOperator())
+  builtInContextMutationSet.assign(PlusOperator.ident, PlusOperator())
 
   //builtInContextMutationSet.assign(Identifier("-"), MultiplyOperator())
 
@@ -33,17 +33,28 @@ package object builtin {
 
   val builtInCtx: Context = Context() :+ builtInContextMutationSet
 
-  trait BuiltInDefObj {
+  trait BuiltInDefinition {
     def onApply(ctx: Context): Evaluation
     def tpe: TypeIdentifier
+    def ident: Identifier
     def formalParams: Vector[FormalParameter]
     def returnTpe: TypeIdentifier
-    val obj: BuiltInExpr = BuiltInExpr(
+    def obj: BuiltInExpr = BuiltInExpr(
       this.formalParams,
       this.onApply,
       this.returnTpe
     )
     def apply(): TypedObject = TypedObject(tpe, obj)
+  }
+
+  trait BuiltInDefinitionWithCustomEval extends BuiltInDefinition {
+    def onEval(ctx: Context): Evaluation
+    override def obj: BuiltInExpr = BuiltInExpr(
+      this.formalParams,
+      this.onApply,
+      this.returnTpe,
+      this.onEval
+    )
   }
 
 }

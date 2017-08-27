@@ -6,24 +6,50 @@ import org.cascas_project.cascas.lang._
 object PlusOperator extends BuiltInDefObj {
 
   def onApply(ctx: Context): Evaluation = {
+
+    // Get typed parameter "summands" from context
+    // and assess its type
     ctx.get(Identifier("summands")) match {
-      case Some(TypedObject(Identifier("List"), list)) => {
+
+      // 1. case SUCCESS, is typed as "List(Number)", then
+      case Some(TypedObject(Identifier("List(Number)"), list)) => {
+
+        // try to evaluate the parameter and assess structure
         list.eval(ctx).keepOnlyReassignments match {
+          
+          // 1.1. case SUCCESS, is a ListExpr, then
+          // do the evaluation
           case Evaluation(ListExpr(summands), ctxDelta) => {
             val res = summands /: (Accum(ListExpr(), RationalNumber.zero))(addIfPossible _)
             Evaluation(res.nonconstTerms :+ res.constTerm, ctxDelta)
           }
-          case other => {
-            throw new Exception("what the fuck no3") //TODO
+
+          // 1.2. case FAIL, is not a ListExpr, then
+          // cannot do evaluation, return as is
+          case Evaluation(other, ctxDelta) => {
+            Evaluation(ApplyExpr(PlusOperator.ident, Vector(other)), ctxDelta)
           }
         }
       }
-      case Some(other) => {
+
+      // 2. case FAIL, is not typed as "List(Number)", then
+      case Some(TypedObject(other, _)) => {
+        // report type mismatch error
         throw new Exception("what the fuck no1") //TODO
       }
+
+      // 3. case FAIL, is not assigned, then
+      case Some(other) => {
+        // report unassigned error
+        throw new Exception("what the fuck no3") //TODO
+      }
+      
+      // 4. case FAIL, is not defined, then
       case None => {
+        // report undefined error
         throw new Exception("what the fuck no2") //TODO
       }
+
     }
   }
 
@@ -34,9 +60,11 @@ object PlusOperator extends BuiltInDefObj {
     }
   }
 
-  def tpe = OperatorType(Identifier("summands"), Identifier("List"))(Identifier("Number"))
+  def tpe = OperatorType(Identifier("summands"), Identifier("List(Number)"))(Identifier("Number"))
 
-  def formalParams = Vector(FormalParameter(Identifier("summands"), Identifier("Number"), Many))
+  def ident = Identifier("+")
+
+  def formalParams = Vector(FormalParameter(Identifier("summands"), Identifier("List(Number)")))
 
   def returnTpe = Identifier("Number")
 
