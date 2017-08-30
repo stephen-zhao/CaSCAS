@@ -5,7 +5,6 @@
 package org.cascas_project.cascas.parser
 
 import org.cascas_project.cascas.Logger
-import org.cascas_project.cascas.lang.EvaluatedType._
 import org.cascas_project.cascas.tokens._
 
 sealed trait ParseNodeLike {
