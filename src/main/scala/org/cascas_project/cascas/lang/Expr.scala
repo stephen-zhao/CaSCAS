@@ -22,9 +22,10 @@ trait Expr extends Object {}
 case class OperatorExpr(args: Vector[FormalParameter], body: Object) extends Expr {
 
   def eval(ctx: Context): Evaluation = {
-    this.body.eval(
+    val evaldBody = this.body.eval(
       ctx.consolidatedWith(ContextMutationSet.empty.withIntroductions(this.args))
     ).keepOnlyReassignments
+    Evaluation(OperatorExpr(this.args, evaldBody.evaldObj), evaldBody.ctxDelta)
   }
 
   def checkType(ctx: Context, tpe: TypeIdentifier): Boolean = {
@@ -64,10 +65,10 @@ case class BuiltInExpr(
   args: Vector[FormalParameter],
   onApply: (Context) => Evaluation,
   ret: TypeIdentifier,
-  onEval: (Context) => Evaluation = Evaluation(this, ContextMutationSet.empty
+  onEval: (Context) => Evaluation = Evaluation(this, ContextMutationSet.empty)
 ) extends Expr {
 
-  def eval(ctx: Context): Evaluation = this.onEval
+  def eval(ctx: Context): Evaluation = this.onEval(ctx)
 
   def checkType(ctx: Context, tpe: TypeIdentifier): Boolean = {
     tpe match {
