@@ -65,10 +65,13 @@ case class BuiltInExpr(
   args: Vector[FormalParameter],
   onApply: (Context) => Evaluation,
   ret: TypeIdentifier,
-  onEval: (Context) => Evaluation = Evaluation(this, ContextMutationSet.empty)
+  maybeOnEval: Option[(Context) => Evaluation]
 ) extends Expr {
 
-  def eval(ctx: Context): Evaluation = this.onEval(ctx)
+  def eval(ctx: Context): Evaluation = this.maybeOnEval match {
+    case Some(onEval) => onEval(ctx)
+    case None => Evaluation(this, ContextMutationSet.empty)
+  }
 
   def checkType(ctx: Context, tpe: TypeIdentifier): Boolean = {
     tpe match {
