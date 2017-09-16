@@ -3,7 +3,7 @@ package org.cascas_project.cascas.lang.builtin
 //import org.cascas_project.cascas.util.ImplicitConversions
 import org.cascas_project.cascas.lang._
 
-object PlusOperator extends BuiltInDefinition {
+object MultiplyOperator extends BuiltInDefinition {
 
   def onApply(v : Vector[Object], a : Boolean, l : Object, ctx: Context): Evaluation = {
     
@@ -13,31 +13,31 @@ object PlusOperator extends BuiltInDefinition {
           // 1.1. case SUCCESS, is a ListExpr, then
           // do the evaluation
           case Evaluation(ListExpr(summands), ctxDelta) => {
-            val res = v /: (Accum(ListExpr(), RationalNumber.zero))(addIfPossible _)
+            val res = v /: (Accum(ListExpr(), RationalNumber.zero))(multiplyIfPossible _)
             Evaluation(res.nonconstTerms :+ res.constTerm, ctxDelta)
           }
 
           // 1.2. case FAIL, is not a ListExpr, then
           // cannot do evaluation, return as is
           case Evaluation(other, ctxDelta) => {
-            Evaluation(ApplyExpr(PlusOperator.ident, Vector(other)), ctxDelta)
+            Evaluation(ApplyExpr(MultiplyOperator.ident, Vector(other)), ctxDelta)
           }
         }
        
   }
 
-  private def addIfPossible(accum: Accum, currentTerm: Object): Accum = {
+  private def multiplyIfPossible(accum: Accum, currentTerm: Object): Accum = {
     currentTerm match {
-      case const: RationalNumber => Accum(accum.nonconstTerms, accum.constTerm + const)
+      case const: RationalNumber => Accum(accum.nonconstTerms, accum.constTerm * const)
       case term => Accum(accum.nonconstTerms :+ term, accum.constTerm)
     }
   }
 
-  def tpe = OperatorType(Identifier("summands"), Identifier("List(Number)"))(Identifier("Number"))
+  def tpe = OperatorType(Identifier("multiplicands"), Identifier("List(Number)"))(Identifier("Number"))
 
-  def ident = Identifier("+")
+  def ident = Identifier("*")
 
-  def formalParams = Vector(FormalParameter(Identifier("summands"), Identifier("List(Number)")))
+  def formalParams = Vector(FormalParameter(Identifier("multiplicands"), Identifier("List(Number)")))
 
   def returnTpe = Identifier("Number")
 
