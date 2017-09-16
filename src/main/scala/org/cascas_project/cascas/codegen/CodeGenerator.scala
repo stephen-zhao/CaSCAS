@@ -12,7 +12,7 @@ import org.cascas_project.cascas.parser._
 import org.cascas_project.cascas.tokens._
 
 class CodeGenerator {
-  
+
 
   def generateLIRObject(parseTree: ParseNodeLike): Object = {
 
