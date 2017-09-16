@@ -66,18 +66,18 @@ case class RationalNumber(numerator: BigInt, denominator: BigInt) extends Litera
   }
 
   def isInteger(): Boolean = {
-    this.reduced().denominator == 1
+    this.numerator.mod(this.denominator) == 0
   }
 
   def isWhole(): Boolean = {
     val reducedThis = this.reduced()
-    reducedThis.denominator == 1 &&
+    this.numerator.mod(this.denominator) == 0 &&
     reducedThis > RationalNumber.zero
   }
 
   def isNatural(): Boolean = {
     val reducedThis = this.reduced()
-    reducedThis.denominator == 1 &&
+    this.numerator.mod(this.denominator) == 0 &&
     reducedThis >= RationalNumber.zero
   }
 
@@ -101,5 +101,7 @@ object RationalNumber {
   val zero = RationalNumber(0, 1)
 
   def apply(i: Int): RationalNumber = RationalNumber(i, 1)
+
+  def apply(i: BigInt): RationalNumber = RationalNumber(i, 1)
 
 }
