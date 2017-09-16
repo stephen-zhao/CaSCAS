@@ -8,6 +8,7 @@ import scala.annotation._
 import scala.Console.{BOLD, RESET, UNDERLINED, println, print}
 import scala.io.StdIn
 import org.cascas_project.cascas.parser.{InteractiveParser, Parser}
+import org.cascas_project.cascas.codegen.CodeGenerator
 
 //=============================================================================
 // Interpreter class
@@ -20,6 +21,8 @@ class Interpreter {
   private val promptStyle = f"${BOLD}${UNDERLINED}"
 
   private var parser: Parser = new InteractiveParser(this)
+
+  private var codeGenerator: CodeGenerator = new CodeGenerator()
 
   private var inputNum: Int = 0
 
@@ -50,7 +53,7 @@ class Interpreter {
         Logger.info('REPL, "Input tokens parsed as tree")
         Logger.verbose('REPL, "Tree is:\n" + tree)
 
-        val resultAsString = "" //this.interpret(tree)
+        val resultAsString = this.codeGenerator.generateLIRObject(tree).toRepr()
         
         // TODO: Do stuff with the tokens
         // for now, the parse tree is just get printed to the screen

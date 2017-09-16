@@ -25,7 +25,8 @@ package object builtin {
     def obj: BuiltInExpr = BuiltInExpr(
       this.formalParams,
       this.onApply,
-      this.returnTpe
+      this.returnTpe,
+      None
     )
     def apply(): TypedObject = TypedObject(tpe, obj)
     
@@ -78,7 +79,7 @@ package object builtin {
       this.formalParams,
       this.onApply,
       this.returnTpe,
-      this.onEval
+      Some(this.onEval)
     )
   }
 
