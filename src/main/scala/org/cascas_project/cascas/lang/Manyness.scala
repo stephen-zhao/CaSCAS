@@ -1,17 +1,20 @@
 //=============================================================================
-// lang/TypedObject.scala : CaSCAS Project
+// lang/Manyness.scala : CaSCAS Project
 //=============================================================================
 
 package org.cascas_project.cascas.lang
 
 //=============================================================================
 
-import org.cascas_project.cascas.lang.liro.Object
+import org.cascas_project.cascas.shared.Enumerated
 
 //=============================================================================
 
-case class TypedObject(tpe: TypeIdentifier, value: Object) extends ContextValue {
-
-  override def toString(): String = f"$tpe -> $value"
-
+sealed abstract class Manyness extends Enumerated.Value[Manyness] {
+  def enumType = Manyness
 }
+final object Manyness extends Enumerated.Type[Manyness] {
+  val enum = Vector(One, Many)
+}
+final case object One extends Manyness {}
+final case object Many extends Manyness {}

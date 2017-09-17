@@ -1,112 +1,26 @@
-package org.cascas_project.cascas.lang
+//=============================================================================
+// lang/liro/ApplyExpr.scala : CaSCAS Project
+//=============================================================================
 
+package org.cascas_project.cascas.lang.liro
+
+//=============================================================================
+
+import org.cascas_project.cascas.lang.Context
+import org.cascas_project.cascas.lang.ContextMutationSet
+import org.cascas_project.cascas.lang.Evaluation
+import org.cascas_project.cascas.lang.FormalParameter
+import org.cascas_project.cascas.lang.OperatorType
+import org.cascas_project.cascas.lang.TypeIdentifier
+import org.cascas_project.cascas.lang.TypedObject
 import scala.annotation.tailrec
 
-
-
-
-case class Evaluation(evaldObj: Object, ctxDelta: ContextMutationSet) {
-  def keepOnlyReassignments(): Evaluation = {
-    Evaluation(evaldObj, ctxDelta.onlyReassignments())
-  }
-}
-
-
-
-
-trait Expr extends Object {}
-
-
-
-
-case class OperatorExpr(args: Vector[FormalParameter], body: Object) extends Expr {
-
-  def eval(ctx: Context): Evaluation = {
-    val evaldBody = this.body.eval(
-      ctx.consolidatedWith(ContextMutationSet.empty.withIntroductions(this.args))
-    ).keepOnlyReassignments
-    Evaluation(OperatorExpr(this.args, evaldBody.evaldObj), evaldBody.ctxDelta)
-  }
-
-  def checkType(ctx: Context, tpe: TypeIdentifier): Boolean = {
-    tpe match {
-      case OperatorType(args, ret) => {
-        if (this.args.length == args.length) {
-          if ((this.args zip args).forall{ case (a, b) => a == b }) {
-            this.body.checkType(
-              ctx.consolidatedWith(ContextMutationSet.empty.withIntroductions(this.args)),
-              ret
-            )
-          }
-          else {
-            throw new Exception("args not same type") //TODO
-          }
-        }
-        else {
-          throw new Exception("not same length args") //TODO
-        }
-      }
-      case other => {
-        throw new Exception("not operator type") //TODO
-      }
-    }
-  }
-
-  def inferType(ctx: Context): Option[TypeIdentifier] = {
-    None //TODO
-  }
-
-}
-
-
-
-
-case class BuiltInExpr(
-  args: Vector[FormalParameter],
-  onApply: (Context) => Evaluation,
-  ret: TypeIdentifier,
-  maybeOnEval: Option[(Context) => Evaluation]
-) extends Expr {
-
-  def eval(ctx: Context): Evaluation = this.maybeOnEval match {
-    case Some(onEval) => onEval(ctx)
-    case None => Evaluation(this, ContextMutationSet.empty)
-  }
-
-  def checkType(ctx: Context, tpe: TypeIdentifier): Boolean = {
-    tpe match {
-      case OperatorType(args, ret) => {
-        if (this.args.length == args.length) {
-          if ((this.args zip args).forall{ case (a, b) => a == b}) {
-            this.ret == ret
-          }
-          else {
-            throw new Exception("args not same type") //TODO
-          }
-        }
-        else {
-          throw new Exception("not same length args") //TODO
-        }
-      }
-      case other => {
-        throw new Exception("not operator type") //TODO
-      }
-    }
-  }
-            
-  def inferType(ctx: Context): Option[TypeIdentifier] = {
-    Some(OperatorType(this.args, this.ret))
-  }
-
-}
-
-
-
+//=============================================================================
 
 case class ApplyExpr(op: Object, params: Vector[Object]) extends Expr {
 
   def eval(ctx: Context): Evaluation = {
-    
+
     val evaldOpRes = this.op.eval(ctx)
     val evaldOp = evaldOpRes.evaldObj
     val evaldOpCtxDelta = evaldOpRes.ctxDelta.onlyReassignments
@@ -253,61 +167,3 @@ case class ApplyExpr(op: Object, params: Vector[Object]) extends Expr {
   }
 
 }
-
-
-
-
-case class WhileExpr(predicate: Object, body: Object) extends Expr {
-  
-//  def eval(ctx: Context): Evaluation = {
-//
-//    @tailrec
-//    def evalRec(ctx: Context, accum: Vector[Object]): (Vector[Object], Context) = {
-//      val (evaldPredicate, ctxDeltaPredicate) = this.predicate.eval(ctx)
-//      if (evaldPredicate.checkType(ctx, Identifier("Bool"))) {
-//        if (evaldPredicate.isTrue()) {
-//          val (evaldBody, ctxDeltaBody) = this.body.eval(ctx)
-//          evalRec(ctx.mutateWith(ctxDeltaBody), accum :+ evaldBody)
-//        }
-//        else {
-//          (accum, ctx)
-//        }
-//      }
-//      else {
-//        throw new Exception("bad type") //TODO
-//      }
-//    }
-//
-//    val (evaldObjs, ctxNew) = evalRec(ctx, Vector[Object]())
-//    val ctxDelta = ctx.getDeltaTo(ctxNew)
-//
-//    Evaluation(makeList(evaldObjs), ctxDelta)
-//
-//  }
-
-  def eval(ctx: Context): Evaluation = {
-    Evaluation(this, ContextMutationSet.empty)
-  }
-
-  def checkType(ctx: Context, tpe: TypeIdentifier): Boolean = {
-    //TODO
-    true
-  }
-
-  def inferType(ctx: Context): Option[TypeIdentifier] = {
-    //TODO
-    None
-  }
-
-}
-
-
-
-
-//TODO
-//case class TestAndBody(test: Object, body: Object)
-//
-//case class IfExpr(ifdo: Vector[TestAndBody], elsedo: Object) extends Expr {
-//  
-//}
-

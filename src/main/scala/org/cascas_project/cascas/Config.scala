@@ -4,11 +4,11 @@
 
 package org.cascas_project.cascas
 
+//=============================================================================
+
 import scala.collection.mutable.{Map => MMap}
 import scala.io.Source
-import scala.util.matching._
-
-import org.cascas_project.cascas.util._
+import scala.util.matching.{Regex, UnanchoredRegex}
 
 //=============================================================================
 // Config object

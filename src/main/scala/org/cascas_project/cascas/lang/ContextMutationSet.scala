@@ -1,9 +1,15 @@
+//=============================================================================
+// lang/ContextMutationSet.scala : CaSCAS Project
+//=============================================================================
+
 package org.cascas_project.cascas.lang
 
+//=============================================================================
+
+import org.cascas_project.cascas.lang.liro.Identifier
 import scala.collection.mutable.{Map => MMap}
 
-
-
+//=============================================================================
 
 class ContextMutationSet {
 
@@ -72,7 +78,7 @@ class ContextMutationSet {
     this
   }
 
-  def assign(id: Identifier, obj: Object, ctx: Context): ContextMutationSet = {
+  def assign(id: Identifier, obj: liro.Object, ctx: Context): ContextMutationSet = {
     obj.inferType(ctx) match {
       case Some(tpe) => {
         this.assignments += (id -> TypedObject(tpe, obj))
@@ -89,7 +95,7 @@ class ContextMutationSet {
     this
   }
 
-  def reassign(id: Identifier, obj: Object, ctx: Context): ContextMutationSet = {
+  def reassign(id: Identifier, obj: liro.Object, ctx: Context): ContextMutationSet = {
     ctx.get(id) match {
       // Reassignment of an assigned identifier
       case Some(TypedObject(oldTpe, oldObj)) => {

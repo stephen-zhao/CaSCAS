@@ -1,17 +1,13 @@
 //=============================================================================
-// lang/TypedObject.scala : CaSCAS Project
+// lang/FormalParameter.scala : CaSCAS Project
 //=============================================================================
 
 package org.cascas_project.cascas.lang
 
 //=============================================================================
 
-import org.cascas_project.cascas.lang.liro.Object
+import org.cascas_project.cascas.lang.liro.Identifier
 
 //=============================================================================
 
-case class TypedObject(tpe: TypeIdentifier, value: Object) extends ContextValue {
-
-  override def toString(): String = f"$tpe -> $value"
-
-}
+case class FormalParameter(id: Identifier, tpe: TypeIdentifier, manyness: Manyness = One)

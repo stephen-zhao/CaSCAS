@@ -1,20 +1,21 @@
 //=============================================================================
-// codegen/CodeGenerator.scala : CaSCAS Project
+// translator/CodeGenerator.scala : CaSCAS Project
 //=============================================================================
 
-package org.cascas_project.cascas.codegen
+package org.cascas_project.cascas.translator
 
 //=============================================================================
 
 import scala.annotation.tailrec
-import org.cascas_project.cascas.lang._
-import org.cascas_project.cascas.parser._
-import org.cascas_project.cascas.tokens._
+import org.cascas_project.cascas.lang.{liro, _}
+import org.cascas_project.cascas.lang.liro.{ApplyExpr, Identifier, RationalNumber}
+import org.cascas_project.cascas.parsetree._
+import org.cascas_project.cascas.token._
 
 class CodeGenerator {
 
 
-  def generateLIRObject(parseTree: ParseNodeLike): Object = {
+  def generateLIRObject(parseTree: ParseNodeLike): liro.Object = {
 
     parseTree match {
 
@@ -33,7 +34,7 @@ class CodeGenerator {
           // 4.1. when there is a parameter list longer than length 1
           case SequenceNode('AParams, seq) => seq.map(this.generateLIRObject(_))
           // 4.2. when there is only one parameter
-          case node => Vector[Object](this.generateLIRObject(node))
+          case node => Vector[liro.Object](this.generateLIRObject(node))
         })
       }
 
@@ -48,7 +49,7 @@ class CodeGenerator {
            if (kind == 'MathExpr && opKind == 'PLUS) || (kind == 'Term && opKind == 'STAR) => {
 
         // Function to do processing on flattening the left operand into the parameter list
-        def processSameOperand1(): Vector[Object] = {
+        def processSameOperand1(): Vector[liro.Object] = {
           // Generate operand1's LIR Object to extract the operands that need promoting
           this.generateLIRObject(operands._1) match {
             // Extract the operands
@@ -101,7 +102,7 @@ class CodeGenerator {
             //        right operator =/= current operator, then
             // CASE: Both operands are not the same kind, so just make a length-2 parameter list
             //       with the left and right operands
-            case operand2 => Vector[Object](
+            case operand2 => Vector[liro.Object](
               this.generateLIRObject(operand1),
               this.generateLIRObject(operand2)
             )
@@ -113,7 +114,7 @@ class CodeGenerator {
       case BinaryOperatorNode(_, operator, operands) => {
         ApplyExpr(
           this.generateLIRObject(operator),
-          Vector[Object](
+          Vector[liro.Object](
             this.generateLIRObject(operands._1),
             this.generateLIRObject(operands._2)
           )

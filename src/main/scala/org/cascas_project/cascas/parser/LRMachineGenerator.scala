@@ -1,14 +1,16 @@
 //=============================================================================
-// LRMachineGenerator.scala : CaSCAS Project
+// parser/LRMachineGenerator.scala : CaSCAS Project
 //=============================================================================
 
 package org.cascas_project.cascas.parser
 
+//=============================================================================
+
+import org.cascas_project.cascas.Logger
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.{Map => MMap}
 import scala.collection.mutable.Queue
 import scala.collection.mutable.Set
-import org.cascas_project.cascas.Logger
 
 //=============================================================================
 // LRMachineGenerator class

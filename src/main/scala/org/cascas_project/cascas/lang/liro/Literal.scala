@@ -1,11 +1,9 @@
 //=============================================================================
-// lang/package.scala : CaSCAS Project
+// lang/liro/Literal.scala : CaSCAS Project
 //=============================================================================
 
-package org.cascas_project.cascas
+package org.cascas_project.cascas.lang.liro
 
 //=============================================================================
 
-package object lang {
-
-}
+trait Literal extends Object {}

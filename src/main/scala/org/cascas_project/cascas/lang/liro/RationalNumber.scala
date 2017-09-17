@@ -1,4 +1,17 @@
-package org.cascas_project.cascas.lang
+//=============================================================================
+// lang/liro/RationalNumber.scala : CaSCAS Project
+//=============================================================================
+
+package org.cascas_project.cascas.lang.liro
+
+//=============================================================================
+
+import org.cascas_project.cascas.lang.Context
+import org.cascas_project.cascas.lang.ContextMutationSet
+import org.cascas_project.cascas.lang.Evaluation
+import org.cascas_project.cascas.lang.TypeIdentifier
+
+//=============================================================================
 
 case class RationalNumber(numerator: BigInt, denominator: BigInt) extends Literal {
 

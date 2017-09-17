@@ -1,14 +1,16 @@
 //=============================================================================
-// Lexer.scala : CaSCAS Project
+// lexer/Lexer.scala : CaSCAS Project
 //=============================================================================
 
-package org.cascas_project.cascas
+package org.cascas_project.cascas.lexer
 
-import java.io._
-import scala.annotation._
+//=============================================================================
+
+import org.cascas_project.cascas.Logger
+import org.cascas_project.cascas.token._
+import scala.annotation.tailrec
 import scala.io.StdIn
-import scala.util.matching._
-import org.cascas_project.cascas.tokens._
+import scala.util.matching.Regex
 
 //=============================================================================
 // Lexer class

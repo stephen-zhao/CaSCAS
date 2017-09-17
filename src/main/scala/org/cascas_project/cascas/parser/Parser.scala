@@ -1,15 +1,20 @@
 //=============================================================================
-// Parser.scala : CaSCAS Project
+// parser/Parser.scala : CaSCAS Project
 //=============================================================================
 
 package org.cascas_project.cascas.parser
 
-import scala.annotation.tailrec
+//=============================================================================
+
 import org.cascas_project.cascas.Interpreter
-import org.cascas_project.cascas.Lexer
 import org.cascas_project.cascas.Logger
-import org.cascas_project.cascas.tokens._
-import org.cascas_project.cascas.parser._
+import org.cascas_project.cascas.lexer.Lexer
+import org.cascas_project.cascas.token._
+import org.cascas_project.cascas.parsetree._
+
+import scala.annotation.tailrec
+
+//=============================================================================
 
 
 object Parser {
