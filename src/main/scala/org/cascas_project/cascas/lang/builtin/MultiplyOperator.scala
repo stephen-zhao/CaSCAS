@@ -1,7 +1,21 @@
+//=============================================================================
+// lang/builtin/MultiplyOperator.scala : CaSCAS Project
+//=============================================================================
+
 package org.cascas_project.cascas.lang.builtin
 
-//import org.cascas_project.cascas.util.ImplicitConversions
-import org.cascas_project.cascas.lang._
+//=============================================================================
+
+import org.cascas_project.cascas.lang.Context
+import org.cascas_project.cascas.lang.Evaluation
+import org.cascas_project.cascas.lang.FormalParameter
+import org.cascas_project.cascas.lang.OperatorType
+import org.cascas_project.cascas.lang.liro.ApplyExpr
+import org.cascas_project.cascas.lang.liro.Identifier
+import org.cascas_project.cascas.lang.liro.Object
+import org.cascas_project.cascas.lang.liro.RationalNumber
+
+//=============================================================================
 
 object MultiplyOperator extends BuiltInDefinition {
 
