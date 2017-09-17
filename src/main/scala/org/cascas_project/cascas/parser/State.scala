@@ -1,24 +1,39 @@
 //=============================================================================
-// State.scala : CaSCAS Project
+// parser/State.scala : CaSCAS Project
 //=============================================================================
 
 package org.cascas_project.cascas.parser
 
-import scala.collection.mutable.{Map => MMap}
+//=============================================================================
 
 import org.cascas_project.cascas.Logger
+import scala.collection.mutable.{Map => MMap}
 
+//=============================================================================
+// The State class represents a state in the parser's finite state machine.
+//
+// A state contains a set of items, to keep track of the potential positions at
+// which the currently parsing sentence may be at, and a mapping from symbols
+// to other states, to tell the parser which state to move to depending on the
+// symbol read in from the currently parsing sentence.
+//
 class State(
-  val id: Int,
-  val name: String,
-  val transition: Symbol)
-{
+  val id:         Int,
+  val name:       String,
+  val transition: Symbol
+) {
 
   var items: Set[Item] = Set[Item]()
   var childStates: MMap[Symbol, State] = MMap[Symbol, State]()
 
   override def toString(): String = {
-    f"${this.transition} -> ${this.name}\nItems:\n  ${items.mkString("\n  ")}\nChildren:\n  ${childStates.map(kvp => f"${kvp._1} -> ${kvp._2.name}").mkString("\n  ")}"
+    f"${this.transition} -> ${this.name}\n" +
+      "Items:\n" +
+      f"  ${items.mkString("\n  ")}\n" +
+      "Children:\n" +
+      f"""  ${childStates.map(
+        kvp => f"${kvp._1} -> ${kvp._2.name}"
+      ).mkString("\n  ")}"""
   }
 
   def generateChildStatesFromItems(): Unit = {
@@ -64,7 +79,9 @@ class State(
 
   def reduceChildStates(lrmg: LRMachineGenerator): Unit = {
     for ((transition, state) <- this.childStates) {
-      this.childStates += (transition -> lrmg.checkReduceRegisterReturnState(state))
+      this.childStates += (
+        transition -> lrmg.checkReduceRegisterReturnState(state)
+      )
     }
   }
 
@@ -73,7 +90,9 @@ class State(
   }
 
   def getItemsWhereLHSIs(nextSymbol: Symbol): Set[Item] = {
-    CFG.rules.collect{ case (nextSymbol, v: Vector[Symbol]) => new Item(nextSymbol, v, 0) }
+    CFG.rules.collect{
+      case (nextSymbol, v: Vector[Symbol]) => new Item(nextSymbol, v, 0)
+    }
   }
 
 }

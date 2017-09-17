@@ -4,11 +4,6 @@
 
 package org.cascas_project.cascas
 
-import scala.annotation._
-import scala.io.StdIn
-import scala.Console.{RESET, BOLD, UNDERLINED, println}
-import org.cascas_project.cascas.parser.Parser
-
 //=============================================================================
 // Main Application Object
 // 

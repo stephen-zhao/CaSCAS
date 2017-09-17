@@ -4,11 +4,12 @@
 
 package org.cascas_project.cascas
 
-import scala.annotation._
-import scala.Console.{BOLD, RESET, UNDERLINED, println, print}
-import scala.io.StdIn
+//=============================================================================
+
 import org.cascas_project.cascas.parser.{InteractiveParser, Parser}
-import org.cascas_project.cascas.codegen.CodeGenerator
+import org.cascas_project.cascas.translator.CodeGenerator
+import scala.annotation.tailrec
+import scala.Console.{BOLD, RESET, UNDERLINED, println, print}
 
 //=============================================================================
 // Interpreter class
@@ -25,8 +26,6 @@ class Interpreter {
   private var codeGenerator: CodeGenerator = new CodeGenerator()
 
   private var inputNum: Int = 0
-
-  private var globalScope: Scope = new Scope
 
   def repl(): Unit = {
     replrec()

@@ -1,0 +1,83 @@
+//=============================================================================
+// token/BracketTokens.scala : CaSCAS Project
+//=============================================================================
+
+package org.cascas_project.cascas.token
+
+//=============================================================================
+
+import scala.util.matching.Regex
+
+//=============================================================================
+
+//== LEFT ROUND BRACKET TOKEN =================================================
+case class LeftRoundBracketToken(
+  val lexeme: String = raw"""(""",
+  val symbol: Symbol = 'LRBRACK
+) extends Token
+  with BracketTokenLike
+
+object LeftRoundBracketToken {
+  val expected: String = raw"""("""
+  val regex: Regex = raw"""^(\()(.*)""".r
+}
+
+//== RIGHT ROUND BRACKET TOKEN ================================================
+case class RightRoundBracketToken(
+  val lexeme: String = raw""")""",
+  val symbol: Symbol = 'RRBRACK
+) extends Token
+  with BracketTokenLike
+
+object RightRoundBracketToken {
+  val expected: String = raw""")"""
+  val regex: Regex = raw"""^(\))(.*)""".r
+}
+
+//== LEFT SQUARE BRACKET TOKEN ================================================
+case class LeftSquareBracketToken(
+  val lexeme: String = raw"""[""",
+  val symbol: Symbol = 'LSBRACK
+) extends Token
+  with BracketTokenLike
+
+object LeftSquareBracketToken {
+  val expected: String = raw"""["""
+  val regex: Regex = raw"""^(\[)(.*)""".r
+}
+
+//== RIGHT SQUARE BRACKET TOKEN ===============================================
+case class RightSquareBracketToken(
+  val lexeme: String = raw"""]""",
+  val symbol: Symbol = 'RSBRACK
+) extends Token
+  with BracketTokenLike
+
+object RightSquareBracketToken {
+  val expected: String = raw"""]"""
+  val regex: Regex = raw"""^(\])(.*)""".r
+}
+
+//== LEFT CURLY BRACKET TOKEN =================================================
+case class LeftCurlyBracketToken(
+  val lexeme: String = raw"""{""",
+  val symbol: Symbol = 'LCBRACK
+) extends Token
+  with BracketTokenLike
+
+object LeftCurlyBracketToken {
+  val expected: String = raw"""{"""
+  val regex: Regex = raw"""^(\{)(.*)""".r
+}
+
+//== RIGHT CURLY BRACKET TOKEN ================================================
+case class RightCurlyBracketToken(
+  val lexeme: String = raw"""}""",
+  val symbol: Symbol = 'RCBRACK
+) extends Token
+  with BracketTokenLike
+
+object RightCurlyBracketToken {
+  val expected: String = raw"""}"""
+  val regex: Regex = raw"""^(\})(.*)""".r
+}

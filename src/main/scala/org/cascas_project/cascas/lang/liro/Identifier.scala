@@ -1,4 +1,14 @@
-package org.cascas_project.cascas.lang
+//=============================================================================
+// lang/liro/Identifier.scala : CaSCAS Project
+//=============================================================================
+
+package org.cascas_project.cascas.lang.liro
+
+//=============================================================================
+
+import org.cascas_project.cascas.lang._
+
+//=============================================================================
 
 case class Identifier(name: String) extends TypeIdentifier with Object {
 

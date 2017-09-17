@@ -1,7 +1,15 @@
+//=============================================================================
+// lang/builtin/PlusOperator.scala : CaSCAS Project
+//=============================================================================
+
 package org.cascas_project.cascas.lang.builtin
 
-//import org.cascas_project.cascas.util.ImplicitConversions
+//=============================================================================
+
 import org.cascas_project.cascas.lang._
+import org.cascas_project.cascas.lang.liro.{ApplyExpr, Identifier, Object, RationalNumber}
+
+//=============================================================================
 
 object PlusOperator extends BuiltInDefinition {
 

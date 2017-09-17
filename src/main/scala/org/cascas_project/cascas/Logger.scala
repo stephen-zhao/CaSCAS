@@ -4,12 +4,14 @@
 
 package org.cascas_project.cascas
 
+//=============================================================================
+
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.text.SimpleDateFormat
 import java.util.Calendar
 
-import scala.collection.mutable.ArrayBuffer
+//=============================================================================
 
 object Logger {
 

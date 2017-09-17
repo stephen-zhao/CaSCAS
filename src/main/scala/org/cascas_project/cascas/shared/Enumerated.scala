@@ -21,8 +21,10 @@
 // final case object Thursday extends Week {}
 // final case object Friday extends Week {}
 // final case object Saturday extends Week {}
-//
+
 package org.cascas_project.cascas.shared
+
+//=============================================================================
 
 object Enumerated {
 

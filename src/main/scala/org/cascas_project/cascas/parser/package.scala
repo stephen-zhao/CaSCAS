@@ -1,7 +1,12 @@
+//=============================================================================
+// parser/package.scala : CaSCAS Project
+//=============================================================================
+
 package org.cascas_project.cascas
 
+//=============================================================================
 // This package contains modules used in parsing.
-
+//
 package object parser {
 
   private[parser] type CFGRule = (Symbol, Vector[Symbol])

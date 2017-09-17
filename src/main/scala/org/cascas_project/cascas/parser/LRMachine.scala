@@ -1,12 +1,17 @@
 //=============================================================================
-// LRMachine.scala : CaSCAS Project
+// parser/LRMachine.scala : CaSCAS Project
 //=============================================================================
 
 package org.cascas_project.cascas.parser
 
-import scala.annotation.tailrec
+//=============================================================================
+
 import org.cascas_project.cascas.Logger
-import org.cascas_project.cascas.tokens.Token
+import org.cascas_project.cascas.parsetree.{ParseNodeLike, TerminalNode}
+import org.cascas_project.cascas.token.Token
+import scala.annotation.tailrec
+
+//=============================================================================
 
 
 object LRMachine {

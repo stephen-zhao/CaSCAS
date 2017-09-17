@@ -1,10 +1,12 @@
 //=============================================================================
-// CFG.scala : CaSCAS Project
+// parser/CFG.scala : CaSCAS Project
 //=============================================================================
 // This file contains the necessary modules used to describe a generic context-
 // free grammar and to instantiate specifically a CaSCAS context-free grammar.
 
 package org.cascas_project.cascas.parser
+
+//=============================================================================
 
 // This class represents a context free grammar definition
 case class ContextFreeGrammar(
