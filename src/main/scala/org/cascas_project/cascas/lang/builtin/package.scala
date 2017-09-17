@@ -17,14 +17,14 @@ package object builtin {
   builtInContextMutationSet.assign(PlusOperator.ident, PlusOperator())
 
   // e.g.
-  //builtInContextMutationSet.assign(MultiplyOperator.ident, MultiplyOperator())
+  builtInContextMutationSet.assign(MultiplyOperator.ident, MultiplyOperator())
 
   //builtInContextMutationSet.assign(Identifier("...."), .....Operator())
 
   val builtInCtx: Context = Context() :+ builtInContextMutationSet
 
   trait BuiltInDefinition {
-    def onApply(ctx: Context): Evaluation
+    def onApply(v : Vector[Object], a : Boolean, l : Object, ctx: Context): Evaluation
     def tpe: TypeIdentifier
     def ident: Identifier
     def formalParams: Vector[FormalParameter]
