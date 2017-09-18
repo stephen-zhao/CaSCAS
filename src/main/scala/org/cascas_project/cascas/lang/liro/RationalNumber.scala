@@ -13,8 +13,8 @@ import org.cascas_project.cascas.lang.TypeIdentifier
 
 //=============================================================================
 
-case class RationalNumber(numerator: BigInt, denominator: BigInt) extends Literal {
-
+case class RationalNumber private (numerator: BigInt, denominator: BigInt) extends Literal {
+  
   def *(that: RationalNumber): RationalNumber = {
     RationalNumber(this.numerator.*(that.numerator), this.denominator.*(that.denominator)).reduced()
   }
@@ -99,8 +99,7 @@ case class RationalNumber(numerator: BigInt, denominator: BigInt) extends Litera
   }
 
   def checkType(ctx: Context, tpe: TypeIdentifier): Boolean = {
-    if (tpe == Identifier("Number")) true
-    else false
+    tpe == Identifier("Number")
   }
 
   def inferType(ctx: Context): Option[TypeIdentifier] = {
@@ -113,6 +112,14 @@ object RationalNumber {
 
   val zero = RationalNumber(0, 1)
 
+  def apply(numerator: BigInt, denominator: BigInt): RationalNumber = {
+    if (denominator < 0) {
+      RationalNumber(numerator * -1, denominator * -1)
+    } else {
+      RationalNumber(numerator, denominator)
+    }
+  }
+  
   def apply(i: Int): RationalNumber = RationalNumber(i, 1)
 
   def apply(i: BigInt): RationalNumber = RationalNumber(i, 1)
