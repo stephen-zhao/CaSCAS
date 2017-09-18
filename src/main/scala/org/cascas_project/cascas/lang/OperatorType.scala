@@ -12,7 +12,7 @@ import org.cascas_project.cascas.lang.liro.Identifier
 
 case class OperatorType(
   args: Vector[FormalParameter],
-  ret: TypeIdentifier
+  ret:  TypeIdentifier
 ) extends TypeIdentifier {
 
   override def toString(): String = args.map {

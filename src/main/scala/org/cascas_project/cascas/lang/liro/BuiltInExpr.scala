@@ -18,47 +18,48 @@ import scala.annotation.tailrec
 //=============================================================================
 
 case class BuiltInExpr(
-  args: Vector[FormalParameter],
-  onApply: (Vector[Object], Context) => Evaluation,
-  ret: TypeIdentifier,
+  args:        Vector[FormalParameter],
+  onApply:     (Vector[Object], Context) => Evaluation,
+  ret:         TypeIdentifier,
   maybeOnEval: Option[(Context) => Evaluation]
 ) extends Expr {
 
-  def processParams (ctx : Context) : Vector[Object] = {
+  def processParams(ctx: Context): Vector[Object] = {
     var temp: Vector[Object] = Vector()
     processParamsRec(args, ctx, temp)
   }
 
   @tailrec
-  private def processParamsRec (fp : Vector[FormalParameter],
-    ctx : Context,
-    acc : Vector[Object]) : Vector[Object] = {
-    var vacc : Vector[Object] = Vector()
-    ctx.get(fp.head.id) match {
-      case Some(TypedObject(t, value)) if (t == fp.head.tpe) => {
-        vacc = acc :+ value
-        if (fp.tail.length > 0) {
-          processParamsRec(fp.tail, ctx, vacc)
-        } else {
-          vacc
+  private def processParamsRec(
+    fp:  Vector[FormalParameter],
+    ctx: Context,
+    acc: Vector[Object]
+  ): Vector[Object] = {
+    if (fp.isEmpty) {
+      acc
+    }
+    else {
+      ctx.get(fp.head.id) match {
+        case Some(TypedObject(tpe, value)) if tpe == fp.head.tpe => {
+          processParamsRec(fp.tail, ctx, acc :+ value)
         }
-      }
 
-      case Some(TypedObject(other, _)) => {
-        // report type mismatch error
-        throw new Exception("type mismatch error") //TODO
-      }
+        case Some(TypedObject(other, _)) => {
+          // report type mismatch error
+          throw new Exception("type mismatch error") //TODO
+        }
 
-      // 3. case FAIL, is not assigned, then
-      case Some(other) => {
-        // report unassigned error
-        throw new Exception("is not assigned") //TODO
-      }
+        // 3. case FAIL, is not assigned, then
+        case Some(other) => {
+          // report unassigned error
+          throw new Exception("is not assigned") //TODO
+        }
 
-      // 4. case FAIL, is not defined, then
-      case None => {
-        // report undefined error
-        throw new Exception("is not defined") //TODO
+        // 4. case FAIL, is not defined, then
+        case None => {
+          // report undefined error
+          throw new Exception("is not defined") //TODO
+        }
       }
     }
   }

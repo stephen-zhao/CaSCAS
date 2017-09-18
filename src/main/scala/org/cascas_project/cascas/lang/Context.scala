@@ -1,6 +1,14 @@
 //=============================================================================
 // lang/Context.scala : CaSCAS Project
 //=============================================================================
+// A Context is used in the runtime to represent a mapping from identifiers
+// (names) to either types or type-value pairs.
+//
+// A mapping from an identifier to a type represents a declaration of a name
+// that hasn't been assigned. e.g. a formal parameter definition.
+//
+// A mapping from an identifier to a type-value pair (TypedObject) represents
+// a name that was assigned a object (and which has a type association).
 
 package org.cascas_project.cascas.lang
 
@@ -30,6 +38,10 @@ case class Context (
     "\n}"
   }
 
+  // ConsolidatedWith is used to incorporate context changes gathered in a
+  // ContextMutationSet into a Context. ContextMutationSet breaks down the
+  // changes into three components: introductions, assignments, and
+  // reassignments, and each of these must be handled appropriately.
   def consolidatedWith(ctxDelta: ContextMutationSet): Context = {
     val intros:    Map[Identifier, ContextValue] = ctxDelta.getIntroductions
     val assigns:   Map[Identifier, ContextValue] = ctxDelta.getAssignments

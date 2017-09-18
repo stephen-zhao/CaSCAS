@@ -17,13 +17,17 @@ import scala.annotation.tailrec
 
 //=============================================================================
 
-case class ApplyExpr(op: Object, params: Vector[Object]) extends Expr {
+case class ApplyExpr(
+  op:     Object,
+  params: Vector[Object]
+) extends Expr
+  with TypeIdentifier {
 
   def eval(ctx: Context): Evaluation = {
 
     val evaldOpRes = this.op.eval(ctx)
     val evaldOp = evaldOpRes.evaldObj
-    val evaldOpCtxDelta = evaldOpRes.ctxDelta.onlyReassignments
+    val evaldOpCtxDelta = evaldOpRes.ctxDelta.onlyReassignments()
 
     evaldOp match {
       case builtIn @ BuiltInExpr(args, onApply, _, _) => {
@@ -32,7 +36,7 @@ case class ApplyExpr(op: Object, params: Vector[Object]) extends Expr {
           onApply(
             builtIn.processParams(ctx.consolidatedWith(evaldOpCtxDelta ++ subCtxDelta)),
             ctx.consolidatedWith(evaldOpCtxDelta ++ subCtxDelta)
-          ).keepOnlyReassignments
+          ).keepOnlyReassignments()
         }
         else {
           throw new Exception("cannot partially apply built-in operator") //TODO
@@ -43,15 +47,15 @@ case class ApplyExpr(op: Object, params: Vector[Object]) extends Expr {
         if (leftOverParams.isEmpty) {
           body.eval(
             ctx.consolidatedWith(evaldOpCtxDelta ++ subCtxDelta)
-          ).keepOnlyReassignments
+          ).keepOnlyReassignments()
         }
         else {
           val evaldBodyRes = body.eval(
             ctx.consolidatedWith(evaldOpCtxDelta ++ subCtxDelta)
-          ).keepOnlyReassignments
+          ).keepOnlyReassignments()
           Evaluation(
             OperatorExpr(leftOverParams, evaldBodyRes.evaldObj),
-            evaldBodyRes.ctxDelta.onlyReassignments
+            evaldBodyRes.ctxDelta.onlyReassignments()
           )
         }
       }
@@ -65,9 +69,9 @@ case class ApplyExpr(op: Object, params: Vector[Object]) extends Expr {
   private def subInRec(
     formalParams: Vector[FormalParameter],
     actualParams: Vector[Object],
-    ctxDelta: ContextMutationSet = ContextMutationSet.empty
+    ctxDelta:     ContextMutationSet = ContextMutationSet.empty
   ): (ContextMutationSet, Vector[FormalParameter]) = {
-    if (!formalParams.isEmpty && !actualParams.isEmpty) {
+    if (formalParams.nonEmpty && actualParams.nonEmpty) {
       ctxDelta.assign(
         formalParams.head.id,
         TypedObject(formalParams.head.tpe, actualParams.head)
@@ -140,11 +144,11 @@ case class ApplyExpr(op: Object, params: Vector[Object]) extends Expr {
 
   @tailrec
   private def tryCheckAllRec(
-    ctx: Context,
+    ctx:          Context,
     formalParams: Vector[FormalParameter],
     actualParams: Vector[Object]
   ): (Boolean, Vector[FormalParameter]) = {
-    if (!formalParams.isEmpty && !actualParams.isEmpty) {
+    if (formalParams.nonEmpty && actualParams.nonEmpty) {
       if (actualParams.head.checkType(ctx, formalParams.head.tpe)) {
         this.tryCheckAllRec(
           ctx.consolidatedWith(ContextMutationSet.empty.assign(

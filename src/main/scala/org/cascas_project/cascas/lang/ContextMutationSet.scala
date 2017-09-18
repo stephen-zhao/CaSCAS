@@ -1,6 +1,8 @@
 //=============================================================================
 // lang/ContextMutationSet.scala : CaSCAS Project
 //=============================================================================
+// A ContextMutationSet represents a collection of potential changes to be
+// applied to a Context.
 
 package org.cascas_project.cascas.lang
 
@@ -40,7 +42,7 @@ class ContextMutationSet {
 
   def withReassignments(
     reassigns: MMap[Identifier, TypedObject],
-    ctx: Context
+    ctx:       Context
   ): ContextMutationSet = {
     reassigns.foreach {
       case (id, TypedObject(tpe, obj)) => {
@@ -69,9 +71,9 @@ class ContextMutationSet {
     )
   }
 
-  def getIntroductions(): Map[Identifier, TypeIdentifier] = this.introductions.toMap
-  def getAssignments():   Map[Identifier, TypedObject]    = this.assignments.toMap
-  def getReassignments(): Map[Identifier, TypedObject]    = this.reassignments.toMap
+  def getIntroductions: Map[Identifier, TypeIdentifier] = this.introductions.toMap
+  def getAssignments:   Map[Identifier, TypedObject]    = this.assignments.toMap
+  def getReassignments: Map[Identifier, TypedObject]    = this.reassignments.toMap
 
   def introduce(id: Identifier, tpe: TypeIdentifier): ContextMutationSet = {
     this.introductions += (id -> tpe)
@@ -115,7 +117,7 @@ class ContextMutationSet {
       // Reassignment of an introduced (unassigned) identifier
       case Some(oldTpe: TypeIdentifier) => {
         obj.inferType(ctx) match {
-          case Some(tpe) if (tpe == oldTpe) => {
+          case Some(tpe) if tpe == oldTpe => {
             this.reassignments += (id -> TypedObject(oldTpe, obj))
             this
           }
@@ -161,7 +163,6 @@ class ContextMutationSet {
       that.reassignments
     )
   }
-  
 }
 
 object ContextMutationSet {
