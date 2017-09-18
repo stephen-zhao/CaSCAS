@@ -7,14 +7,11 @@ package org.cascas_project.cascas.lang.builtin
 //=============================================================================
 
 import org.cascas_project.cascas.lang.FormalParameter
-import org.cascas_project.cascas.lang.OperatorType
 import org.cascas_project.cascas.lang.liro.Identifier
 
 //=============================================================================
 
-object ListOperator extends BuiltInDefinition with Unappliable {
-
-  def tpe = OperatorType(Identifier("T"), Identifier("Type"))(Identifier("Type"))
+object ListOperator extends BuiltInDefinition with Unapplyable {
 
   def ident = Identifier("List")
 

@@ -8,7 +8,6 @@ package org.cascas_project.cascas.lang.builtin
 
 import org.cascas_project.cascas.lang.Context
 import org.cascas_project.cascas.lang.FormalParameter
-import org.cascas_project.cascas.lang.OperatorType
 import org.cascas_project.cascas.lang.liro.ApplyExpr
 import org.cascas_project.cascas.lang.liro.Identifier
 import org.cascas_project.cascas.lang.liro.ListExpr
@@ -45,12 +44,6 @@ object MultiplyOperator extends BuiltInDefinition {
       case term => Accum(accum.nonconstFactors :+ term, accum.constFactor) //TODO: logic to collect like factors
     }
   }
-
-  def tpe = OperatorType(
-    Identifier("multiplicands"), ApplyExpr(Identifier("List"), Vector(Identifier("Number")))
-  )(
-    Identifier("Number")
-  )
 
   def ident = Identifier("*")
 

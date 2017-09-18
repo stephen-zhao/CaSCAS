@@ -8,7 +8,6 @@ package org.cascas_project.cascas.lang.builtin
 
 import org.cascas_project.cascas.lang.Context
 import org.cascas_project.cascas.lang.FormalParameter
-import org.cascas_project.cascas.lang.OperatorType
 import org.cascas_project.cascas.lang.liro.ApplyExpr
 import org.cascas_project.cascas.lang.liro.Identifier
 import org.cascas_project.cascas.lang.liro.ListExpr
@@ -45,12 +44,6 @@ object AdditionOperator extends BuiltInDefinition {
       case term => Accum(accum.nonconstTerms :+ term, accum.constTerm) //TODO: logic to collect like terms
     }
   }
-
-  def tpe = OperatorType(
-    Identifier("summands"), ApplyExpr(Identifier("List"), Vector(Identifier("Number")))
-  )(
-    Identifier("Number")
-  )
 
   def ident = Identifier("+")
 

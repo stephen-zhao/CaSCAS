@@ -14,6 +14,11 @@ package object builtin {
 
   private var builtInContextMutationSet: ContextMutationSet = ContextMutationSet.empty
 
+  builtInContextMutationSet.introduce(Identifier("Number"),Identifier("Type"))
+  builtInContextMutationSet.introduce(Identifier("Bool"),Identifier("Type"))
+
+  builtInContextMutationSet.assign(ListOperator.ident, ListOperator())
+
   builtInContextMutationSet.assign(AdditionOperator.ident, AdditionOperator())
   builtInContextMutationSet.assign(MultiplyOperator.ident, MultiplyOperator())
 
@@ -24,10 +29,10 @@ package object builtin {
 
   trait BuiltInDefinition {
     private[builtin] def onApply(params : Map[String, Object], ctx: Context): Object
-    private[builtin] def tpe: TypeIdentifier
     private[builtin] def ident: Identifier
     private[builtin] def formalParams: Vector[FormalParameter]
     private[builtin] def returnTpe: TypeIdentifier
+    private[builtin] def tpe: TypeIdentifier = OperatorType(this.formalParams)(this.returnTpe)
     private[builtin] def obj: BuiltInExpr = BuiltInExpr(
       this.formalParams,
       this.onApply,
@@ -38,7 +43,7 @@ package object builtin {
   }
 
   //TODO: This is temporary. There should not be any unappliable operators
-  trait Unappliable {
+  trait Unapplyable {
     private[builtin] def onApply(params : Map[String, Object], ctx: Context): Object = {
       throw new Exception("This operator is unappliable") //TODO
     }
