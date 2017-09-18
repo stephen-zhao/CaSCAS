@@ -41,7 +41,7 @@ class Interpreter {
 
     Logger.info('REPL, "Waiting for input.")
 
-    this.parser.parseOption match {
+    this.parser.parseOption() match {
       case None => {
         
         Logger.info('REPL, "Bad input.")

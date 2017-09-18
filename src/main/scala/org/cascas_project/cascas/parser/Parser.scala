@@ -29,7 +29,7 @@ object Parser {
 
 class Parser {
 
-  private val lrm: LRMachine = new LRMachineGenerator().generate.attachParser(this)
+  private val lrm: LRMachine = new LRMachineGenerator().generate().attachParser(this)
 
   private val lexer: Lexer = new Lexer
 
@@ -50,8 +50,8 @@ class Parser {
     lineNum: Int,
     isContinuedScan: Boolean
   ): Vector[Token] = this.lexer.scanProgram(
-    displayPrompt=this.displayPrompt,
-    displayContPrompt=this.displayContinuedPrompt,
+    displayPrompt=this.displayPrompt(),
+    displayContPrompt=this.displayContinuedPrompt(),
     useContPrompt=isContinuedScan
   )
 
@@ -255,11 +255,11 @@ class InteractiveParser(
 ) extends Parser {
 
   protected override def displayPrompt(): Unit = {
-    this.interpreter.displayInputPrompt
+    this.interpreter.displayInputPrompt()
   }
 
   protected override def displayContinuedPrompt(): Unit = {
-    this.interpreter.displayContinuedInputPrompt
+    this.interpreter.displayContinuedInputPrompt()
   }
 
 }

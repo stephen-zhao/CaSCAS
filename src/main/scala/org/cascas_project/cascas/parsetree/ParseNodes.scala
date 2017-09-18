@@ -16,7 +16,7 @@ sealed trait ParseNodeLike {
   // A toString that can be used to give a useful representation of the node
   // for human eyes and does not override the default toString, which may still
   // be used to convert the node to a canonical scala string representation.
-  def toRepr(): String
+  def toRepr: String
 
   // The kind of node is based on the context-free grammar used to parse the
   // node. All valid kinds are listed in the CaSCAS CFG definition.
@@ -59,19 +59,19 @@ sealed trait NonTerminalNodeLike extends ParseNodeLike {
 
 //== TERMINAL NODE ============================================================
 final case class TerminalNode(
-  val kind:  Symbol,
-  val token: Token,
+  kind:  Symbol,
+  token: Token,
 ) extends TerminalNodeLike {
-  def toRepr(): String = token.lexeme
+  def toRepr: String = token.lexeme
 }
 
 //== UNARY OPERATOR NODE ======================================================
 final case class UnaryOperatorNode(
-  val kind:     Symbol,
-  val operator: ParseNodeLike,
-  val operand:  ParseNodeLike
+  kind:     Symbol,
+  operator: ParseNodeLike,
+  operand:  ParseNodeLike
 ) extends NonTerminalNodeLike {
-  def toRepr(): String = f"(${operator.toRepr} ${operand.toRepr})"
+  def toRepr: String = f"(${operator.toRepr} ${operand.toRepr})"
   def get(i: Int): ParseNodeLike = i match {
     case 0 => this.operator
     case 1 => this.operand
@@ -81,11 +81,11 @@ final case class UnaryOperatorNode(
 
 //== BINARY OPERATOR NODE =====================================================
 final case class BinaryOperatorNode(
-  val kind:     Symbol,
-  val operator: ParseNodeLike,
-  val operands: (ParseNodeLike, ParseNodeLike),
+  kind:     Symbol,
+  operator: ParseNodeLike,
+  operands: (ParseNodeLike, ParseNodeLike),
 ) extends NonTerminalNodeLike {
-  def toRepr(): String = {
+  def toRepr: String = {
     f"(${operator.toRepr} ${operands._1.toRepr} ${operands._2.toRepr})"
   }
   def get(i: Int): ParseNodeLike = i match {
@@ -98,11 +98,11 @@ final case class BinaryOperatorNode(
 
 //== ASSIGN NODE ==============================================================
 final case class AssignNode(
-  val kind:     Symbol,
-  val assignee: ParseNodeLike,
-  val assigned: ParseNodeLike,
+  kind:     Symbol,
+  assignee: ParseNodeLike,
+  assigned: ParseNodeLike,
 ) extends NonTerminalNodeLike {
-  def toRepr(): String = f"let ${assignee.toRepr} := ${assigned.toRepr}"
+  def toRepr: String = f"let ${assignee.toRepr} := ${assigned.toRepr}"
   def get(i: Int): ParseNodeLike = i match {
     case 0 => this.assignee
     case 1 => this.assigned
@@ -112,11 +112,11 @@ final case class AssignNode(
 
 //== REASSIGN NODE ============================================================
 final case class ReAssignNode(
-  val kind:     Symbol,
-  val assignee: ParseNodeLike,
-  val assigned: ParseNodeLike,
+  kind:     Symbol,
+  assignee: ParseNodeLike,
+  assigned: ParseNodeLike,
 ) extends NonTerminalNodeLike {
-  def toRepr(): String = f"${assignee.toRepr} := ${assigned.toRepr}"
+  def toRepr: String = f"${assignee.toRepr} := ${assigned.toRepr}"
   def get(i: Int): ParseNodeLike = i match {
     case 0 => this.assignee
     case 1 => this.assigned
@@ -126,12 +126,12 @@ final case class ReAssignNode(
 
 //== OPERATOR ASSIGN NODE =====================================================
 final case class OperatorAssignNode(
-  val kind:     Symbol,
-  val assignee: ParseNodeLike,
-  val params:   ParseNodeLike,
-  val assigned: ParseNodeLike,
+  kind:     Symbol,
+  assignee: ParseNodeLike,
+  params:   ParseNodeLike,
+  assigned: ParseNodeLike,
 ) extends NonTerminalNodeLike {
-  def toRepr(): String = {
+  def toRepr: String = {
     f"let ${assignee.toRepr}(${params.toRepr}) := ${assigned.toRepr}"
   }
   def get(i: Int): ParseNodeLike = i match {
@@ -144,10 +144,10 @@ final case class OperatorAssignNode(
 
 //== WRAPPER NODE =============================================================
 final case class WrapperNode(
-  val kind:    Symbol,
-  val wrapped: ParseNodeLike,
+  kind:    Symbol,
+  wrapped: ParseNodeLike,
 ) extends NonTerminalNodeLike {
-  def toRepr(): String = wrapped.toRepr
+  def toRepr: String = wrapped.toRepr
   def get(i: Int): ParseNodeLike = i match {
     case 0 => this.wrapped
     case x => this.handleGetBadIndex(x)
@@ -156,10 +156,10 @@ final case class WrapperNode(
 
 //== STATEMENTS NODE ==========================================================
 final case class StatementsNode(
-  val kind:       Symbol,
-  val statements: Vector[ParseNodeLike],
+  kind:       Symbol,
+  statements: Vector[ParseNodeLike],
 ) extends NonTerminalNodeLike {
-  def toRepr(): String = statements.mkString("; ")
+  def toRepr: String = statements.mkString("; ")
   def get(i: Int): ParseNodeLike = statements.lift(i) match {
     case Some(node) => node
     case None => this.handleGetBadIndex(i)
@@ -168,11 +168,11 @@ final case class StatementsNode(
 
 //== LAMBDA NODE ==============================================================
 final case class LambdaNode(
-  val kind:   Symbol,
-  val params: ParseNodeLike,
-  val body:   ParseNodeLike,
+  kind:   Symbol,
+  params: ParseNodeLike,
+  body:   ParseNodeLike,
 ) extends NonTerminalNodeLike {
-  def toRepr(): String = {
+  def toRepr: String = {
     '\u03bb'.toString + f"(${params.toRepr}).(${body.toRepr})"
   }
   def get(i: Int): ParseNodeLike = i match {
@@ -184,10 +184,10 @@ final case class LambdaNode(
 
 //== SEQUENCE NODE ============================================================
 final case class SequenceNode(
-  val kind:     Symbol,
-  val sequence: Vector[ParseNodeLike],
+  kind:     Symbol,
+  sequence: Vector[ParseNodeLike],
 ) extends NonTerminalNodeLike {
-  def toRepr(): String = {
+  def toRepr: String = {
     kind match {
       case 'ListIn => "[" + sequence.mkString(", ") + "]"
       case 'SetIn  => "{" + sequence.mkString(", ") + "}"
@@ -202,11 +202,11 @@ final case class SequenceNode(
 
 //== WHILE NODE ===============================================================
 final case class WhileNode(
-  val kind:      Symbol,
-  val predicate: ParseNodeLike,
-  val body:      ParseNodeLike,
+  kind:      Symbol,
+  predicate: ParseNodeLike,
+  body:      ParseNodeLike,
 ) extends NonTerminalNodeLike {
-  def toRepr(): String = f"while(${predicate.toRepr})(${body.toRepr})"
+  def toRepr: String = f"while(${predicate.toRepr})(${body.toRepr})"
   def get(i: Int): ParseNodeLike = i match {
     case 0 => this.predicate
     case 1 => this.body
@@ -216,12 +216,12 @@ final case class WhileNode(
 
 //== FOR NODE =================================================================
 final case class ForNode(
-  val kind:       Symbol,
-  val iterator:   ParseNodeLike,
-  val collection: ParseNodeLike,
-  val body:       ParseNodeLike,
+  kind:       Symbol,
+  iterator:   ParseNodeLike,
+  collection: ParseNodeLike,
+  body:       ParseNodeLike,
 ) extends NonTerminalNodeLike {
-  def toRepr(): String = {
+  def toRepr: String = {
     f"for ${iterator.toRepr} in ${collection.toRepr} (${body.toRepr})"
   }
   def get(i: Int): ParseNodeLike = i match {
@@ -234,12 +234,12 @@ final case class ForNode(
 
 //== IF NODE ==================================================================
 final case class IfNode(
-  val kind:      Symbol,
-  val test:      ParseNodeLike,
-  val whenTrue:  ParseNodeLike,
-  val whenFalse: ParseNodeLike,
+  kind:      Symbol,
+  test:      ParseNodeLike,
+  whenTrue:  ParseNodeLike,
+  whenFalse: ParseNodeLike,
 ) extends NonTerminalNodeLike {
-  def toRepr(): String = {
+  def toRepr: String = {
     f"if(${test.toRepr})(${whenTrue.toRepr})(${whenFalse.toRepr})"
   }
   def get(i: Int): ParseNodeLike = i match {

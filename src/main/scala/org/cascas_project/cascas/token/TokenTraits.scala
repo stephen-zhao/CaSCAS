@@ -10,7 +10,7 @@ abstract class Token
 {
   def lexeme: String
   def symbol: Symbol
-  def length(): Int = {
+  def length: Int = {
     lexeme.length
   }
 }

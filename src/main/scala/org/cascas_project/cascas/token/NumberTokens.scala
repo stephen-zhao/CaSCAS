@@ -12,8 +12,8 @@ import scala.util.matching.Regex
 
 //== INTEGER TOKEN ============================================================
 case class IntegerToken(
-  val lexeme: String,
-  val symbol: Symbol = 'INT
+  lexeme: String,
+  symbol: Symbol = 'INT
 ) extends Token
   with NumberTokenLike
 
@@ -23,8 +23,8 @@ object IntegerToken {
 
 //== DECIMAL TOKEN ============================================================
 case class DecimalToken(
-  val lexeme: String,
-  val symbol: Symbol = 'FLOAT
+  lexeme: String,
+  symbol: Symbol = 'FLOAT
 ) extends Token
   with NumberTokenLike
 

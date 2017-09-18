@@ -26,7 +26,7 @@ class LRMachineGenerator() {
 
   def generate(): LRMachine = {
     Logger.info('LRMG, "Starting LR finite state machine generation.")
-    val lrm = new LRMachine(this.createStateGraph)
+    val lrm = new LRMachine(this.createStateGraph())
     Logger.info('LRMG, "Finished LR finite state machine generation.")
     lrm
   }
@@ -35,7 +35,7 @@ class LRMachineGenerator() {
     Logger.info('LRMG, f"Creating LR State Graph from starting symbol ${CFG.start}")
     var initialState = State.create(CFG.start)
     CFG.getStartingRules.collect{
-      case (lhs, rhs) => new Item(lhs, rhs)
+      case (lhs, rhs) => Item(lhs, rhs)
     }.foreach(item => initialState.addItemAndPopulate(item))
     Logger.info('LRMG, f"Initial state: ${initialState.id} ${initialState.transition}")
     Logger.verbose('LRMG, f"Initial state pre-generation items: ${initialState.items.mkString("\n")}")
@@ -48,10 +48,10 @@ class LRMachineGenerator() {
     var state_ = state
     Logger.info('LRMG, f"Recursively generating child states for ${state.name}")
     Logger.verbose('LRMG, f"    Transition in is ${state.transition}")
-    state_.generateChildStatesFromItems
+    state_.generateChildStatesFromItems()
     this.reduceChildStates(state_)
     Logger.info('LRMG, f"Finished generating child states for ${state.name}")
-    Logger.verbose('LRMG, state.toString)
+    Logger.verbose('LRMG, state.toString())
     state_.childStates.foreach(kvp => this.recursivelyGenerateChildStates(kvp._2))
   }
 
@@ -62,12 +62,12 @@ class LRMachineGenerator() {
     var touchedIds: Set[Int] = Set()
     stateQueue.enqueue(state)
     touchedIds += state.id
-    while (!stateQueue.isEmpty) {
+    while (stateQueue.nonEmpty) {
       var state = stateQueue.dequeue
-      state.generateChildStatesFromItems
+      state.generateChildStatesFromItems()
       this.reduceChildStates(state)
       Logger.info('LRMG, f"Finished generating child states for ${state.name}")
-      Logger.verbose('LRMG, state.toString)
+      Logger.verbose('LRMG, state.toString())
       state.childStates.foreach(
         kvp => if (!(touchedIds contains kvp._2.id)) {
           touchedIds += kvp._2.id

@@ -2,7 +2,7 @@
 // util/package.scala : CaSCAS Project
 //=============================================================================
 
-package org.cascas_project.cascas.util
+package org.cascas_project.cascas
 
 //=============================================================================
 // util package object

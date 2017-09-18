@@ -34,7 +34,7 @@ object LRMachine {
 // to perform derivations on sequences of tokens that produce parse trees
 //
 case class LRMachine(
-  val start: State
+  start: State
 ) {
 
   // The parser that is using this LRMachine
@@ -55,7 +55,7 @@ case class LRMachine(
   // Holds the status of the current derivation if one is in progress, or of
   // the last derivation if there isn't one in progress.
   private var derivationStatus: LRMachine.DerivationStatus = LRMachine.NotStarted
-  def getDerivationStatus() = { this.derivationStatus }
+  def getDerivationStatus: LRMachine.DerivationStatus = { this.derivationStatus }
 
   // Stack to hold the path of states being traversed
   // ** A state is a step in the process of collecting the terminals/nonterminals
@@ -68,7 +68,7 @@ case class LRMachine(
   private var stateStack: List[State] = List[State](start)
 
   // the current state of the derivation
-  private def currentState(): State = {
+  private def currentState: State = {
     this.stateStack.head
   }
 
@@ -128,7 +128,7 @@ case class LRMachine(
 
     if (isNewDerivation) {
       Logger.info('LRM, "New derivation, so resetting LRMachine state.")
-      this.resetMachineState
+      this.resetMachineState()
     }
 
     this.derivationStatus = LRMachine.Deriving
@@ -158,7 +158,7 @@ case class LRMachine(
     tokens: Seq[Token]
   ): Option[ParseNodeLike] = this.derivationStatus match {
     case LRMachine.Deriving => {
-      if (!this.stateStack.isEmpty) {
+      if (this.stateStack.nonEmpty) {
 
         Logger.verbose('LRM, "Checking tokens for input")
 
