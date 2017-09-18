@@ -70,14 +70,14 @@ object Logger {
       require(tagMap contains tag)
       if (this.isLoggingActiveFor(severity, tag)) {
         val now = Calendar.getInstance.getTime
-        val time = (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS")).format(now)
+        val time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(now)
         Console.err.println(f"[$time][${severityMap(severity)._2}][${tagMap(tag)}] $msg")
       }
     }
     
   }
 
-  private val defaultLogger = createDefaultInstance
+  private val defaultLogger = createDefaultInstance()
 
   private def createDefaultInstance(): Logger = {
     var logger = new Logger()

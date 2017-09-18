@@ -12,8 +12,8 @@ import scala.util.matching.Regex
 
 //== WHITESPACE TOKEN =========================================================
 case class WhitespaceToken(
-  val lexeme: String,
-  val symbol: Symbol = 'WHITESPACE
+  lexeme: String,
+  symbol: Symbol = 'WHITESPACE
 ) extends Token
   with WhitespaceTokenLike
 
@@ -23,8 +23,8 @@ object WhitespaceToken {
 
 //== COMMENT TOKEN ============================================================
 case class CommentToken(
-  val lexeme: String,
-  val symbol: Symbol = 'COMMENT
+  lexeme: String,
+  symbol: Symbol = 'COMMENT
 ) extends Token
 
 object CommentToken {
@@ -33,8 +33,8 @@ object CommentToken {
 
 //== END OF LINE TOKEN ========================================================
 //case class EndOfLineToken(
-//  val lexeme: String = "\n",
-//  val symbol: Symbol = 'EOL
+//  lexeme: String = "\n",
+//  symbol: Symbol = 'EOL
 //) extends Token
 //
 //object EndOfLineToken {

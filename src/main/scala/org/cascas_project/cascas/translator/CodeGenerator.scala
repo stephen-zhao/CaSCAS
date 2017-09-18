@@ -7,15 +7,15 @@ package org.cascas_project.cascas.translator
 //=============================================================================
 
 import scala.annotation.tailrec
-import org.cascas_project.cascas.lang.{liro, _}
-import org.cascas_project.cascas.lang.liro.{ApplyExpr, Identifier, RationalNumber}
+import org.cascas_project.cascas.lang._
+import org.cascas_project.cascas.lang.liro._
 import org.cascas_project.cascas.parsetree._
 import org.cascas_project.cascas.token._
 
 class CodeGenerator {
 
 
-  def generateLIRObject(parseTree: ParseNodeLike): liro.Object = {
+  def generateLIRObject(parseTree: ParseNodeLike): Object = {
 
     parseTree match {
 
@@ -43,7 +43,7 @@ class CodeGenerator {
       //                                     becomes ApplyExpr
       //                                     with operator (Identifier("+")) or
       //                                     with operator (Identifier("*"))    and
-      //                                     with flattened parameter list
+      //                                     with flattened parameter ListExpr as the only parameter
       //                                     (if nested operators of the same kind)
       case BinaryOperatorNode(kind, operator @ TerminalNode(opKind,_), operands)
            if (kind == 'MathExpr && opKind == 'PLUS) || (kind == 'Term && opKind == 'STAR) => {
@@ -53,7 +53,7 @@ class CodeGenerator {
           // Generate operand1's LIR Object to extract the operands that need promoting
           this.generateLIRObject(operands._1) match {
             // Extract the operands
-            case ApplyExpr(_, leftOperands) => operands._2 match {
+            case ApplyExpr(_, Vector(ListExpr(leftOperands))) => operands._2 match {
               // 5.1.1. right operand kind == currently processing kind and
               //        right operator == current operator, so do flattening work on it too
               // CASE: Both left and right operands are the same kind, so flatten both
@@ -63,7 +63,7 @@ class CodeGenerator {
                 // Generate operand2's LIR Object to extract the operands that need promoting
                 this.generateLIRObject(operands._2) match {
                   // Extract the operands and do the append
-                  case ApplyExpr(_, rightOperands) => leftOperands ++ rightOperands
+                  case ApplyExpr(_, Vector(ListExpr(rightOperands))) => leftOperands ++ rightOperands
                   // Error in extraction
                   case other => throw new Exception("ERROR") //TODO
                 }
@@ -78,7 +78,7 @@ class CodeGenerator {
           }
         }
 
-        ApplyExpr(this.generateLIRObject(operator), operands._1 match {
+        ApplyExpr(this.generateLIRObject(operator), Vector(ListExpr(operands._1 match {
           // 5.1 left operand kind == currently processing kind and
           //     left operator == current operator, so do flattening work
           case BinaryOperatorNode(kindOperandLeft, TerminalNode(kindOperatorLeft, _), _)
@@ -93,7 +93,7 @@ class CodeGenerator {
               // Generate operand2's LIR Object to extract the operands that need promoting
               this.generateLIRObject(operands._2) match {
                 // Extract the operands and do the flatten
-                case ApplyExpr(_, rightOperands) => this.generateLIRObject(operand1) +: rightOperands
+                case ApplyExpr(_, Vector(ListExpr(rightOperands))) => this.generateLIRObject(operand1) +: rightOperands
                 // Error in extraction
                 case other => throw new Exception("ERROR") //TODO
               }
@@ -107,7 +107,7 @@ class CodeGenerator {
               this.generateLIRObject(operand2)
             )
           }
-        })
+        })))
       }
 
       // 6. other kind BinaryOperatorNode becomes ApplyExpr with length-2 parameter list

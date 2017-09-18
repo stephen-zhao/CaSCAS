@@ -26,7 +26,7 @@ class State(
   var items: Set[Item] = Set[Item]()
   var childStates: MMap[Symbol, State] = MMap[Symbol, State]()
 
-  override def toString(): String = {
+  override def toString: String = {
     f"${this.transition} -> ${this.name}\n" +
       "Items:\n" +
       f"  ${items.mkString("\n  ")}\n" +
@@ -61,10 +61,10 @@ class State(
     Logger.verbose('LRMG, f"    Adding item $item to state ${this.name}")
     this.items += item
     item.nextSymbol match {
-      case Some(nextSymbol) if (CFG.nonterminals contains nextSymbol) => {
+      case Some(nextSymbol) if CFG.nonterminals contains nextSymbol => {
         val autoAddItems = CFG.rules.collect { 
-          case (transition, v: Vector[Symbol]) if (transition == nextSymbol) => {
-            new Item(nextSymbol, v, 0)
+          case (transition, v: Vector[Symbol]) if transition == nextSymbol => {
+            Item(nextSymbol, v, 0)
           }
         }
         for (autoItem <- autoAddItems) {
@@ -85,13 +85,13 @@ class State(
     }
   }
 
-  def isLastItemState(): Boolean = {
+  def isLastItemState: Boolean = {
     this.items.exists(_.isAtEnd)
   }
 
   def getItemsWhereLHSIs(nextSymbol: Symbol): Set[Item] = {
     CFG.rules.collect{
-      case (nextSymbol, v: Vector[Symbol]) => new Item(nextSymbol, v, 0)
+      case (ruleSymbol, v: Vector[Symbol]) if nextSymbol == ruleSymbol => Item(nextSymbol, v, 0)
     }
   }
 
@@ -101,7 +101,7 @@ object State {
   
   var stateIdCounter = 0
 
-  def getUniqueStateId(): Int = {
+  def getUniqueStateId: Int = {
     stateIdCounter += 1
     stateIdCounter
   }

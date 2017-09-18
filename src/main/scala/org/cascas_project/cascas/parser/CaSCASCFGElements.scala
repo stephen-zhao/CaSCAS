@@ -1,60 +1,28 @@
 //=============================================================================
 // parser/CFG.scala : CaSCAS Project
 //=============================================================================
-// This file contains the necessary modules used to describe a generic context-
-// free grammar and to instantiate specifically a CaSCAS context-free grammar.
+// Static object to hold the specific definitions for the elements used in
+// CaSCAS's context-free grammar.
 
 package org.cascas_project.cascas.parser
 
 //=============================================================================
 
-// This class represents a context free grammar definition
-case class ContextFreeGrammar(
-  val nonterminals: Set[Symbol],
-  val terminals:    Set[Symbol],
-  val start:        Symbol,
-  val rules:        CFGRuleSet
-) {
-  // Throw runtime error if the lefthand-side of any rule is not a
-  // nonterminal symbol
-  require(this.rules forall (this.nonterminals contains _._1))
-
-  // Union containing all symbols
-  val allSymbols:   Set[Symbol] = this.nonterminals ++ this.terminals
-  
-  // Throw runtime error if the righthand-side of any rule contains
-  // symbols not defined as either a nonterminal or a terminal
-  require(this.rules forall (_._2 forall (this.allSymbols contains _)))
-
-  // Throw compile-time error if the starting symbol is not in the set of
-  // nonterminals
-  require(this.nonterminals contains this.start)
-
-  // Returns a set of all the rules originating from the start symbol
-  def getStartingRules(): CFGRuleSet = {
-    this.rules.collect {
-      case rule @ (lhs, rhs) if (lhs == this.start) => rule 
-    }
-  }
-}
-
-// Static object to hold the specific definitions for the elements used in
-// CaSCAS's context-free grammar.
 private[parser] object CaSCASCFGElements {
 
-  val nonterminals: Set[Symbol] = 
+  val nonterminals: Set[Symbol] =
     Set('Program, 'Statements, 'Statement, 'Assign, 'ReAssign, 'Expr, 'Control,
-        'IfControl, 'ElControl, 'WhileControl, 'ForControl, 'Collection,
-        'Set, 'SetIn, 'List, 'ListIn, 'BoolExpr, 'BoolOrend, 'BoolAndend,
-        'Relation, 'MathExpr, 'Term, 'Factor, 'Exponent, 'Base, 'Lambda, 
-        'Apply, 'FParams, 'AParams)
-  
-  val terminals: Set[Symbol] = 
+      'IfControl, 'ElControl, 'WhileControl, 'ForControl, 'Collection,
+      'Set, 'SetIn, 'List, 'ListIn, 'BoolExpr, 'BoolOrend, 'BoolAndend,
+      'Relation, 'MathExpr, 'Term, 'Factor, 'Exponent, 'Base, 'Lambda,
+      'Apply, 'FParams, 'AParams)
+
+  val terminals: Set[Symbol] =
     Set('LET, 'IF, 'ELSIF, 'ELSE, 'WHILE, 'FOR, 'IN,
-        'WORD, 'INT, 'FLOAT, 'COMMA, 'ASSIGN, 'SEMICOLON,
-        'LRBRACK, 'RRBRACK, 'LCBRACK, 'RCBRACK, 'LSBRACK, 'RSBRACK, 
-        'OR, 'AND, 'NOT, 'EQ, 'NEQ, 'GT, 'LT, 'GTE, 'LTE,
-        'PLUS, 'MINUS, 'STAR, 'SLASH, 'BANG, 'POW, 'LAMBDA)
+      'WORD, 'INT, 'FLOAT, 'COMMA, 'ASSIGN, 'SEMICOLON,
+      'LRBRACK, 'RRBRACK, 'LCBRACK, 'RCBRACK, 'LSBRACK, 'RSBRACK,
+      'OR, 'AND, 'NOT, 'EQ, 'NEQ, 'GT, 'LT, 'GTE, 'LTE,
+      'PLUS, 'MINUS, 'STAR, 'SLASH, 'BANG, 'POW, 'LAMBDA)
 
   val start: Symbol = 'Program
 
@@ -117,7 +85,7 @@ private[parser] object CaSCASCFGElements {
 
     ('Exponent,   Vector('Base, 'POW, 'Exponent)),
     ('Exponent,   Vector('Base)),
-    
+
     ('Base,       Vector('WORD)),
     ('Base,       Vector('INT)),
     ('Base,       Vector('FLOAT)),
@@ -126,7 +94,7 @@ private[parser] object CaSCASCFGElements {
     ('Base,       Vector('Collection)),
     ('Base,       Vector('Control)),
     ('Base,       Vector('LRBRACK, 'Statements, 'RRBRACK)),
-    
+
     ('Lambda,     Vector('LAMBDA, 'LRBRACK, 'FParams, 'RRBRACK, 'LRBRACK,
                          'Statements, 'RRBRACK)),
 
@@ -139,24 +107,24 @@ private[parser] object CaSCASCFGElements {
 
     ('AParams,    Vector('AParams, 'COMMA, 'Expr)),
     ('AParams,    Vector('Expr)),
-    
+
     ('Control,    Vector('IfControl)),
     ('Control,    Vector('WhileControl)),
     ('Control,    Vector('ForControl)),
 
     ('Collection, Vector('Set)),
     ('Collection, Vector('List)),
-    
-    ('IfControl,  Vector('IF, 'LRBRACK, 'Expr, 'RRBRACK, 'LRBRACK, 
+
+    ('IfControl,  Vector('IF, 'LRBRACK, 'Expr, 'RRBRACK, 'LRBRACK,
                          'Statements, 'RRBRACK, 'ElControl)),
-    ('ElControl,  Vector('ELSIF, 'LRBRACK, 'Expr, 'RRBRACK, 'LRBRACK, 
+    ('ElControl,  Vector('ELSIF, 'LRBRACK, 'Expr, 'RRBRACK, 'LRBRACK,
                          'Statements, 'RRBRACK, 'ElControl)),
     ('ElControl,  Vector('ELSE, 'LRBRACK, 'Statements, 'RRBRACK)),
 
-    ('WhileControl, Vector('WHILE, 'LRBRACK, 'Expr, 'RRBRACK, 
-                         'LRBRACK, 'Statements, 'RRBRACK)),
+    ('WhileControl, Vector('WHILE, 'LRBRACK, 'Expr, 'RRBRACK,
+                           'LRBRACK, 'Statements, 'RRBRACK)),
 
-    ('ForControl, Vector('FOR, 'LRBRACK, 'WORD, 'IN, 'Collection, 
+    ('ForControl, Vector('FOR, 'LRBRACK, 'WORD, 'IN, 'Collection,
                          'RRBRACK, 'LRBRACK, 'Statements, 'RRBRACK)),
 
     ('Set,        Vector('LCBRACK, 'RCBRACK)),

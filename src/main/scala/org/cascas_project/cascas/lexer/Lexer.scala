@@ -215,7 +215,7 @@ class BracketStack {
     }
   }
 
-  def isEmpty(): Boolean = {
+  def isEmpty: Boolean = {
     this.theStack.isEmpty
   }
 

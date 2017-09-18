@@ -12,8 +12,8 @@ import scala.util.matching.Regex
 
 // == WORD TOKEN ==============================================================
 case class WordToken(
-  val lexeme: String,
-  val symbol: Symbol = 'WORD
+  lexeme: String,
+  symbol: Symbol = 'WORD
 ) extends Token
 
 object WordToken {
@@ -22,8 +22,8 @@ object WordToken {
 
 // == KEYWORD LAMBDA TOKEN ====================================================
 case class KeywordLambdaToken(
-  val lexeme: String,
-  val symbol: Symbol = 'LAMBDA
+  lexeme: String,
+  symbol: Symbol = 'LAMBDA
 ) extends Token
   with KeywordTokenLike
 
@@ -37,8 +37,8 @@ object KeywordLambdaToken {
 
 // == KEYWORD LET TOKEN =======================================================
 case class KeywordLetToken(
-  val lexeme: String = raw"""let""",
-  val symbol: Symbol = 'LET
+  lexeme: String = raw"""let""",
+  symbol: Symbol = 'LET
 ) extends Token
   with KeywordTokenLike
 
@@ -48,8 +48,8 @@ object KeywordLetToken {
 
 // == KEYWORD IF TOKEN ========================================================
 case class KeywordIfToken(
-  val lexeme: String = raw"""if""",
-  val symbol: Symbol = 'IF
+  lexeme: String = raw"""if""",
+  symbol: Symbol = 'IF
 ) extends Token
   with KeywordTokenLike
 
@@ -59,8 +59,8 @@ object KeywordIfToken {
 
 // == KEYWORD ELSIF TOKEN =====================================================
 case class KeywordElsifToken(
-  val lexeme: String = raw"""elsif""",
-  val symbol: Symbol = 'ELSIF
+  lexeme: String = raw"""elsif""",
+  symbol: Symbol = 'ELSIF
 ) extends Token
   with KeywordTokenLike
 
@@ -70,8 +70,8 @@ object KeywordElsifToken {
 
 // == KEYWORD ELSE TOKEN ======================================================
 case class KeywordElseToken(
-  val lexeme: String = raw"""else""",
-  val symbol: Symbol = 'ELSE
+  lexeme: String = raw"""else""",
+  symbol: Symbol = 'ELSE
 ) extends Token
   with KeywordTokenLike
 
@@ -81,8 +81,8 @@ object KeywordElseToken {
 
 // == KEYWORD WHILE TOKEN =====================================================
 case class KeywordWhileToken(
-  val lexeme: String = raw"""while""",
-  val symbol: Symbol = 'WHILE
+  lexeme: String = raw"""while""",
+  symbol: Symbol = 'WHILE
 ) extends Token
   with KeywordTokenLike
 
@@ -92,8 +92,8 @@ object KeywordWhileToken {
 
 // == KEYWORD FOR TOKEN =======================================================
 case class KeywordForToken(
-  val lexeme: String = raw"""for""",
-  val symbol: Symbol = 'FOR
+  lexeme: String = raw"""for""",
+  symbol: Symbol = 'FOR
 ) extends Token
   with KeywordTokenLike
 
@@ -103,8 +103,8 @@ object KeywordForToken {
 
 // == KEYWORD IN TOKEN ========================================================
 case class KeywordInToken(
-  val lexeme: String = raw"""in""",
-  val symbol: Symbol = 'IN
+  lexeme: String = raw"""in""",
+  symbol: Symbol = 'IN
 ) extends Token
   with KeywordTokenLike
 

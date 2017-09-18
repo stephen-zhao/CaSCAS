@@ -7,53 +7,52 @@ package org.cascas_project.cascas.lang.builtin
 //=============================================================================
 
 import org.cascas_project.cascas.lang.Context
-import org.cascas_project.cascas.lang.Evaluation
 import org.cascas_project.cascas.lang.FormalParameter
-import org.cascas_project.cascas.lang.OperatorType
 import org.cascas_project.cascas.lang.liro.ApplyExpr
 import org.cascas_project.cascas.lang.liro.Identifier
+import org.cascas_project.cascas.lang.liro.ListExpr
 import org.cascas_project.cascas.lang.liro.Object
 import org.cascas_project.cascas.lang.liro.RationalNumber
 
 //=============================================================================
 
 object MultiplyOperator extends BuiltInDefinition {
-  //v is the processed vector of arguments, l is 
-  def onApply(v : Vector[Object], ctx: Context): Evaluation = {
-   
-        // try to evaluate the parameter and assess structure
-        v(0).eval(ctx).keepOnlyReassignments match {
-          
-          // 1.1. case SUCCESS, is a ListExpr, then
-          // do the evaluation
-          case Evaluation(ListExpr(multiplicands), ctxDelta) => {
-            val res = multiplicands /: (Accum(ListExpr(), RationalNumber.zero))(multiplyIfPossible _)
-            Evaluation(res.nonconstTerms :+ res.constTerm, ctxDelta)
-          }
 
-          // 1.2. case FAIL, is not a ListExpr, then
-          // cannot do evaluation, return as is
-          case Evaluation(other, ctxDelta) => {
-            Evaluation(ApplyExpr(MultiplyOperator.ident, Vector(other)), ctxDelta)
-          }
-        }
-  }
+  def onApply(params : Map[String, Object], ctx: Context): Object = {
 
-  private def multiplyIfPossible(accum: Accum, currentTerm: Object): Accum = {
-    currentTerm match {
-      case const: RationalNumber => Accum(accum.nonconstTerms, accum.constTerm * const)
-      case term => Accum(accum.nonconstTerms :+ term, accum.constTerm)
+    // Assess the structure of the multiplicands parameter
+    params("multiplicands") match {
+
+      // 1. case SUCCESS, is a ListExpr, then
+      // do the multiplication
+      case ListExpr(multiplicands) => {
+        val res = (multiplicands foldLeft Accum(ListExpr(), RationalNumber.zero))(multiplyIfPossible _)
+        res.nonconstFactors :+ res.constFactor
+      }
+
+      // 2. case FAIL, is not a ListExpr, then
+      // cannot do multiplication on a non-explicit list, return as is
+      case other => {
+        ApplyExpr(MultiplyOperator.ident, Vector(other))
+      }
     }
   }
 
-  def tpe = OperatorType(Identifier("multiplicands"), Identifier("List(Number)"))(Identifier("Number"))
+  private def multiplyIfPossible(accum: Accum, currentFactor: Object): Accum = {
+    currentFactor match {
+      case const: RationalNumber => Accum(accum.nonconstFactors, accum.constFactor * const)
+      case term => Accum(accum.nonconstFactors :+ term, accum.constFactor) //TODO: logic to collect like factors
+    }
+  }
 
   def ident = Identifier("*")
 
-  def formalParams = Vector(FormalParameter(Identifier("multiplicands"), Identifier("List(Number)")))
+  def formalParams = Vector(
+    FormalParameter(Identifier("multiplicands"), ApplyExpr(Identifier("List"), Vector(Identifier("Number"))))
+  )
 
   def returnTpe = Identifier("Number")
 
-  case class Accum(nonconstTerms: ListExpr, constTerm: RationalNumber)
+  case class Accum(nonconstFactors: ListExpr, constFactor: RationalNumber)
 
 }

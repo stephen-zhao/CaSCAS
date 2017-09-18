@@ -34,7 +34,7 @@ object Enumerated {
     def apply(i: Int): E = enum.lift(i).getOrElse(throw new OutOfRangeException)
     def apply(e: Value[E]): Int = enumByValue(e)
     def apply(s: String): E = enum.find(_.name == s).getOrElse(throw new OutOfRangeException)
-    def cardinality = enum.length
+    def cardinality: Int = enum.length
   }
 
   trait Value[E <: Value[E]] extends Product with Serializable {

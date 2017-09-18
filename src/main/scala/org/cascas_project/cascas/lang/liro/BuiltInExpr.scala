@@ -18,47 +18,51 @@ import scala.annotation.tailrec
 //=============================================================================
 
 case class BuiltInExpr(
-  args: Vector[FormalParameter],
-  onApply: (Vector[Object], Context) => Evaluation,
-  ret: TypeIdentifier,
-  maybeOnEval: Option[(Context) => Evaluation]
+  formalParams: Vector[FormalParameter],
+  onApply:      (Map[String, Object], Context) => Object,
+  ret:          TypeIdentifier,
+  maybeOnEval:  Option[(Context) => Evaluation]
 ) extends Expr {
 
-  def processParams (ctx : Context) : Vector[Object] = {
-    var temp: Vector[Object] = Vector()
-    processParamsRec(args, ctx, temp)
+  def processParams(ctx: Context): (Map[String, Object], Context) = {
+    processParamsRec(formalParams, ctx, Map())
   }
 
   @tailrec
-  private def processParamsRec (fp : Vector[FormalParameter],
-    ctx : Context,
-    acc : Vector[Object]) : Vector[Object] = {
-    var vacc : Vector[Object] = Vector()
-    ctx.get(fp.head.id) match {
-      case Some(TypedObject(t, value)) if (t == fp.head.tpe) => {
-        vacc = acc :+ value
-        if (fp.tail.length > 0) {
-          processParamsRec(fp.tail, ctx, vacc)
-        } else {
-          vacc
+  private def processParamsRec(
+    fp:  Vector[FormalParameter],
+    ctx: Context,
+    acc: Map[String, Object]
+  ): (Map[String, Object], Context) = {
+    if (fp.isEmpty) {
+      (acc, ctx)
+    }
+    else {
+      ctx.get(fp.head.id) match {
+        case Some(TypedObject(tpe, value)) if tpe == fp.head.tpe => {
+          value.eval(ctx).keepOnlyReassignments() match {
+            case Evaluation(evaldValue, ctxDelta) => {
+              processParamsRec(fp.tail, ctx :+ ctxDelta, acc + (fp.head.id.name -> evaldValue))
+            }
+          }
         }
-      }
 
-      case Some(TypedObject(other, _)) => {
-        // report type mismatch error
-        throw new Exception("type mismatch error") //TODO
-      }
+        case Some(TypedObject(other, _)) => {
+          // report type mismatch error
+          throw new Exception("type mismatch error") //TODO
+        }
 
-      // 3. case FAIL, is not assigned, then
-      case Some(other) => {
-        // report unassigned error
-        throw new Exception("is not assigned") //TODO
-      }
+        // 3. case FAIL, is not assigned, then
+        case Some(other) => {
+          // report unassigned error
+          throw new Exception("is not assigned") //TODO
+        }
 
-      // 4. case FAIL, is not defined, then
-      case None => {
-        // report undefined error
-        throw new Exception("is not defined") //TODO
+        // 4. case FAIL, is not defined, then
+        case None => {
+          // report undefined error
+          throw new Exception("is not defined") //TODO
+        }
       }
     }
   }
@@ -71,12 +75,12 @@ case class BuiltInExpr(
   def checkType(ctx: Context, tpe: TypeIdentifier): Boolean = {
     tpe match {
       case OperatorType(args, ret) => {
-        if (this.args.length == args.length) {
-          if ((this.args zip args).forall{ case (a, b) => a == b}) {
+        if (this.formalParams.length == args.length) {
+          if ((this.formalParams zip args).forall{ case (a, b) => a == b}) {
             this.ret == ret
           }
           else {
-            throw new Exception("args not same type") //TODO
+            throw new Exception("formalParams not same type") //TODO
           }
         }
         else {
@@ -90,7 +94,7 @@ case class BuiltInExpr(
   }
 
   def inferType(ctx: Context): Option[TypeIdentifier] = {
-    Some(OperatorType(this.args, this.ret))
+    Some(OperatorType(this.formalParams, this.ret))
   }
 
 }

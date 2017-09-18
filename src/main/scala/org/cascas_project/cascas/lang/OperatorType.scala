@@ -12,7 +12,7 @@ import org.cascas_project.cascas.lang.liro.Identifier
 
 case class OperatorType(
   args: Vector[FormalParameter],
-  ret: TypeIdentifier
+  ret:  TypeIdentifier
 ) extends TypeIdentifier {
 
   override def toString(): String = args.map {
@@ -40,6 +40,11 @@ object OperatorType {
       this
     }
 
+    def apply(formalParams: Vector[FormalParameter]): Builder = {
+      this.args = this.args ++ formalParams
+      this
+    }
+
     def apply(tpe: TypeIdentifier): OperatorType = {
       new OperatorType(this.args, tpe)
     }
@@ -49,6 +54,10 @@ object OperatorType {
   // Add a formal parameter to the OperatorType
   def apply(name: Identifier, tpe: TypeIdentifier, manyness: Manyness = One): Builder = {
     new Builder()(name, tpe, manyness)
+  }
+
+  def apply(formalParams: Vector[FormalParameter]): Builder = {
+    new Builder()(formalParams)
   }
 
   // Add a return type to the OperatorType

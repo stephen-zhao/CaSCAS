@@ -12,8 +12,8 @@ import scala.util.matching.Regex
 
 //== OPERATOR PLUS TOKEN ======================================================
 case class OperatorPlusToken(
-  val lexeme: String = raw"""+""",
-  val symbol: Symbol = 'PLUS
+  lexeme: String = raw"""+""",
+  symbol: Symbol = 'PLUS
 ) extends Token
   with OperatorTokenLike
 
@@ -24,8 +24,8 @@ object OperatorPlusToken {
 
 //== OPERATOR MINUS TOKEN =====================================================
 case class OperatorMinusToken(
-  val lexeme: String = raw"-",
-  val symbol: Symbol = 'MINUS
+  lexeme: String = raw"-",
+  symbol: Symbol = 'MINUS
 ) extends Token
   with OperatorTokenLike
 
@@ -36,8 +36,8 @@ object OperatorMinusToken {
 
 //== OPERATOR MULT TOKEN ======================================================
 case class OperatorMultToken(
-  val lexeme: String = raw"""*""",
-  val symbol: Symbol = 'STAR
+  lexeme: String = raw"""*""",
+  symbol: Symbol = 'STAR
 ) extends Token
   with OperatorTokenLike
 
@@ -48,8 +48,8 @@ object OperatorMultToken {
 
 //== OPERATOR DIV TOKEN =======================================================
 case class OperatorDivToken(
-  val lexeme: String = raw"""/""",
-  val symbol: Symbol = 'SLASH
+  lexeme: String = raw"""/""",
+  symbol: Symbol = 'SLASH
 ) extends Token
   with OperatorTokenLike
 
@@ -60,8 +60,8 @@ object OperatorDivToken {
 
 //== OPERATOR POW TOKEN =======================================================
 case class OperatorPowToken(
-  val lexeme: String = raw"""^""",
-  val symbol: Symbol = 'POW
+  lexeme: String = raw"""^""",
+  symbol: Symbol = 'POW
 ) extends Token
   with OperatorTokenLike
 
@@ -72,8 +72,8 @@ object OperatorPowToken {
 
 //== OPERATOR BANG TOKEN ======================================================
 case class OperatorBangToken(
-  val lexeme: String = raw"""!""",
-  val symbol: Symbol = 'BANG
+  lexeme: String = raw"""!""",
+  symbol: Symbol = 'BANG
 ) extends Token
   with OperatorTokenLike
 
@@ -84,8 +84,8 @@ object OperatorBangToken {
 
 //== BOOL OPERATOR AND TOKEN ==================================================
 case class BoolOperatorAndToken(
-  val lexeme: String = raw"""/\\""",
-  val symbol: Symbol = 'AND
+  lexeme: String = raw"""/\\""",
+  symbol: Symbol = 'AND
 ) extends Token
   with BoolOperatorTokenLike
 
@@ -96,8 +96,8 @@ object BoolOperatorAndToken{
 
 //== BOOL OPERATOR OR TOKEN ===================================================
 case class BoolOperatorOrToken(
-  val lexeme: String = raw"""\\/""",
-  val symbol: Symbol = 'OR
+  lexeme: String = raw"""\\/""",
+  symbol: Symbol = 'OR
 ) extends Token
   with BoolOperatorTokenLike
 
@@ -108,8 +108,8 @@ object BoolOperatorOrToken{
 
 //== BOOL OPERATOR NOT TOKEN ==================================================
 case class BoolOperatorNotToken(
-  val lexeme: String = raw"""~""",
-  val symbol: Symbol = 'NOT
+  lexeme: String = raw"""~""",
+  symbol: Symbol = 'NOT
 ) extends Token
   with BoolOperatorTokenLike
 
@@ -120,8 +120,8 @@ object BoolOperatorNotToken{
 
 //== RELATION LESS EQUAL TOKEN ================================================
 case class RelationLessEqualToken(
-  val lexeme: String = raw"""<=""",
-  val symbol: Symbol = 'LTE
+  lexeme: String = raw"""<=""",
+  symbol: Symbol = 'LTE
 ) extends Token
   with RelationTokenLike
 
@@ -131,8 +131,8 @@ object RelationLessEqualToken {
 
 //== RELATION GREATER EQUAL TOKEN =============================================
 case class RelationGreaterEqualToken(
-  val lexeme: String = raw""">=""",
-  val symbol: Symbol = 'GTE
+  lexeme: String = raw""">=""",
+  symbol: Symbol = 'GTE
 ) extends Token
   with RelationTokenLike
 
@@ -142,8 +142,8 @@ object RelationGreaterEqualToken {
 
 //== RELATION EQUAL TOKEN =====================================================
 case class RelationEqualToken(
-  val lexeme: String = raw"""=""",
-  val symbol: Symbol = 'EQ
+  lexeme: String = raw"""=""",
+  symbol: Symbol = 'EQ
 ) extends Token
   with RelationTokenLike
 
@@ -153,8 +153,8 @@ object RelationEqualToken {
 
 //== RELATION NOT EQUAL TOKEN =================================================
 case class RelationNotEqualToken(
-  val lexeme: String = raw"""=/=""",
-  val symbol: Symbol = 'NEQ
+  lexeme: String = raw"""=/=""",
+  symbol: Symbol = 'NEQ
 ) extends Token
   with RelationTokenLike
 
@@ -164,8 +164,8 @@ object RelationNotEqualToken {
 
 //== RELATION LESS TOKEN ======================================================
 case class RelationLessToken(
-  val lexeme: String = raw"""<""",
-  val symbol: Symbol = 'LT
+  lexeme: String = raw"""<""",
+  symbol: Symbol = 'LT
 ) extends Token
   with RelationTokenLike
 
@@ -175,8 +175,8 @@ object RelationLessToken {
 
 //== RELATION GREATER TOKEN ===================================================
 case class RelationGreaterToken(
-  val lexeme: String = raw""">""",
-  val symbol: Symbol = 'GT
+  lexeme: String = raw""">""",
+  symbol: Symbol = 'GT
 ) extends Token
   with RelationTokenLike
 
@@ -186,8 +186,8 @@ object RelationGreaterToken {
 
 //== SEMICOLON TOKEN ==========================================================
 case class SemicolonToken(
-  val lexeme: String = raw""";""",
-  val symbol: Symbol = 'SEMICOLON
+  lexeme: String = raw""";""",
+  symbol: Symbol = 'SEMICOLON
 ) extends Token
 
 object SemicolonToken {
@@ -196,8 +196,8 @@ object SemicolonToken {
 
 //== COMMA TOKEN ==============================================================
 case class CommaToken(
-  val lexeme: String = raw""",""",
-  val symbol: Symbol = 'COMMA
+  lexeme: String = raw""",""",
+  symbol: Symbol = 'COMMA
 ) extends Token
 
 object CommaToken {
@@ -206,8 +206,8 @@ object CommaToken {
 
 //== ASSIGNMENT TOKEN =========================================================
 case class AssignmentToken(
-  val lexeme: String = raw""":=""",
-  val symbol: Symbol = 'ASSIGN
+  lexeme: String = raw""":=""",
+  symbol: Symbol = 'ASSIGN
 ) extends Token
 
 object AssignmentToken {
