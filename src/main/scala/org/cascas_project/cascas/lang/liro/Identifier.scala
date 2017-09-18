@@ -26,6 +26,8 @@ case class Identifier(name: String) extends TypeIdentifier with Object {
     ctx.get(this) match {
       case Some(TypedObject(chtpe, obj)) => chtpe == tpe
       case Some(chtpe: TypeIdentifier) => chtpe == tpe
+      // Not really possible
+      case Some(other) => throw new Exception("Not possible damn it") //TODO
       case None => throw new Exception("not in context") //TODO
     }
   }
@@ -34,6 +36,8 @@ case class Identifier(name: String) extends TypeIdentifier with Object {
     ctx.get(this) match {
       case Some(TypedObject(tpe, obj)) => Some(tpe)
       case Some(tpe: TypeIdentifier) => Some(tpe)
+      // Not really possible
+      case Some(other) => throw new Exception("Not possible damn it") //TODO
       case None => None
     }
   }

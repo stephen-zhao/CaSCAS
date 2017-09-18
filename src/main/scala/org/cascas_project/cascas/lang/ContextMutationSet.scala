@@ -129,6 +129,10 @@ class ContextMutationSet {
           }
         }
       }
+      // Not really possible
+      case Some(other) => {
+        throw new Exception("Not possible damn it") //TODO
+      }
       // Reassignment of a non-introduced identifier
       case None => {
         throw new Exception("Cannot reassign non-introduced identifier") //TODO

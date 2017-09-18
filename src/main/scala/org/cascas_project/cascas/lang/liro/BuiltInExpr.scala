@@ -18,14 +18,14 @@ import scala.annotation.tailrec
 //=============================================================================
 
 case class BuiltInExpr(
-  args:        Vector[FormalParameter],
-  onApply:     (Map[String, Object], Context) => Evaluation,
-  ret:         TypeIdentifier,
-  maybeOnEval: Option[(Context) => Evaluation]
+  formalParams: Vector[FormalParameter],
+  onApply:      (Map[String, Object], Context) => Object,
+  ret:          TypeIdentifier,
+  maybeOnEval:  Option[(Context) => Evaluation]
 ) extends Expr {
 
   def processParams(ctx: Context): (Map[String, Object], Context) = {
-    processParamsRec(args, ctx, Map())
+    processParamsRec(formalParams, ctx, Map())
   }
 
   @tailrec
@@ -75,12 +75,12 @@ case class BuiltInExpr(
   def checkType(ctx: Context, tpe: TypeIdentifier): Boolean = {
     tpe match {
       case OperatorType(args, ret) => {
-        if (this.args.length == args.length) {
-          if ((this.args zip args).forall{ case (a, b) => a == b}) {
+        if (this.formalParams.length == args.length) {
+          if ((this.formalParams zip args).forall{ case (a, b) => a == b}) {
             this.ret == ret
           }
           else {
-            throw new Exception("args not same type") //TODO
+            throw new Exception("formalParams not same type") //TODO
           }
         }
         else {
@@ -94,7 +94,7 @@ case class BuiltInExpr(
   }
 
   def inferType(ctx: Context): Option[TypeIdentifier] = {
-    Some(OperatorType(this.args, this.ret))
+    Some(OperatorType(this.formalParams, this.ret))
   }
 
 }

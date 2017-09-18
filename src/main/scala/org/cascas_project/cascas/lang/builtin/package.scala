@@ -6,7 +6,7 @@ package org.cascas_project.cascas.lang
 
 //=============================================================================
 
-import org.cascas_project.cascas.lang.liro.{BuiltInExpr, Identifier}
+import org.cascas_project.cascas.lang.liro.{BuiltInExpr, Identifier, Object}
 
 //=============================================================================
 
@@ -23,7 +23,7 @@ package object builtin {
   val builtInCtx: Context = Context() :+ builtInContextMutationSet
 
   trait BuiltInDefinition {
-    private[builtin] def onApply(params : Map[String, Object], ctx: Context): Evaluation
+    private[builtin] def onApply(params : Map[String, Object], ctx: Context): Object
     private[builtin] def tpe: TypeIdentifier
     private[builtin] def ident: Identifier
     private[builtin] def formalParams: Vector[FormalParameter]
@@ -35,6 +35,13 @@ package object builtin {
       None
     )
     private[builtin] def apply(): TypedObject = TypedObject(tpe, obj)
+  }
+
+  //TODO: This is temporary. There should not be any unappliable operators
+  trait Unappliable {
+    private[builtin] def onApply(params : Map[String, Object], ctx: Context): Object = {
+      throw new Exception("This operator is unappliable") //TODO
+    }
   }
 
   trait BuiltInDefinitionWithCustomEval extends BuiltInDefinition {
