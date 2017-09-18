@@ -33,9 +33,12 @@ case class ApplyExpr(
       case builtIn @ BuiltInExpr(args, onApply, _, _) => {
         val (subCtxDelta, leftOverParams) = this.subInRec(args, params)
         if (leftOverParams.isEmpty) {
-          onApply(
-            builtIn.processParams(ctx.consolidatedWith(evaldOpCtxDelta ++ subCtxDelta)),
+          val (processedParams, newCtx) = builtIn.processParams(
             ctx.consolidatedWith(evaldOpCtxDelta ++ subCtxDelta)
+          )
+          onApply(
+            processedParams,
+            newCtx
           ).keepOnlyReassignments()
         }
         else {

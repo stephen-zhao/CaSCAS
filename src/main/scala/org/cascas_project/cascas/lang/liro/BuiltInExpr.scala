@@ -19,29 +19,32 @@ import scala.annotation.tailrec
 
 case class BuiltInExpr(
   args:        Vector[FormalParameter],
-  onApply:     (Vector[Object], Context) => Evaluation,
+  onApply:     (Map[String, Object], Context) => Evaluation,
   ret:         TypeIdentifier,
   maybeOnEval: Option[(Context) => Evaluation]
 ) extends Expr {
 
-  def processParams(ctx: Context): Vector[Object] = {
-    var temp: Vector[Object] = Vector()
-    processParamsRec(args, ctx, temp)
+  def processParams(ctx: Context): (Map[String, Object], Context) = {
+    processParamsRec(args, ctx, Map())
   }
 
   @tailrec
   private def processParamsRec(
     fp:  Vector[FormalParameter],
     ctx: Context,
-    acc: Vector[Object]
-  ): Vector[Object] = {
+    acc: Map[String, Object]
+  ): (Map[String, Object], Context) = {
     if (fp.isEmpty) {
-      acc
+      (acc, ctx)
     }
     else {
       ctx.get(fp.head.id) match {
         case Some(TypedObject(tpe, value)) if tpe == fp.head.tpe => {
-          processParamsRec(fp.tail, ctx, acc :+ value)
+          value.eval(ctx).keepOnlyReassignments() match {
+            case Evaluation(evaldValue, ctxDelta) => {
+              processParamsRec(fp.tail, ctx :+ ctxDelta, acc + (fp.head.id.name -> evaldValue))
+            }
+          }
         }
 
         case Some(TypedObject(other, _)) => {

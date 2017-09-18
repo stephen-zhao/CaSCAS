@@ -14,33 +14,32 @@ package object builtin {
 
   private var builtInContextMutationSet: ContextMutationSet = ContextMutationSet.empty
 
-  builtInContextMutationSet.assign(PlusOperator.ident, PlusOperator())
-
-  // e.g.
+  builtInContextMutationSet.assign(AdditionOperator.ident, AdditionOperator())
   builtInContextMutationSet.assign(MultiplyOperator.ident, MultiplyOperator())
 
+  // e.g.
   //builtInContextMutationSet.assign(Identifier("...."), .....Operator())
 
   val builtInCtx: Context = Context() :+ builtInContextMutationSet
 
   trait BuiltInDefinition {
-    def onApply(v : Vector[Object], ctx: Context): Evaluation
-    def tpe: TypeIdentifier
-    def ident: Identifier
-    def formalParams: Vector[FormalParameter]
-    def returnTpe: TypeIdentifier
-    def obj: BuiltInExpr = BuiltInExpr(
+    private[builtin] def onApply(params : Map[String, Object], ctx: Context): Evaluation
+    private[builtin] def tpe: TypeIdentifier
+    private[builtin] def ident: Identifier
+    private[builtin] def formalParams: Vector[FormalParameter]
+    private[builtin] def returnTpe: TypeIdentifier
+    private[builtin] def obj: BuiltInExpr = BuiltInExpr(
       this.formalParams,
       this.onApply,
       this.returnTpe,
       None
     )
-    def apply(): TypedObject = TypedObject(tpe, obj)
+    private[builtin] def apply(): TypedObject = TypedObject(tpe, obj)
   }
 
   trait BuiltInDefinitionWithCustomEval extends BuiltInDefinition {
-    def onEval(ctx: Context): Evaluation
-    override def obj: BuiltInExpr = BuiltInExpr(
+    private[builtin] def onEval(ctx: Context): Evaluation
+    private[builtin] override def obj: BuiltInExpr = BuiltInExpr(
       this.formalParams,
       this.onApply,
       this.returnTpe,
