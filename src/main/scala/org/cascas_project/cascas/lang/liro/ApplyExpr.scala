@@ -29,11 +29,8 @@ case class ApplyExpr(op: Object, params: Vector[Object]) extends Expr {
       case builtIn @ BuiltInExpr(args, onApply, _, _) => {
         val (subCtxDelta, leftOverParams) = this.subInRec(args, params)
         if (leftOverParams.isEmpty) {
-          val temp : (Vector[Object], Boolean, Object) = builtIn.processParams(ctx.consolidatedWith(evaldOpCtxDelta ++ subCtxDelta))
           onApply(
-            temp._1,
-            temp._2,
-            temp._3,
+            builtIn.processParams(ctx.consolidatedWith(evaldOpCtxDelta ++ subCtxDelta)),
             ctx.consolidatedWith(evaldOpCtxDelta ++ subCtxDelta)
           ).keepOnlyReassignments
         }

@@ -18,16 +18,16 @@ import org.cascas_project.cascas.lang.liro.RationalNumber
 //=============================================================================
 
 object MultiplyOperator extends BuiltInDefinition {
-
-  def onApply(v : Vector[Object], a : Boolean, l : Object, ctx: Context): Evaluation = {
-    
+  //v is the processed vector of arguments, l is 
+  def onApply(v : Vector[Object], ctx: Context): Evaluation = {
+   
         // try to evaluate the parameter and assess structure
-        l.eval(ctx).keepOnlyReassignments match {
+        v(0).eval(ctx).keepOnlyReassignments match {
           
           // 1.1. case SUCCESS, is a ListExpr, then
           // do the evaluation
-          case Evaluation(ListExpr(summands), ctxDelta) => {
-            val res = v /: (Accum(ListExpr(), RationalNumber.zero))(multiplyIfPossible _)
+          case Evaluation(ListExpr(multiplicands), ctxDelta) => {
+            val res = multiplicands /: (Accum(ListExpr(), RationalNumber.zero))(multiplyIfPossible _)
             Evaluation(res.nonconstTerms :+ res.constTerm, ctxDelta)
           }
 
@@ -37,7 +37,6 @@ object MultiplyOperator extends BuiltInDefinition {
             Evaluation(ApplyExpr(MultiplyOperator.ident, Vector(other)), ctxDelta)
           }
         }
-       
   }
 
   private def multiplyIfPossible(accum: Accum, currentTerm: Object): Accum = {

@@ -13,15 +13,15 @@ import org.cascas_project.cascas.lang.liro.{ApplyExpr, Identifier, Object, Ratio
 
 object PlusOperator extends BuiltInDefinition {
 
-  def onApply(v : Vector[Object], a : Boolean, l : Object, ctx: Context): Evaluation = {
-    
+  def onApply(v : Vector[Object], ctx: Context): Evaluation = {
+   
         // try to evaluate the parameter and assess structure
-        l.eval(ctx).keepOnlyReassignments match {
+        v(0).eval(ctx).keepOnlyReassignments match {
           
           // 1.1. case SUCCESS, is a ListExpr, then
           // do the evaluation
           case Evaluation(ListExpr(summands), ctxDelta) => {
-            val res = v /: (Accum(ListExpr(), RationalNumber.zero))(addIfPossible _)
+            val res = summands /: (Accum(ListExpr(), RationalNumber.zero))(addIfPossible _)
             Evaluation(res.nonconstTerms :+ res.constTerm, ctxDelta)
           }
 
@@ -31,8 +31,7 @@ object PlusOperator extends BuiltInDefinition {
             Evaluation(ApplyExpr(PlusOperator.ident, Vector(other)), ctxDelta)
           }
         }
-       
-  }
+    }
 
   private def addIfPossible(accum: Accum, currentTerm: Object): Accum = {
     currentTerm match {

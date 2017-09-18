@@ -19,37 +19,28 @@ import scala.annotation.tailrec
 
 case class BuiltInExpr(
   args: Vector[FormalParameter],
-  onApply: (Vector[Object], Boolean, Object, Context) => Evaluation,
+  onApply: (Vector[Object], Context) => Evaluation,
   ret: TypeIdentifier,
   maybeOnEval: Option[(Context) => Evaluation]
 ) extends Expr {
 
-  def processParams (ctx : Context) : (Vector[Object], Boolean, Object) = {
+  def processParams (ctx : Context) : Vector[Object] = {
     var temp: Vector[Object] = Vector()
-    processParamsRec(args, ctx, temp, true)
+    processParamsRec(args, ctx, temp)
   }
 
   @tailrec
   private def processParamsRec (fp : Vector[FormalParameter],
     ctx : Context,
-    acc : Vector[Object],
-    b : Boolean) : (Vector[Object], Boolean, Object) = {
-    var ve : Vector[Object] = Vector()
-    var a: Boolean = true
+    acc : Vector[Object]) : Vector[Object] = {
+    var vacc : Vector[Object] = Vector()
     ctx.get(fp.head.id) match {
-      case Some(TypedObject(t, v)) if (t == fp.head.tpe) => {
-        v.eval(ctx).keepOnlyReassignments match {
-          case Evaluation(l, ctxDelta) => {
-            ve = acc :+ l
-          }
-          case Evaluation(other, ctxDelta) => {
-            a = a && b
-          }
-        }
+      case Some(TypedObject(t, value)) if (t == fp.head.tpe) => {
+        vacc = acc :+ value
         if (fp.tail.length > 0) {
-          processParamsRec(fp.tail, ctx, ve, a)
+          processParamsRec(fp.tail, ctx, vacc)
         } else {
-          (ve, a, v)
+          vacc
         }
       }
 

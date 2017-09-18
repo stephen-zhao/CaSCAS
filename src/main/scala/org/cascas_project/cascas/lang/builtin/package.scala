@@ -24,7 +24,7 @@ package object builtin {
   val builtInCtx: Context = Context() :+ builtInContextMutationSet
 
   trait BuiltInDefinition {
-    def onApply(v : Vector[Object], a : Boolean, l : Object, ctx: Context): Evaluation
+    def onApply(v : Vector[Object], ctx: Context): Evaluation
     def tpe: TypeIdentifier
     def ident: Identifier
     def formalParams: Vector[FormalParameter]
