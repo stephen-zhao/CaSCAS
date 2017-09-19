@@ -24,25 +24,33 @@ case class BuiltInExpr(
   maybeOnEval:  Option[(Context) => Evaluation]
 ) extends Expr {
 
-  def processParams(ctx: Context): (Map[String, Object], Context) = {
-    processParamsRec(formalParams, ctx, Map())
+  def processParams(
+    ctx: Context
+  ): (Map[String, Object], ContextMutationSet) = {
+    processParamsRec(formalParams, ctx)
   }
 
   @tailrec
   private def processParamsRec(
-    fp:  Vector[FormalParameter],
-    ctx: Context,
-    acc: Map[String, Object]
-  ): (Map[String, Object], Context) = {
+    fp:       Vector[FormalParameter],
+    ctx:      Context,
+    ctxDelta: ContextMutationSet = ContextMutationSet.empty,
+    acc:      Map[String, Object] = Map()
+  ): (Map[String, Object], ContextMutationSet) = {
     if (fp.isEmpty) {
-      (acc, ctx)
+      (acc, ctxDelta)
     }
     else {
       ctx.get(fp.head.id) match {
         case Some(TypedObject(tpe, value)) if tpe == fp.head.tpe => {
           value.eval(ctx).keepOnlyReassignments() match {
-            case Evaluation(evaldValue, ctxDelta) => {
-              processParamsRec(fp.tail, ctx :+ ctxDelta, acc + (fp.head.id.name -> evaldValue))
+            case Evaluation(evaldValue, evaldCtxDeltaOR) => {
+              processParamsRec(
+                fp.tail,
+                ctx :+ evaldCtxDeltaOR,
+                ctxDelta ++ evaldCtxDeltaOR,
+                acc + (fp.head.id.name -> evaldValue)
+              )
             }
           }
         }
