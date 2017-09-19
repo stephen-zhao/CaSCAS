@@ -76,7 +76,11 @@ case class BuiltInExpr(
   }
 
   def eval(ctx: Context): Evaluation = this.maybeOnEval match {
+    // 1. There is an explicitly defined behaviour for what to
+    //    do upon eval, so call that.
     case Some(onEval) => onEval(ctx)
+    // 2. There is no explicitly defined behaviour for what to
+    //    do upon eval, so just return this as is.
     case None => Evaluation(this, ContextMutationSet.empty)
   }
 

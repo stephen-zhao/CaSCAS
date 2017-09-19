@@ -16,6 +16,9 @@ import org.cascas_project.cascas.lang.TypeIdentifier
 case class ListExpr(list: Vector[Object]) extends Expr {
 
   def eval(ctx: Context): Evaluation = {
+    // ListExpr behaves like a literal with respect to evaluations. Simply
+    // return itself when doing an evaluation. Back propagate an empty
+    // context mutation set.
     Evaluation(this, ContextMutationSet.empty)
   }
 

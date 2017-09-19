@@ -95,6 +95,8 @@ case class RationalNumber private (numerator: BigInt, denominator: BigInt) exten
   }
 
   def eval(ctx: Context): Evaluation = {
+    // Evaluating a rational number involves simply reducing it
+    // Back propagate an empty context delta
     Evaluation(this.reduced(), ContextMutationSet.empty)
   }
 
