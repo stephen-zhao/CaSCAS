@@ -110,7 +110,8 @@ class CodeGenerator {
         })))
       }
 
-      // 6. other kind BinaryOperatorNode becomes ApplyExpr with length-2 parameter list
+      // 6. other kind BinaryOperatorNode becomes ApplyExpr with length-2
+      //    parameter list
       case BinaryOperatorNode(_, operator, operands) => {
         ApplyExpr(
           this.generateLIRObject(operator),
@@ -121,8 +122,20 @@ class CodeGenerator {
         )
       }
 
-      // 7. Assign kind AssignNode becomes
-        
+      // 7. Assign kind AssignNode becomes an AssignmentExpr with a basic
+      //    value assigned to it
+      case AssignNode('Assign, TerminalNode(_, idToken), assigned) => {
+        AssignmentExpr(Identifier(idToken.lexeme), this.generateLIRObject(assigned))
+      }
+
+      // 8. Assign kind OperatorAssignNode becomes an AssignmentExpr with an
+      //    operator assigned to it
+//      case OperatorAssignNode('Assign, TerminalNode(_, idToken), params, assigned) => {
+//        AssignmentExpr(
+//          Identifier(idToken.lexeme),
+//          this.getOperatorExprFromFParamsAndBodyNodes(params, assigned)
+//        )
+//      }
     } 
   }
 
@@ -166,5 +179,14 @@ class CodeGenerator {
   def getRationalNumberFromIntegerToken(it: IntegerToken): RationalNumber = {
     RationalNumber(BigInt(it.lexeme.filter(_ != '_')))
   }
+
+//  def getOperatorExprFromFParamsAndBodyNodes(
+//    params: ParseNodeLike,
+//    body: ParseNodeLike
+//  ): OperatorExpr = {
+//    params match {
+//      case SequenceNode('FParams, )
+//    }
+//  }
 
 }
