@@ -63,7 +63,7 @@ case class BlockExpr(sequence: Vector[Object]) extends Expr {
   }
 
   def toRepr: String = {
-    "(\n" + this.sequence.foldRight("")((obj, acc) => acc + "\n" + obj.toRepr) + "\n)"
+    "(\n" + this.sequence.map(_.toRepr).mkString("\n") + "\n)"
   }
 
 }

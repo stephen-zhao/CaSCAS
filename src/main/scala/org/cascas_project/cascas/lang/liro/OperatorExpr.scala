@@ -60,7 +60,7 @@ case class OperatorExpr(
   }
 
   def toRepr: String = {
-    "lambda(" + this.formalParams.foldRight("")((fp, acc) => acc + ", " + fp.id + " : " + fp.tpe) + ")" + "(" + this.body.toRepr + ")"
+    "lambda(" + this.formalParams.map(fp => fp.id + " : " + fp.tpe).mkString(", ") + ")" + "(" + this.body.toRepr + ")"
   }
 
 }

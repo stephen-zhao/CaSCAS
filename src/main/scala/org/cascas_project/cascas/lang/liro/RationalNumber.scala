@@ -108,7 +108,14 @@ case class RationalNumber private (numerator: BigInt, denominator: BigInt) exten
     Some(Identifier("Number"))
   }
 
-  def toRepr: String = f"${this.numerator}/${this.denominator}"
+  def toRepr: String = {
+    if (this.denominator == 1) {
+      f"${this.numerator}"
+    }
+    else {
+      f"${this.numerator}/${this.denominator}"
+    }
+  }
 
 }
 
@@ -118,9 +125,9 @@ object RationalNumber {
 
   def apply(numerator: BigInt, denominator: BigInt): RationalNumber = {
     if (denominator < 0) {
-      RationalNumber(numerator * -1, denominator * -1)
+      new RationalNumber(numerator * -1, denominator * -1)
     } else {
-      RationalNumber(numerator, denominator)
+      new RationalNumber(numerator, denominator)
     }
   }
   

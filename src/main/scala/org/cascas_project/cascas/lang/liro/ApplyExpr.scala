@@ -232,7 +232,7 @@ case class ApplyExpr(
   }
 
   def toRepr: String = {
-    this.op.toRepr + "(" + this.actualParams.foldRight("")((param, acc) => acc + ", " + param.toRepr) + ")"
+    this.op.toRepr + "(" + this.actualParams.map(_.toRepr).mkString(", ") + ")"
   }
 
 }

@@ -58,7 +58,7 @@ case class ListExpr(list: Vector[Object]) extends Expr {
   }
 
   def toRepr: String = {
-    "[" + this.list.foldRight("")((elem, acc) => acc + ", " + elem.toRepr) + "]"
+    "[" + this.list.map(_.toRepr).mkString(", ") + "]"
   }
 
   def :+(newElement: Object): ListExpr = ListExpr(this.list :+ newElement)
