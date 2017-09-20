@@ -136,6 +136,13 @@ class CodeGenerator {
 //          this.getOperatorExprFromFParamsAndBodyNodes(params, assigned)
 //        )
 //      }
+
+      // 9. Statements kind StatementsNode becomes a BlockExpr containing
+      //    the sequence of LIRO to execute in order of definition.
+      case StatementsNode('Statements, statements) => {
+        BlockExpr(statements.map(this.generateLIRObject(_)))
+      }
+
     } 
   }
 
