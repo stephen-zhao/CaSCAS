@@ -34,7 +34,7 @@ case class ApplyExpr(
     // Assess the structure of the evaluated operator
     evaldOp match {
       // 1. it's a BuiltInExpr:
-      case builtIn @ BuiltInExpr(formalParams, onApply, _, _) => {
+      case builtIn@BuiltInExpr(_, formalParams, onApply, _, _) => {
         // Substitute in the actual parameters by assigning them to the formal
         // parameters in context to obtain a context mutation set (as well a
         // vector of leftover formal parameters, for the case of a partial
@@ -55,11 +55,13 @@ case class ApplyExpr(
           // operator evaluation + parameter processing need to be back-
           // propagated.
           Evaluation(
-            onApply(processedParams, ctx :+ (
-              evaldOpCtxDeltaOR ++
-              subCtxDeltaA ++
-              processParamsCtxDeltaOR
-            )),
+            onApply(
+              processedParams, ctx :+ (
+                evaldOpCtxDeltaOR ++
+                  subCtxDeltaA ++
+                  processParamsCtxDeltaOR
+                )
+            ),
             evaldOpCtxDeltaOR ++ processParamsCtxDeltaOR
           )
         }
@@ -126,7 +128,7 @@ case class ApplyExpr(
   private def subInRec(
     formalParams: Vector[FormalParameter],
     actualParams: Vector[Object],
-    ctxDelta:     ContextMutationSet = ContextMutationSet.empty
+    ctxDelta    : ContextMutationSet = ContextMutationSet.empty
   ): (ContextMutationSet, Vector[FormalParameter]) = {
     if (formalParams.nonEmpty && actualParams.nonEmpty) {
       ctxDelta.assign(
@@ -201,7 +203,7 @@ case class ApplyExpr(
 
   @tailrec
   private def tryCheckAllRec(
-    ctx:          Context,
+    ctx         : Context,
     formalParams: Vector[FormalParameter],
     actualParams: Vector[Object]
   ): (Boolean, Vector[FormalParameter]) = {
@@ -211,7 +213,8 @@ case class ApplyExpr(
           ctx.consolidatedWith(ContextMutationSet.empty.assign(
             formalParams.head.id,
             TypedObject(formalParams.head.tpe, actualParams.head)
-          )),
+          )
+          ),
           formalParams.tail,
           actualParams.tail
         )
@@ -226,6 +229,10 @@ case class ApplyExpr(
     else {
       (false, formalParams)
     }
+  }
+
+  def toRepr: String = {
+    this.op.toRepr + "(" + this.actualParams.foldRight("")((param, acc) => acc + ", " + param.toRepr) + ")"
   }
 
 }

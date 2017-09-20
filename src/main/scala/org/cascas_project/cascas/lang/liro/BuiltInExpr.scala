@@ -18,6 +18,7 @@ import scala.annotation.tailrec
 //=============================================================================
 
 case class BuiltInExpr(
+  name:         String,
   formalParams: Vector[FormalParameter],
   onApply:      (Map[String, Object], Context) => Object,
   ret:          TypeIdentifier,
@@ -107,6 +108,10 @@ case class BuiltInExpr(
 
   def inferType(ctx: Context): Option[TypeIdentifier] = {
     Some(OperatorType(this.formalParams, this.ret))
+  }
+
+  def toRepr: String = {
+    this.name
   }
 
 }

@@ -108,6 +108,8 @@ case class RationalNumber private (numerator: BigInt, denominator: BigInt) exten
     Some(Identifier("Number"))
   }
 
+  def toRepr: String = f"${this.numerator}/${this.denominator}"
+
 }
 
 object RationalNumber {

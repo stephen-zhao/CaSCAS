@@ -17,4 +17,5 @@ case class NothingObject() extends Literal {
   def eval(ctx: Context): Evaluation = Evaluation(this, ContextMutationSet.empty)
   def checkType(ctx: Context, tpe: TypeIdentifier): Boolean = true
   def inferType(ctx: Context): Option[TypeIdentifier] = None
+  def toRepr: String = "<<NOTHING>>" //TODO
 }

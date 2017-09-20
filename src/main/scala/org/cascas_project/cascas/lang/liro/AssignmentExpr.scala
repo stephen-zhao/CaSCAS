@@ -31,4 +31,8 @@ case class AssignmentExpr(
 
   def inferType(ctx: Context): Option[TypeIdentifier] = None //TODO
 
+  def toRepr: String = {
+    "let " + identifier.toRepr + " := " + value.toRepr
+  }
+
 }

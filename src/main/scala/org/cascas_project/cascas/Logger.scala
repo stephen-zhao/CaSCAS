@@ -27,15 +27,20 @@ object Logger {
         'CALLSTACK-> (4, "CALL"))
 
   private val tagMap: Map[Tag, String] = 
-    Map('ANALYZER -> "ANALYZER",
-        'APP      -> "CASCAS",
-        'CONFIG   -> "CONFIG",
-        'LEXER    -> "LEXER",
-        'LRM      -> "LRM",
-        'LRMG     -> "LRMG",
-        'PARSER   -> "PARSER",
-        'REPL     -> "REPL",
-        'UTIL     -> "UTIL")
+    Map(
+      'ANALYZER -> "ANALYZER",
+      'APP      -> "CASCAS",
+      'CONFIG   -> "CONFIG",
+      'LEXER    -> "LEXER",
+      'LRM      -> "LRM",
+      'LRMG     -> "LRMG",
+      'PARSER   -> "PARSER",
+      'REPL     -> "REPL",
+      'UTIL     -> "UTIL",
+      'TRNSLTR  -> "TRNSLTR",
+      'LIRO     -> "LIRO",
+      'LANG     -> "LANG"
+    )
 
   class Logger {
 

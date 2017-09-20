@@ -34,6 +34,7 @@ package object builtin {
     private[builtin] def returnTpe: TypeIdentifier
     private[builtin] def tpe: TypeIdentifier = OperatorType(this.formalParams)(this.returnTpe)
     private[builtin] def obj: BuiltInExpr = BuiltInExpr(
+      this.ident.name,
       this.formalParams,
       this.onApply,
       this.returnTpe,
@@ -52,6 +53,7 @@ package object builtin {
   trait BuiltInDefinitionWithCustomEval extends BuiltInDefinition {
     private[builtin] def onEval(ctx: Context): Evaluation
     private[builtin] override def obj: BuiltInExpr = BuiltInExpr(
+      this.ident.name,
       this.formalParams,
       this.onApply,
       this.returnTpe,

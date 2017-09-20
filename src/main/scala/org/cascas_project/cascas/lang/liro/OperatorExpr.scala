@@ -59,6 +59,10 @@ case class OperatorExpr(
     None //TODO
   }
 
+  def toRepr: String = {
+    "lambda(" + this.formalParams.foldRight("")((fp, acc) => acc + ", " + fp.id + " : " + fp.tpe) + ")" + "(" + this.body.toRepr + ")"
+  }
+
 }
 
 
