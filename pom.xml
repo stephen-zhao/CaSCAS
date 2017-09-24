@@ -2,17 +2,24 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.cascas-project</groupId>
   <artifactId>CaSCAS</artifactId>
-  <version>0.0.1</version>
+  <version>0.1-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
   <name>${project.artifactId}</name>
-  <description>My wonderfull scala app</description>
+  <description>A dynamically typed functional computer algebra system written in Scala</description>
   <inceptionYear>2017</inceptionYear>
-  <licenses>
-    <license>
-      <name>My License</name>
-      <url>http://....</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
+  <url>https://github.com/stephen-zhao/CaSCAS</url>
+
+  <developers>
+    <developer>
+      <name>Stephen Zhao</name>
+      <email>mail@zhaostephen.com</email>
+    </developer>
+    <developer>
+      <name>Yizhou (Max) Deng</name>
+      <email>//TODO</email>
+    </developer>
+  </developers>
 
   <properties>
     <maven.compiler.source>1.6</maven.compiler.source>
@@ -95,6 +102,15 @@
             <include>**/*Test.*</include>
             <include>**/*Suite.*</include>
           </includes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <!--PURPOSE: To execute the project main for manual interactive testing -->
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.6.0</version>
+        <configuration>
+          <mainClass>org.cascas_project.cascas.App</mainClass>
         </configuration>
       </plugin>
     </plugins>
