@@ -151,7 +151,7 @@ class CodeGenerator {
       case StatementsNode('Statements, statements) => {
         Logger.info('TRNSLTR, f"Processing StatementsNode $statements...")
         val res = BlockExpr(statements.map(s => this.generateLIRO(s)))
-        Logger.info('TRNSLTR, f"Generated BlockExpr ${res.toRepr}")
+        Logger.info('TRNSLTR, f"Generated BlockExpr ${res.toRepr()}")
         res
       }
 
@@ -180,7 +180,7 @@ class CodeGenerator {
       f: List[Char] = List()
     ): (String, String) = {
       s.headOption match {
-        case None => (w.reverse.toString, f.reverse.toString)
+        case None => (w.reverse.mkString, f.reverse.mkString)
         case Some('_') => parseFractionalPartRec(s.tail, w, f)
         case Some(x: Char) => parseFractionalPartRec(s.tail, w, x :: f)
       }
@@ -189,19 +189,19 @@ class CodeGenerator {
     val res = parseWholePartRec(dt.lexeme.toList) match {
       case (w, f) => {
         val numerator = BigInt(w ++ f)
-        val denominator = BigInt(10).pow((w ++ f).length)
+        val denominator = BigInt(10).pow((f).length)
         RationalNumber(numerator, denominator)
       }
     }
 
-    Logger.info('TRNSLTR, f"Generated RationalNumber ${res.toRepr}")
+    Logger.info('TRNSLTR, f"Generated RationalNumber ${res.toRepr()}")
     res
   }
 
   def processIntegerToken(it: IntegerToken): RationalNumber = {
     Logger.info('TRNSLTR, f"Processing IntegerToken $it...")
-    val res = RationalNumber(BigInt(it.lexeme))
-    Logger.info('TRNSLTR, f"Generated RationalNumber ${res.toRepr}")
+    val res = RationalNumber(BigInt(it.lexeme.filter(_ != '_')))
+    Logger.info('TRNSLTR, f"Generated RationalNumber ${res.toRepr()}")
     res
   }
 

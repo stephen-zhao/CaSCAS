@@ -108,7 +108,7 @@ case class RationalNumber private (numerator: BigInt, denominator: BigInt) exten
     Some(Identifier("Number"))
   }
 
-  def toRepr: String = {
+  def toRepr(indentLevel: Int): String = {
     if (this.denominator == 1) {
       f"${this.numerator}"
     }

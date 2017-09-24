@@ -57,8 +57,8 @@ case class ListExpr(list: Vector[Object]) extends Expr {
     }
   }
 
-  def toRepr: String = {
-    "[" + this.list.map(_.toRepr).mkString(", ") + "]"
+  def toRepr(indentLevel: Int): String = {
+    "[" + this.list.map(_.toRepr(indentLevel)).mkString(", ") + "]"
   }
 
   def :+(newElement: Object): ListExpr = ListExpr(this.list :+ newElement)

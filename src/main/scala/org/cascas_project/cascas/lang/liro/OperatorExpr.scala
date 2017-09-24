@@ -59,8 +59,8 @@ case class OperatorExpr(
     None //TODO
   }
 
-  def toRepr: String = {
-    "lambda(" + this.formalParams.map(fp => fp.id + " : " + fp.tpe).mkString(", ") + ")" + "(" + this.body.toRepr + ")"
+  def toRepr(indentLevel: Int): String = {
+    "lambda(" + this.formalParams.map(fp => fp.id + " : " + fp.tpe).mkString(", ") + ")" + "(" + this.body.toRepr(indentLevel) + ")"
   }
 
 }

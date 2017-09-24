@@ -58,6 +58,8 @@ case class Context (
 
   def :+(ctxDelta: ContextMutationSet): Context = consolidatedWith(ctxDelta)
 
+  def contains(ident: Identifier): Boolean = this.m contains ident
+
 }
 
 object Context {

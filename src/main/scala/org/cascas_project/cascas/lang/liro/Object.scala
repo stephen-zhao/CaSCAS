@@ -16,5 +16,6 @@ trait Object {
   def eval(ctx: Context): Evaluation
   def checkType(ctx: Context, tpe: TypeIdentifier): Boolean
   def inferType(ctx: Context): Option[TypeIdentifier]
-  def toRepr: String
+  def toRepr(identLevel: Int = 0): String
+  protected def getIndentationString(indentLevel: Int): String = "  " * indentLevel
 }

@@ -62,8 +62,13 @@ case class BlockExpr(sequence: Vector[Object]) extends Expr {
     }
   }
 
-  def toRepr: String = {
-    "(\n" + this.sequence.map(_.toRepr).mkString("\n") + "\n)"
+  def toRepr(indentLevel: Int): String = {
+    val indentStringExterior = this.getIndentationString(indentLevel)
+    val indentStringInterior = this.getIndentationString(indentLevel + 1)
+    "\n" +
+      indentStringExterior + "(\n" +
+      indentStringInterior + this.sequence.map(_.toRepr(indentLevel + 1)).mkString(";\n" + indentStringInterior) + "\n" +
+      indentStringExterior + ")"
   }
 
 }
