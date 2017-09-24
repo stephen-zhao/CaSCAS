@@ -46,7 +46,7 @@ object Logger {
 
     private var tagToMaxSeverity: Map[Tag, Severity] = Map[Tag, Severity]()
 
-    private def isLoggingActiveFor(severity: Severity, tag: Tag): Boolean = {
+    def isLoggingActiveFor(severity: Severity, tag: Tag): Boolean = {
       if (this.tagToMaxSeverity.isEmpty) {
         tag match {
           case 'APP => severityMap(severity)._1 <= severityMap('INFO)._1
@@ -126,5 +126,9 @@ object Logger {
 
   def exception(tag: Tag, t: Throwable): Unit = {
     defaultLogger.write('ERROR, tag, getStackTraceAsString(t))
+  }
+
+  def isLoggingActiveFor(severity: Severity, tag: Tag): Boolean = {
+    defaultLogger.isLoggingActiveFor(severity, tag)
   }
 }

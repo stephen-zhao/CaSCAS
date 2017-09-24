@@ -11,15 +11,33 @@ import org.cascas_project.cascas.lang.ContextMutationSet
 import org.cascas_project.cascas.lang.Evaluation
 import org.cascas_project.cascas.lang.TypeIdentifier
 
+import scala.annotation.tailrec
+
 //=============================================================================
 
 case class ListExpr(list: Vector[Object]) extends Expr {
 
   def eval(ctx: Context): Evaluation = {
-    // ListExpr behaves like a literal with respect to evaluations. Simply
-    // return itself when doing an evaluation. Back propagate an empty
-    // context mutation set.
-    Evaluation(this, ContextMutationSet.empty)
+    // Evaluate each element in a ListExpr in order to evaluate a ListExpr.
+    // Back propagate an empty context mutation set.
+    this.evalRec(this.list.toList, ctx)
+  }
+
+  @tailrec
+  private def evalRec(
+    listToEval: List[Object],
+    ctx:        Context,
+    ctxDelta:   ContextMutationSet = ContextMutationSet.empty,
+    accum:      List[Object] = List()
+  ): Evaluation = {
+    listToEval.headOption match {
+      case None => Evaluation(ListExpr(accum.reverse.toVector), ctxDelta)
+      case Some(obj) => obj.eval(ctx).keepOnlyReassignments() match {
+        case Evaluation(evaldObj, evaldCtxDeltaOR) => {
+          this.evalRec(listToEval.tail, ctx :+ evaldCtxDeltaOR, ctxDelta ++ evaldCtxDeltaOR, evaldObj :: accum)
+        }
+      }
+    }
   }
 
   def checkType(ctx: Context, tpe: TypeIdentifier): Boolean = {

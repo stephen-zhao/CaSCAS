@@ -121,7 +121,13 @@ case class RationalNumber private (numerator: BigInt, denominator: BigInt) exten
 
 object RationalNumber {
 
-  val zero = RationalNumber(0, 1)
+  val zero: RationalNumber = RationalNumber(0, 1)
+
+  def additiveIdentity: RationalNumber = zero
+
+  val one: RationalNumber = RationalNumber(1, 1)
+
+  def multiplicativeIdentity: RationalNumber = one
 
   def apply(numerator: BigInt, denominator: BigInt): RationalNumber = {
     if (denominator < 0) {

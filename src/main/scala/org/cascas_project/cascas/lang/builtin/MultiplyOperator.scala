@@ -26,8 +26,11 @@ object MultiplyOperator extends BuiltInDefinition with AppearsAsBinaryInfixOp {
       // 1. case SUCCESS, is a ListExpr, then
       // do the multiplication
       case ListExpr(multiplicands) => {
-        val res = (multiplicands foldLeft Accum(ListExpr(), RationalNumber.zero))(multiplyIfPossible _)
-        res.nonconstFactors :+ res.constFactor
+        val res = (multiplicands foldLeft Accum(List(), RationalNumber.multiplicativeIdentity))(this.multiplyIfPossible)
+        (res.constFactor :: res.nonConstFactors).reverse match {
+          case (onlyConstFactor @ RationalNumber(_, _)) :: Nil => onlyConstFactor
+          case listOfFactors => ApplyExpr(this.ident, Vector(ListExpr(listOfFactors.toVector)))
+        }
       }
 
       // 2. case FAIL, is not a ListExpr, then
@@ -40,8 +43,8 @@ object MultiplyOperator extends BuiltInDefinition with AppearsAsBinaryInfixOp {
 
   private def multiplyIfPossible(accum: Accum, currentFactor: Object): Accum = {
     currentFactor match {
-      case const: RationalNumber => Accum(accum.nonconstFactors, accum.constFactor * const)
-      case term => Accum(accum.nonconstFactors :+ term, accum.constFactor) //TODO: logic to collect like factors
+      case const: RationalNumber => Accum(accum.nonConstFactors, accum.constFactor * const)
+      case term => Accum(accum.nonConstFactors :+ term, accum.constFactor) //TODO: logic to collect like factors
     }
   }
 
@@ -53,6 +56,6 @@ object MultiplyOperator extends BuiltInDefinition with AppearsAsBinaryInfixOp {
 
   def returnTpe = Identifier("Number")
 
-  case class Accum(nonconstFactors: ListExpr, constFactor: RationalNumber)
+  case class Accum(nonConstFactors: List[Object], constFactor: RationalNumber)
 
 }

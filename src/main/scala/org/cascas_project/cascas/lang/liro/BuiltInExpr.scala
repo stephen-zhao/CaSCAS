@@ -34,24 +34,24 @@ case class BuiltInExpr(
 
   @tailrec
   private def processParamsRec(
-    fp:       Vector[FormalParameter],
-    ctx:      Context,
-    ctxDelta: ContextMutationSet = ContextMutationSet.empty,
-    acc:      Map[String, Object] = Map()
+    formalParams: Vector[FormalParameter],
+    ctx:          Context,
+    ctxDelta:     ContextMutationSet = ContextMutationSet.empty,
+    actualParams: Map[String, Object] = Map()
   ): (Map[String, Object], ContextMutationSet) = {
-    if (fp.isEmpty) {
-      (acc, ctxDelta)
+    if (formalParams.isEmpty) {
+      (actualParams, ctxDelta)
     }
     else {
-      ctx.get(fp.head.id) match {
-        case Some(TypedObject(tpe, value)) if tpe == fp.head.tpe => {
+      ctx.get(formalParams.head.id) match {
+        case Some(TypedObject(tpe, value)) if tpe == formalParams.head.tpe => {
           value.eval(ctx).keepOnlyReassignments() match {
             case Evaluation(evaldValue, evaldCtxDeltaOR) => {
               processParamsRec(
-                fp.tail,
+                formalParams.tail,
                 ctx :+ evaldCtxDeltaOR,
                 ctxDelta ++ evaldCtxDeltaOR,
-                acc + (fp.head.id.name -> evaldValue)
+                actualParams + (formalParams.head.id.name -> evaldValue)
               )
             }
           }

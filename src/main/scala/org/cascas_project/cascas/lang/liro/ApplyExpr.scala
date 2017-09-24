@@ -6,6 +6,7 @@ package org.cascas_project.cascas.lang.liro
 
 //=============================================================================
 
+import org.cascas_project.cascas.Logger
 import org.cascas_project.cascas.lang.Context
 import org.cascas_project.cascas.lang.ContextMutationSet
 import org.cascas_project.cascas.lang.Evaluation
@@ -27,33 +28,52 @@ case class ApplyExpr(
 
     // Evaluate the operator first, and extract the evaluated object (evaldOp)
     // and any reassignment changes to the context
+    this.evalLogVerbose(s"Evaluating operator $op ...")
     val evaldOpRes = this.op.eval(ctx)
     val evaldOp = evaldOpRes.evaldObj
     val evaldOpCtxDeltaOR = evaldOpRes.ctxDelta.onlyReassignments()
+    this.evalLogVerbose(Vector(
+      "Operator evaluated.",
+      s"Evaluated operator: $evaldOp",
+      s"Reassignments: ${evaldOpCtxDeltaOR.getReassignments}"
+    ))
 
     // Assess the structure of the evaluated operator
+    this.evalLogVerbose("Assessing structure of evaluated operator...")
     evaldOp match {
       // 1. it's a BuiltInExpr:
       case builtIn @ BuiltInExpr(_, formalParams, onApply, _, _, _) => {
+        this.evalLogVerbose("Structural assessment complete. BuiltInExpr detected.")
         // Substitute in the actual parameters by assigning them to the formal
         // parameters in context to obtain a context mutation set (as well a
         // vector of leftover formal parameters, for the case of a partial
         // function application)
+        this.evalLogVerbose("Substituting actual parameters by adding to context...")
         val (subCtxDeltaA, leftOverParams) = this.subInRec(formalParams, actualParams)
+        this.evalLogVerbose("Actual parameters substitution complete.")
+        this.evalLogVerbose("Assessing the degree of operator application...")
         // 1.1. A full function application:
         if (leftOverParams.isEmpty) {
+          this.evalLogVerbose("Full operator application detected (no left-over formal parameters).")
           // Process the parameters to obtain an explicit mapping from parameter
           // name to the value that is properly type-checked and a new context
           // with all changes from evaluating this Expr + processing the
           // parameters consolidated together.
+          this.evalLogVerbose("Processing parameters...")
           val (processedParams, processParamsCtxDeltaOR) = builtIn.processParams(
             ctx :+ (evaldOpCtxDeltaOR ++ subCtxDeltaA)
           )
+          this.evalLogVerbose(Vector(
+            "Parameters processing complete.",
+            s"Processed parameters: $processedParams",
+            s"Reassignments: ${processParamsCtxDeltaOR.getReassignments}"
+          ))
           // Result is determined by the implementation of onApply
           // A promise is made that onApply will NEVER make persistent
           // alterations to the context, and so only reassignments from the
           // operator evaluation + parameter processing need to be back-
           // propagated.
+          this.evalLogVerbose("Producing evaluation....")
           Evaluation(
             onApply(
               processedParams, ctx :+ (
@@ -68,26 +88,35 @@ case class ApplyExpr(
         // 1.2. A partial function application:
         else {
           // is not allowed for BuiltInExprs
+          this.evalLogVerbose("Partial operator application detected (left-over formal parameters exist).")
           throw new Exception("cannot partially apply built-in operator") //TODO
         }
       }
       // 2. it's an OperatorExpr with a LIRO body definition.
       case OperatorExpr(formalParams, body) => {
+        this.evalLogVerbose("Structural assessment complete. OperatorExpr detected.")
         // Substitute in the actual parameters by assigning them to the formal
         // parameters in context to obtain a context mutation set (as well a
         // vector of leftover formal parameters, for the case of a partial
         // function application)
+        this.evalLogVerbose("Substituting actual parameters by adding to context...")
         val (subCtxDeltaA, leftOverParams) = this.subInRec(formalParams, actualParams)
+        this.evalLogVerbose("Actual parameters substitution complete.")
+        this.evalLogVerbose("Assessing the degree of operator application...")
         // 2.1. A full function application:
         if (leftOverParams.isEmpty) {
+          this.evalLogVerbose("Full operator application detected (no left-over formal parameters).")
           // Evaluate the body of the OperatorExpr with the modified context
           // (to include the reassignments from evaluating the operator and
           // the assignments from substituting in the parameters).
+          this.evalLogVerbose("Evaluating body of operator...")
           val evaldBodyRes = body.eval(
             ctx :+ (evaldOpCtxDeltaOR ++ subCtxDeltaA)
           ).keepOnlyReassignments()
+          this.evalLogVerbose("Evaluation of body complete.")
           // Return the evaluated body, and back-propagate all reassignments
           // made thus far.
+          this.evalLogVerbose("Producing evaluation....")
           Evaluation(
             evaldBodyRes.evaldObj,
             evaldOpCtxDeltaOR ++ evaldBodyRes.ctxDelta
@@ -95,16 +124,20 @@ case class ApplyExpr(
         }
         // 2.2. A partial function application:
         else {
+          this.evalLogVerbose("Partial operator application detected (left-over formal parameters exist).")
           // Evaluate the body of the OperatorExpr with the modified context
           // which includes the reassignments from evaluating the operator
           // and the assignments from partial substitution of the parameters.
+          this.evalLogVerbose("Evaluating body of operator...")
           val evaldBodyRes = body.eval(
             ctx :+ (evaldOpCtxDeltaOR ++ subCtxDeltaA)
           ).keepOnlyReassignments()
+          this.evalLogVerbose("Evaluation of body complete.")
           // Return the evaluated body wrapped in an OperatorExpr with the
           // leftover parameters to indicate work still needs to be done to
           // complete the function application. Back-propagate all
           // reassignments made thus far.
+          this.evalLogVerbose("Producing evaluation....")
           Evaluation(
             OperatorExpr(leftOverParams, evaldBodyRes.evaldObj),
             evaldOpCtxDeltaOR ++ evaldBodyRes.ctxDelta
@@ -113,9 +146,11 @@ case class ApplyExpr(
       }
       // 3. the structure cannot be used explicitly in a function application.
       case other => {
+        this.evalLogVerbose("Structural assessment complete. Some other LIRO detected.")
         // Return the same ApplyExpr except with the operator evaluated.
         // (parameters remain unevaluated) //TODO
         // Back propagate the reassignments from the operator evaluation.
+        this.evalLogVerbose("Producing evaluation....")
         Evaluation(
           ApplyExpr(evaldOp, this.actualParams),
           evaldOpCtxDeltaOR
@@ -245,6 +280,24 @@ case class ApplyExpr(
 
   private def toReprImpl(indentLevel: Int): String = {
     this.op.toRepr(indentLevel) + "(" + this.actualParams.map(_.toRepr(indentLevel)).mkString(", ") + ")"
+  }
+
+  private def evalLogInfo(msg: String): Unit = {
+    if (Logger.isLoggingActiveFor('INFO, 'LIRO)) {
+      Logger.info('LIRO, "[ApplyExpr][Eval] " + msg)
+    }
+  }
+
+  private def evalLogVerbose(msg: String): Unit = {
+    if (Logger.isLoggingActiveFor('VERBOSE, 'LIRO)) {
+      Logger.verbose('LIRO, "[ApplyExpr][Eval] " + msg)
+    }
+  }
+
+  private def evalLogVerbose(msgs: Vector[String]): Unit = {
+    if (Logger.isLoggingActiveFor('VERBOSE, 'LIRO)) {
+      Logger.verbose('LIRO, "[ApplyExpr][Eval]\n    " + msgs.mkString("\n    "))
+    }
   }
 
 }

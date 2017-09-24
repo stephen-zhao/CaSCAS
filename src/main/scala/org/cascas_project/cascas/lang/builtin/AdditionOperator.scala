@@ -26,22 +26,25 @@ object AdditionOperator extends BuiltInDefinition with AppearsAsBinaryInfixOp {
       // 1. case SUCCESS, is a ListExpr, then
       // do the addition
       case ListExpr(summands) => {
-        val res = (summands foldLeft Accum(ListExpr(), RationalNumber.zero))(addIfPossible _)
-        res.nonconstTerms :+ res.constTerm
+        val res = (summands foldLeft Accum(List(), RationalNumber.additiveIdentity))(this.addIfPossible)
+        (res.constTerm :: res.nonConstTerms).reverse match {
+          case (onlyConstTerm @ RationalNumber(_, _)) :: Nil => onlyConstTerm
+          case listOfTerms => ApplyExpr(this.ident, Vector(ListExpr(listOfTerms.toVector)))
+        }
       }
 
       // 2. case FAIL, is not a ListExpr, then
       // cannot do addition on a non-explicit list, return as is
       case other => {
-        ApplyExpr(AdditionOperator.ident, Vector(other))
+        ApplyExpr(this.ident, Vector(other))
       }
     }
   }
 
   private def addIfPossible(accum: Accum, currentTerm: Object): Accum = {
     currentTerm match {
-      case const: RationalNumber => Accum(accum.nonconstTerms, accum.constTerm + const)
-      case term => Accum(accum.nonconstTerms :+ term, accum.constTerm) //TODO: logic to collect like terms
+      case const: RationalNumber => Accum(accum.nonConstTerms, accum.constTerm + const)
+      case term => Accum(term :: accum.nonConstTerms, accum.constTerm) //TODO: logic to collect like terms
     }
   }
 
@@ -53,6 +56,6 @@ object AdditionOperator extends BuiltInDefinition with AppearsAsBinaryInfixOp {
 
   def returnTpe = Identifier("Number")
 
-  case class Accum(nonconstTerms: ListExpr, constTerm: RationalNumber)
+  case class Accum(nonConstTerms: List[Object], constTerm: RationalNumber)
 
 }
