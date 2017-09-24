@@ -42,6 +42,10 @@ case class Identifier(name: String) extends TypeIdentifier with Object {
     }
   }
 
+  def toRepr(indentLevel: Int): String = {
+    this.name
+  }
+
 }
 
 object Identifier {

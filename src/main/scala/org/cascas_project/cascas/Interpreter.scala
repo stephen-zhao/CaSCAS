@@ -52,7 +52,7 @@ class Interpreter {
         Logger.info('REPL, "Input tokens parsed as tree")
         Logger.verbose('REPL, "Tree is:\n" + tree)
 
-        val resultAsString = this.codeGenerator.generateLIRObject(tree).toRepr()
+        val resultAsString = this.codeGenerator.generateLIRO(tree).toRepr()
         
         // TODO: Do stuff with the tokens
         // for now, the parse tree is just get printed to the screen

@@ -16,6 +16,9 @@ import org.cascas_project.cascas.lang.TypeIdentifier
 case class ListExpr(list: Vector[Object]) extends Expr {
 
   def eval(ctx: Context): Evaluation = {
+    // ListExpr behaves like a literal with respect to evaluations. Simply
+    // return itself when doing an evaluation. Back propagate an empty
+    // context mutation set.
     Evaluation(this, ContextMutationSet.empty)
   }
 
@@ -52,6 +55,10 @@ case class ListExpr(list: Vector[Object]) extends Expr {
       //throw new Exception("Can't infer the type of an empty list expression")
       None
     }
+  }
+
+  def toRepr(indentLevel: Int): String = {
+    "[" + this.list.map(_.toRepr(indentLevel)).mkString(", ") + "]"
   }
 
   def :+(newElement: Object): ListExpr = ListExpr(this.list :+ newElement)

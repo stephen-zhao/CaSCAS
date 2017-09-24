@@ -95,6 +95,8 @@ case class RationalNumber private (numerator: BigInt, denominator: BigInt) exten
   }
 
   def eval(ctx: Context): Evaluation = {
+    // Evaluating a rational number involves simply reducing it
+    // Back propagate an empty context delta
     Evaluation(this.reduced(), ContextMutationSet.empty)
   }
 
@@ -106,6 +108,15 @@ case class RationalNumber private (numerator: BigInt, denominator: BigInt) exten
     Some(Identifier("Number"))
   }
 
+  def toRepr(indentLevel: Int): String = {
+    if (this.denominator == 1) {
+      f"${this.numerator}"
+    }
+    else {
+      f"${this.numerator}/${this.denominator}"
+    }
+  }
+
 }
 
 object RationalNumber {
@@ -114,9 +125,9 @@ object RationalNumber {
 
   def apply(numerator: BigInt, denominator: BigInt): RationalNumber = {
     if (denominator < 0) {
-      RationalNumber(numerator * -1, denominator * -1)
+      new RationalNumber(numerator * -1, denominator * -1)
     } else {
-      RationalNumber(numerator, denominator)
+      new RationalNumber(numerator, denominator)
     }
   }
   

@@ -55,4 +55,9 @@ case class WhileExpr(predicate: Object, body: Object) extends Expr {
     None
   }
 
+  def toRepr(indentLevel: Int): String = {
+    //TODO
+    ""
+  }
+
 }

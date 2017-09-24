@@ -18,31 +18,41 @@ import scala.annotation.tailrec
 //=============================================================================
 
 case class BuiltInExpr(
-  formalParams: Vector[FormalParameter],
-  onApply:      (Map[String, Object], Context) => Object,
-  ret:          TypeIdentifier,
-  maybeOnEval:  Option[(Context) => Evaluation]
+  name:          String,
+  formalParams:  Vector[FormalParameter],
+  onApply:       (Map[String, Object], Context) => Object,
+  ret:           TypeIdentifier,
+  maybeOnEval:   Option[Context => Evaluation],
+  maybeOnApplyToRepr: Option[(ApplyExpr, Int) => String]
 ) extends Expr {
 
-  def processParams(ctx: Context): (Map[String, Object], Context) = {
-    processParamsRec(formalParams, ctx, Map())
+  def processParams(
+    ctx: Context
+  ): (Map[String, Object], ContextMutationSet) = {
+    processParamsRec(formalParams, ctx)
   }
 
   @tailrec
   private def processParamsRec(
-    fp:  Vector[FormalParameter],
-    ctx: Context,
-    acc: Map[String, Object]
-  ): (Map[String, Object], Context) = {
+    fp:       Vector[FormalParameter],
+    ctx:      Context,
+    ctxDelta: ContextMutationSet = ContextMutationSet.empty,
+    acc:      Map[String, Object] = Map()
+  ): (Map[String, Object], ContextMutationSet) = {
     if (fp.isEmpty) {
-      (acc, ctx)
+      (acc, ctxDelta)
     }
     else {
       ctx.get(fp.head.id) match {
         case Some(TypedObject(tpe, value)) if tpe == fp.head.tpe => {
           value.eval(ctx).keepOnlyReassignments() match {
-            case Evaluation(evaldValue, ctxDelta) => {
-              processParamsRec(fp.tail, ctx :+ ctxDelta, acc + (fp.head.id.name -> evaldValue))
+            case Evaluation(evaldValue, evaldCtxDeltaOR) => {
+              processParamsRec(
+                fp.tail,
+                ctx :+ evaldCtxDeltaOR,
+                ctxDelta ++ evaldCtxDeltaOR,
+                acc + (fp.head.id.name -> evaldValue)
+              )
             }
           }
         }
@@ -68,7 +78,11 @@ case class BuiltInExpr(
   }
 
   def eval(ctx: Context): Evaluation = this.maybeOnEval match {
+    // 1. There is an explicitly defined behaviour for what to
+    //    do upon eval, so call that.
     case Some(onEval) => onEval(ctx)
+    // 2. There is no explicitly defined behaviour for what to
+    //    do upon eval, so just return this as is.
     case None => Evaluation(this, ContextMutationSet.empty)
   }
 
@@ -95,6 +109,10 @@ case class BuiltInExpr(
 
   def inferType(ctx: Context): Option[TypeIdentifier] = {
     Some(OperatorType(this.formalParams, this.ret))
+  }
+
+  def toRepr(indentLevel: Int): String = {
+    this.name
   }
 
 }

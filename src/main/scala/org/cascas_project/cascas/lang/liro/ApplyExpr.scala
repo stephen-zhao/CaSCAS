@@ -18,53 +18,108 @@ import scala.annotation.tailrec
 //=============================================================================
 
 case class ApplyExpr(
-  op:     Object,
-  params: Vector[Object]
+  op:           Object,
+  actualParams: Vector[Object]
 ) extends Expr
   with TypeIdentifier {
 
   def eval(ctx: Context): Evaluation = {
 
+    // Evaluate the operator first, and extract the evaluated object (evaldOp)
+    // and any reassignment changes to the context
     val evaldOpRes = this.op.eval(ctx)
     val evaldOp = evaldOpRes.evaldObj
-    val evaldOpCtxDelta = evaldOpRes.ctxDelta.onlyReassignments()
+    val evaldOpCtxDeltaOR = evaldOpRes.ctxDelta.onlyReassignments()
 
+    // Assess the structure of the evaluated operator
     evaldOp match {
-      case builtIn @ BuiltInExpr(args, onApply, _, _) => {
-        val (subCtxDelta, leftOverParams) = this.subInRec(args, params)
+      // 1. it's a BuiltInExpr:
+      case builtIn @ BuiltInExpr(_, formalParams, onApply, _, _, _) => {
+        // Substitute in the actual parameters by assigning them to the formal
+        // parameters in context to obtain a context mutation set (as well a
+        // vector of leftover formal parameters, for the case of a partial
+        // function application)
+        val (subCtxDeltaA, leftOverParams) = this.subInRec(formalParams, actualParams)
+        // 1.1. A full function application:
         if (leftOverParams.isEmpty) {
-          val allChangesCtxDelta = evaldOpCtxDelta ++ subCtxDelta
-          val (processedParams, newCtx) = builtIn.processParams(
-            ctx.consolidatedWith(allChangesCtxDelta)
+          // Process the parameters to obtain an explicit mapping from parameter
+          // name to the value that is properly type-checked and a new context
+          // with all changes from evaluating this Expr + processing the
+          // parameters consolidated together.
+          val (processedParams, processParamsCtxDeltaOR) = builtIn.processParams(
+            ctx :+ (evaldOpCtxDeltaOR ++ subCtxDeltaA)
           )
+          // Result is determined by the implementation of onApply
+          // A promise is made that onApply will NEVER make persistent
+          // alterations to the context, and so only reassignments from the
+          // operator evaluation + parameter processing need to be back-
+          // propagated.
           Evaluation(
-            onApply(processedParams, newCtx),
-            allChangesCtxDelta
-          ).keepOnlyReassignments()
+            onApply(
+              processedParams, ctx :+ (
+                evaldOpCtxDeltaOR ++
+                  subCtxDeltaA ++
+                  processParamsCtxDeltaOR
+                )
+            ),
+            evaldOpCtxDeltaOR ++ processParamsCtxDeltaOR
+          )
         }
+        // 1.2. A partial function application:
         else {
+          // is not allowed for BuiltInExprs
           throw new Exception("cannot partially apply built-in operator") //TODO
         }
       }
-      case OperatorExpr(args, body) => {
-        val (subCtxDelta, leftOverParams) = this.subInRec(args, params)
+      // 2. it's an OperatorExpr with a LIRO body definition.
+      case OperatorExpr(formalParams, body) => {
+        // Substitute in the actual parameters by assigning them to the formal
+        // parameters in context to obtain a context mutation set (as well a
+        // vector of leftover formal parameters, for the case of a partial
+        // function application)
+        val (subCtxDeltaA, leftOverParams) = this.subInRec(formalParams, actualParams)
+        // 2.1. A full function application:
         if (leftOverParams.isEmpty) {
-          body.eval(
-            ctx.consolidatedWith(evaldOpCtxDelta ++ subCtxDelta)
-          ).keepOnlyReassignments()
-        }
-        else {
+          // Evaluate the body of the OperatorExpr with the modified context
+          // (to include the reassignments from evaluating the operator and
+          // the assignments from substituting in the parameters).
           val evaldBodyRes = body.eval(
-            ctx.consolidatedWith(evaldOpCtxDelta ++ subCtxDelta)
+            ctx :+ (evaldOpCtxDeltaOR ++ subCtxDeltaA)
           ).keepOnlyReassignments()
+          // Return the evaluated body, and back-propagate all reassignments
+          // made thus far.
+          Evaluation(
+            evaldBodyRes.evaldObj,
+            evaldOpCtxDeltaOR ++ evaldBodyRes.ctxDelta
+          )
+        }
+        // 2.2. A partial function application:
+        else {
+          // Evaluate the body of the OperatorExpr with the modified context
+          // which includes the reassignments from evaluating the operator
+          // and the assignments from partial substitution of the parameters.
+          val evaldBodyRes = body.eval(
+            ctx :+ (evaldOpCtxDeltaOR ++ subCtxDeltaA)
+          ).keepOnlyReassignments()
+          // Return the evaluated body wrapped in an OperatorExpr with the
+          // leftover parameters to indicate work still needs to be done to
+          // complete the function application. Back-propagate all
+          // reassignments made thus far.
           Evaluation(
             OperatorExpr(leftOverParams, evaldBodyRes.evaldObj),
-            evaldBodyRes.ctxDelta.onlyReassignments()
+            evaldOpCtxDeltaOR ++ evaldBodyRes.ctxDelta
           )
         }
       }
+      // 3. the structure cannot be used explicitly in a function application.
       case other => {
-        throw new Exception("not operator expr") //TODO
+        // Return the same ApplyExpr except with the operator evaluated.
+        // (parameters remain unevaluated) //TODO
+        // Back propagate the reassignments from the operator evaluation.
+        Evaluation(
+          ApplyExpr(evaldOp, this.actualParams),
+          evaldOpCtxDeltaOR
+        )
       }
     }
   }
@@ -73,7 +128,7 @@ case class ApplyExpr(
   private def subInRec(
     formalParams: Vector[FormalParameter],
     actualParams: Vector[Object],
-    ctxDelta:     ContextMutationSet = ContextMutationSet.empty
+    ctxDelta    : ContextMutationSet = ContextMutationSet.empty
   ): (ContextMutationSet, Vector[FormalParameter]) = {
     if (formalParams.nonEmpty && actualParams.nonEmpty) {
       ctxDelta.assign(
@@ -100,7 +155,7 @@ case class ApplyExpr(
         // the remaining formal parameters. If there are none leftover, then
         // then type to check against tpe will be the return type of the
         // operator. Otherwise, it does not type check.
-        this.tryCheckAllRec(ctx, args, this.params) match {
+        this.tryCheckAllRec(ctx, args, this.actualParams) match {
           case (false, _) => false
           case (true, Vector()) => {
             tpe == ret
@@ -125,7 +180,7 @@ case class ApplyExpr(
         // on the remaining formal parameters + return type. Else if no formal
         // parameters are left, this apply node must be the return type of
         // the operator. Otherwise, type inference fails.
-        this.tryCheckAllRec(ctx, args, this.params) match {
+        this.tryCheckAllRec(ctx, args, this.actualParams) match {
           case (false, _) => None
           case (true, Vector()) => {
             Some(ret)
@@ -148,7 +203,7 @@ case class ApplyExpr(
 
   @tailrec
   private def tryCheckAllRec(
-    ctx:          Context,
+    ctx         : Context,
     formalParams: Vector[FormalParameter],
     actualParams: Vector[Object]
   ): (Boolean, Vector[FormalParameter]) = {
@@ -158,7 +213,8 @@ case class ApplyExpr(
           ctx.consolidatedWith(ContextMutationSet.empty.assign(
             formalParams.head.id,
             TypedObject(formalParams.head.tpe, actualParams.head)
-          )),
+          )
+          ),
           formalParams.tail,
           actualParams.tail
         )
@@ -173,6 +229,22 @@ case class ApplyExpr(
     else {
       (false, formalParams)
     }
+  }
+
+  def toRepr(indentLevel: Int): String = this.op match {
+    case operatorIdent @ Identifier(name) => {
+      org.cascas_project.cascas.lang.builtin.builtInCtx.get(operatorIdent) match {
+        case Some(TypedObject(tpe, BuiltInExpr(_, _, _, _, _, Some(onApplyToRepr)))) => {
+          onApplyToRepr(this, indentLevel)
+        }
+        case other => this.toReprImpl(indentLevel)
+      }
+    }
+    case other => this.toReprImpl(indentLevel)
+  }
+
+  private def toReprImpl(indentLevel: Int): String = {
+    this.op.toRepr(indentLevel) + "(" + this.actualParams.map(_.toRepr(indentLevel)).mkString(", ") + ")"
   }
 
 }
