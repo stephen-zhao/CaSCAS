@@ -16,7 +16,7 @@ import org.cascas_project.cascas.lang.liro.RationalNumber
 
 //=============================================================================
 
-object MultiplyOperator extends BuiltInDefinition {
+object MultiplyOperator extends BuiltInDefinition with AppearsAsBinaryInfixOp {
 
   def onApply(params : Map[String, Object], ctx: Context): Object = {
 

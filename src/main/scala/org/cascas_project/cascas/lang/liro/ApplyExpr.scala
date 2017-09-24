@@ -34,7 +34,7 @@ case class ApplyExpr(
     // Assess the structure of the evaluated operator
     evaldOp match {
       // 1. it's a BuiltInExpr:
-      case builtIn@BuiltInExpr(_, formalParams, onApply, _, _) => {
+      case builtIn @ BuiltInExpr(_, formalParams, onApply, _, _, _) => {
         // Substitute in the actual parameters by assigning them to the formal
         // parameters in context to obtain a context mutation set (as well a
         // vector of leftover formal parameters, for the case of a partial
@@ -231,8 +231,20 @@ case class ApplyExpr(
     }
   }
 
-  def toRepr: String = {
-    this.op.toRepr + "(" + this.actualParams.map(_.toRepr).mkString(", ") + ")"
+  def toRepr(indentLevel: Int): String = this.op match {
+    case operatorIdent @ Identifier(name) => {
+      org.cascas_project.cascas.lang.builtin.builtInCtx.get(operatorIdent) match {
+        case Some(TypedObject(tpe, BuiltInExpr(_, _, _, _, _, Some(onApplyToRepr)))) => {
+          onApplyToRepr(this, indentLevel)
+        }
+        case other => this.toReprImpl(indentLevel)
+      }
+    }
+    case other => this.toReprImpl(indentLevel)
+  }
+
+  private def toReprImpl(indentLevel: Int): String = {
+    this.op.toRepr(indentLevel) + "(" + this.actualParams.map(_.toRepr(indentLevel)).mkString(", ") + ")"
   }
 
 }

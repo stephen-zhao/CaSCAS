@@ -6,59 +6,33 @@ package org.cascas_project.cascas.lang
 
 //=============================================================================
 
-import org.cascas_project.cascas.lang.liro.{BuiltInExpr, Identifier, Object}
+import org.cascas_project.cascas.lang.liro.Identifier
 
 //=============================================================================
 
 package object builtin {
 
+  // The context mutation set to add the built-in definitions to the built-in context
   private var builtInContextMutationSet: ContextMutationSet = ContextMutationSet.empty
 
+  // List the built-ins to be included in the language:
+
+  // Introduce the Primitive Types
   builtInContextMutationSet.introduce(Identifier("Number"),Identifier("Type"))
   builtInContextMutationSet.introduce(Identifier("Bool"),Identifier("Type"))
 
+  // Assign the Type-Generics
   builtInContextMutationSet.assign(ListOperator.ident, ListOperator())
 
+  // Assign the built-in operators
   builtInContextMutationSet.assign(AdditionOperator.ident, AdditionOperator())
   builtInContextMutationSet.assign(MultiplyOperator.ident, MultiplyOperator())
 
+  // To add another entry to the list, do the following
   // e.g.
   //builtInContextMutationSet.assign(Identifier("...."), .....Operator())
 
+  // Export the built-ins as a context
   val builtInCtx: Context = Context() :+ builtInContextMutationSet
-
-  trait BuiltInDefinition {
-    private[builtin] def onApply(params : Map[String, Object], ctx: Context): Object
-    private[builtin] def ident: Identifier
-    private[builtin] def formalParams: Vector[FormalParameter]
-    private[builtin] def returnTpe: TypeIdentifier
-    private[builtin] def tpe: TypeIdentifier = OperatorType(this.formalParams)(this.returnTpe)
-    private[builtin] def obj: BuiltInExpr = BuiltInExpr(
-      this.ident.name,
-      this.formalParams,
-      this.onApply,
-      this.returnTpe,
-      None
-    )
-    private[builtin] def apply(): TypedObject = TypedObject(tpe, obj)
-  }
-
-  //TODO: This is temporary. There should not be any unappliable operators
-  trait Unapplyable {
-    private[builtin] def onApply(params : Map[String, Object], ctx: Context): Object = {
-      throw new Exception("This operator is unappliable") //TODO
-    }
-  }
-
-  trait BuiltInDefinitionWithCustomEval extends BuiltInDefinition {
-    private[builtin] def onEval(ctx: Context): Evaluation
-    private[builtin] override def obj: BuiltInExpr = BuiltInExpr(
-      this.ident.name,
-      this.formalParams,
-      this.onApply,
-      this.returnTpe,
-      Some(this.onEval)
-    )
-  }
 
 }

@@ -16,7 +16,7 @@ import org.cascas_project.cascas.lang.liro.RationalNumber
 
 //=============================================================================
 
-object AdditionOperator extends BuiltInDefinition {
+object AdditionOperator extends BuiltInDefinition with AppearsAsBinaryInfixOp {
 
   def onApply(params: Map[String, Object], ctx: Context): Object = {
    

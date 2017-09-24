@@ -18,11 +18,12 @@ import scala.annotation.tailrec
 //=============================================================================
 
 case class BuiltInExpr(
-  name:         String,
-  formalParams: Vector[FormalParameter],
-  onApply:      (Map[String, Object], Context) => Object,
-  ret:          TypeIdentifier,
-  maybeOnEval:  Option[(Context) => Evaluation]
+  name:          String,
+  formalParams:  Vector[FormalParameter],
+  onApply:       (Map[String, Object], Context) => Object,
+  ret:           TypeIdentifier,
+  maybeOnEval:   Option[Context => Evaluation],
+  maybeOnApplyToRepr: Option[(ApplyExpr, Int) => String]
 ) extends Expr {
 
   def processParams(
@@ -110,7 +111,7 @@ case class BuiltInExpr(
     Some(OperatorType(this.formalParams, this.ret))
   }
 
-  def toRepr: String = {
+  def toRepr(indentLevel: Int): String = {
     this.name
   }
 

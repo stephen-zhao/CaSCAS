@@ -11,7 +11,7 @@ import org.cascas_project.cascas.lang.liro.Identifier
 
 //=============================================================================
 
-object ListOperator extends BuiltInDefinition with Unapplyable {
+object ListOperator extends BuiltInDefinition with Unapplyable with AppearsAsStandardOp {
 
   def ident = Identifier("List")
 
