@@ -6,6 +6,7 @@ package org.cascas_project.cascas.lang.liro
 
 //=============================================================================
 
+import org.cascas_project.cascas.Logger
 import org.cascas_project.cascas.lang.Context
 import org.cascas_project.cascas.lang.ContextMutationSet
 import org.cascas_project.cascas.lang.Evaluation
@@ -21,10 +22,17 @@ case class AssignmentExpr(
 
   def eval(ctx: Context): Evaluation = {
     // To evaluate an assignment, carry out the context modification, and back propagate it
-    Evaluation(NothingObject(), ContextMutationSet.empty.assign(
+    Logger.verbose('LIRO, "[AssignmentExpr][Eval] Producing evaluation...")
+    val res = Evaluation(NothingObject(), ContextMutationSet.empty.assign(
       this.identifier,
       TypedObject(this.value.inferType(ctx).getOrElse(Identifier("T")), this.value) //TODO handle bad type inference
     ))
+    Logger.verbose(
+      'LIRO, "[AssignmentExpr][Eval]\n" +
+             "    Evaluation produced.\n" +
+            s"    Resultant context assignments: ${res.ctxDelta.getAssignments}"
+    )
+    res
   }
 
   def checkType(ctx: Context, tpe: TypeIdentifier): Boolean = true //TODO

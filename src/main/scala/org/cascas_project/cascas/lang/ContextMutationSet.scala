@@ -9,6 +9,8 @@ package org.cascas_project.cascas.lang
 //=============================================================================
 
 import org.cascas_project.cascas.lang.liro.Identifier
+
+import scala.collection.immutable.Map
 import scala.collection.mutable.{Map => MMap}
 
 //=============================================================================
@@ -159,13 +161,25 @@ class ContextMutationSet {
   }
 
   def ++(that: ContextMutationSet): ContextMutationSet = {
-    this.clone.withIntroductions(
+    this.clone().withIntroductions(
       that.introductions
     ).withAssignments(
       that.assignments
     ).withReassignments(
       that.reassignments
     )
+  }
+
+  override def toString: String = {
+    "Introductions:" + ( if (this.introductions.isEmpty) "<<NONE>>\n" else {
+      this.introductions.mkString("\n    ", "\n    ", "\n")
+    }) +
+    "Assignments:" + ( if (this.assignments.isEmpty) "<<NONE>>\n" else {
+      this.assignments.mkString("\n    ", "\n    ", "\n")
+    }) +
+    "Reassignments:" + ( if (this.reassignments.isEmpty) "<<NONE>>\n" else {
+      this.reassignments.mkString("\n    ", "\n    ", "")
+    })
   }
 }
 

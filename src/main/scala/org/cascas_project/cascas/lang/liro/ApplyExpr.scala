@@ -73,8 +73,8 @@ case class ApplyExpr(
           // alterations to the context, and so only reassignments from the
           // operator evaluation + parameter processing need to be back-
           // propagated.
-          this.evalLogVerbose("Producing evaluation....")
-          Evaluation(
+          this.evalLogVerbose("Producing evaluation...")
+          val res = Evaluation(
             onApply(
               processedParams, ctx :+ (
                 evaldOpCtxDeltaOR ++
@@ -84,6 +84,12 @@ case class ApplyExpr(
             ),
             evaldOpCtxDeltaOR ++ processParamsCtxDeltaOR
           )
+          this.evalLogVerbose(Vector(
+            "Evaluation produced.",
+            s"Result from built-in operator application: ${res.evaldObj}",
+            s"Resultant context reassignments: ${res.ctxDelta.getReassignments}"
+          ))
+          res
         }
         // 1.2. A partial function application:
         else {
@@ -116,11 +122,17 @@ case class ApplyExpr(
           this.evalLogVerbose("Evaluation of body complete.")
           // Return the evaluated body, and back-propagate all reassignments
           // made thus far.
-          this.evalLogVerbose("Producing evaluation....")
-          Evaluation(
+          this.evalLogVerbose("Producing evaluation...")
+          val res = Evaluation(
             evaldBodyRes.evaldObj,
             evaldOpCtxDeltaOR ++ evaldBodyRes.ctxDelta
           )
+          this.evalLogVerbose(Vector(
+            "Evaluation produced.",
+            s"Result from full operator application: ${res.evaldObj}",
+            s"Resultant context reassignments: ${res.ctxDelta.getReassignments}"
+          ))
+          res
         }
         // 2.2. A partial function application:
         else {
@@ -137,11 +149,17 @@ case class ApplyExpr(
           // leftover parameters to indicate work still needs to be done to
           // complete the function application. Back-propagate all
           // reassignments made thus far.
-          this.evalLogVerbose("Producing evaluation....")
-          Evaluation(
+          this.evalLogVerbose("Producing evaluation...")
+          val res = Evaluation(
             OperatorExpr(leftOverParams, evaldBodyRes.evaldObj),
             evaldOpCtxDeltaOR ++ evaldBodyRes.ctxDelta
           )
+          this.evalLogVerbose(Vector(
+            "Evaluation produced.",
+            s"Result from partial operator application: ${res.evaldObj}",
+            s"Resultant context reassignments: ${res.ctxDelta.getReassignments}"
+          ))
+          res
         }
       }
       // 3. the structure cannot be used explicitly in a function application.
@@ -150,11 +168,17 @@ case class ApplyExpr(
         // Return the same ApplyExpr except with the operator evaluated.
         // (parameters remain unevaluated) //TODO
         // Back propagate the reassignments from the operator evaluation.
-        this.evalLogVerbose("Producing evaluation....")
-        Evaluation(
+        this.evalLogVerbose("Producing evaluation...")
+        val res = Evaluation(
           ApplyExpr(evaldOp, this.actualParams),
           evaldOpCtxDeltaOR
         )
+        this.evalLogVerbose(Vector(
+          "Evaluation produced.",
+          s"Result from unapplyable operator: ${res.evaldObj}",
+          s"Resultant context reassignments: ${res.ctxDelta.getReassignments}"
+        ))
+        res
       }
     }
   }
