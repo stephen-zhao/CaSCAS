@@ -6,6 +6,10 @@ package org.cascas_project.cascas
 
 //=============================================================================
 
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStream
+import java.io.PrintStream
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.text.SimpleDateFormat
@@ -46,6 +50,8 @@ object Logger {
 
     private var tagToMaxSeverity: Map[Tag, Severity] = Map[Tag, Severity]()
 
+    private var outputs: Vector[PrintStream] = Vector()
+
     def isLoggingActiveFor(severity: Severity, tag: Tag): Boolean = {
       if (this.tagToMaxSeverity.isEmpty) {
         tag match {
@@ -76,19 +82,37 @@ object Logger {
       if (this.isLoggingActiveFor(severity, tag)) {
         val now = Calendar.getInstance.getTime
         val time = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").format(now)
-        Console.err.println(f"[$time][${severityMap(severity)._2}][${tagMap(tag)}] $msg")
+        this.outputs.foreach(_.println(f"[$time][${severityMap(severity)._2}][${tagMap(tag)}] $msg"))
       }
     }
-    
+
+    def addOutput(output: PrintStream): Unit = {
+      this.outputs = this.outputs :+ output
+    }
+
+    def stop(output: PrintStream): Unit = {
+      this.outputs.foreach(_.flush())
+      this.outputs.foreach(_.close())
+    }
   }
 
-  private val defaultLogger = createDefaultInstance()
+  private val defaultLogFile: File =
+    new File(sys.env("CASCAS_PROJECT_DIR") + "/log/cascas_" + new SimpleDateFormat("yyyyMMdd_HHmmss").format(App.appStartTime) + ".log")
 
   private def createDefaultInstance(): Logger = {
     var logger = new Logger()
-    Config("Logger").foreach((kvp) => logger.setTagMaxSeverity(Symbol(kvp._1), Symbol(kvp._2)))
+    Config("Logger-Tags").foreach((kvp) => logger.setTagMaxSeverity(Symbol(kvp._1), Symbol(kvp._2)))
+    if (sys.env("CASCAS_ENV") == "develop") {
+      logger.addOutput(new PrintStream(new FileOutputStream(defaultLogFile)))
+      logger.addOutput(Console.err)
+    }
+    else {
+      logger.addOutput(Console.err)
+    }
     logger
   }
+
+  private val defaultLogger = createDefaultInstance()
  
   private def getStackTraceAsString(t: Throwable): String = {
     val sw = new StringWriter

@@ -6,6 +6,7 @@ package org.cascas_project.cascas.lang.liro
 
 //=============================================================================
 
+import org.cascas_project.cascas.Logger
 import org.cascas_project.cascas.lang.Context
 import org.cascas_project.cascas.lang.ContextMutationSet
 import org.cascas_project.cascas.lang.Evaluation
@@ -13,6 +14,7 @@ import org.cascas_project.cascas.lang.FormalParameter
 import org.cascas_project.cascas.lang.OperatorType
 import org.cascas_project.cascas.lang.TypeIdentifier
 import org.cascas_project.cascas.lang.TypedObject
+
 import scala.annotation.tailrec
 
 //=============================================================================
@@ -80,10 +82,30 @@ case class BuiltInExpr(
   def eval(ctx: Context): Evaluation = this.maybeOnEval match {
     // 1. There is an explicitly defined behaviour for what to
     //    do upon eval, so call that.
-    case Some(onEval) => onEval(ctx)
+    case Some(onEval) => {
+      Logger.verbose('LIRO, "[BuiltInExpr][Eval] 1. Producing custom evaluation...")
+      val res = onEval(ctx)
+      Logger.verbose(
+        'LIRO, "[BuiltInExpr][Eval] 2.\n" +
+               "    Evaluation produced.\n" +
+              s"    Result of evaluating the built-in expression: ${res.evaldObj}\n" +
+              s"    Resultant context reassignments: ${res.ctxDelta.getReassignments}"
+      )
+      res
+    }
     // 2. There is no explicitly defined behaviour for what to
-    //    do upon eval, so just return this as is.
-    case None => Evaluation(this, ContextMutationSet.empty)
+    //    do upon eval, so return the name of the built-in
+    case None => {
+      Logger.verbose('LIRO, "[BuiltInExpr][Eval] 1. Producing default evaluation...")
+      val res = Evaluation(Identifier(this.name), ContextMutationSet.empty)
+      Logger.verbose(
+        'LIRO, "[BuiltInExpr][Eval] 2.\n" +
+               "    Evaluation produced.\n" +
+              s"    Result of evaluating the built-in expression: ${res.evaldObj}\n" +
+              s"    Resultant context reassignments: ${res.ctxDelta.getReassignments}"
+      )
+      res
+    }
   }
 
   def checkType(ctx: Context, tpe: TypeIdentifier): Boolean = {

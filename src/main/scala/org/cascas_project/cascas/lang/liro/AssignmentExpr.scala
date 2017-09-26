@@ -22,13 +22,13 @@ case class AssignmentExpr(
 
   def eval(ctx: Context): Evaluation = {
     // To evaluate an assignment, carry out the context modification, and back propagate it
-    Logger.verbose('LIRO, "[AssignmentExpr][Eval] Producing evaluation...")
+    Logger.verbose('LIRO, "[AssignmentExpr][Eval] 1. Producing evaluation...")
     val res = Evaluation(NothingObject(), ContextMutationSet.empty.assign(
       this.identifier,
       TypedObject(this.value.inferType(ctx).getOrElse(Identifier("T")), this.value) //TODO handle bad type inference
     ))
     Logger.verbose(
-      'LIRO, "[AssignmentExpr][Eval]\n" +
+      'LIRO, "[AssignmentExpr][Eval] 2.\n" +
              "    Evaluation produced.\n" +
             s"    Resultant context assignments: ${res.ctxDelta.getAssignments}"
     )

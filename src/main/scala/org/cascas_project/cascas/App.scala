@@ -5,14 +5,21 @@
 package org.cascas_project.cascas
 
 //=============================================================================
+
+import java.util.Calendar
+
+//=============================================================================
 // Main Application Object
 // 
 object App {
+
+  val appStartTime = Calendar.getInstance.getTime
   
   //===========================================================================
   // Main function
   //
   def main(args : Array[String]): Unit = {
+
 
     Logger.info('APP, f"""running "CaSCAS${if (args.length > 0) (" " /: args)((x,y) => x + " " + y) else ""}"""")
     

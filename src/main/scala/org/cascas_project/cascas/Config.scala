@@ -28,8 +28,9 @@ object Config {
   private val kvpR: UnanchoredRegex = raw"""(\w+)=(\w+)""".r.unanchored
   private val IntR: Regex = raw"""(\d+)""".r
   private val floatR: Regex = raw"""(\d+\.\d+)""".r
+  private val whitespaceR: Regex = raw"""\w*""".r
 
-  private val configFile = sys.env("CASCAS_CONFIG_INI")
+  private val configFile = sys.env("CASCAS_PROJECT_DIR") + "/" + sys.env("CASCAS_CONFIG_INI")
 
   private def createConfigFromIniFile(file: String): Ini = {
     var config: Ini = MMap[Section, Contents]()
@@ -42,6 +43,9 @@ object Config {
         }
         case kvpR(k, v) => {
           config(currentSection) += (k -> v)
+        }
+        case whitespaceR() => {
+          null
         }
         case _ => {
           val err = f"""Bad syntax in config file on line $i: "$line""""

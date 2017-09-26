@@ -21,7 +21,7 @@ case class BlockExpr(sequence: Vector[Object]) extends Expr {
     // To evaluate a block expression, evaluate the sequence of expressions
     // in order of definition, making sure to propagate changes in context
     // from one expression to the next.
-    Logger.verbose('LIRO, "[BlockExpr][Eval] Evaluating sequence recursively...")
+    Logger.verbose('LIRO, "[BlockExpr][Eval] 1. Evaluating sequence recursively...")
     this.evalRecWithAllCtxDelta(this.sequence.toList, ctx)
   }
 
@@ -37,16 +37,15 @@ case class BlockExpr(sequence: Vector[Object]) extends Expr {
       // 1. There exists an object to be evaluated
       case Some(obj) => {
         // Evaluate the object with the current context
-        Logger.verbose('LIRO, "[BlockExpr][Eval] Evaluating...")
+        Logger.verbose('LIRO, "[BlockExpr][Eval] 2*. Evaluating current object in block...")
         obj.eval(ctx) match {
           // Extract the evaluated object and changes to context
           case Evaluation(evaldObj, evaldObjCtxDelta) => {
-            Logger.verbose('LIRO, "[BlockExpr][Eval] Evaluated.")
+            Logger.verbose('LIRO, "[BlockExpr][Eval] 3*. Evaluated.")
             // Recursively evaluate the remaining objects in the sequence,
             // making sure to update the context and context delta with the
             // new changes in context from the evaluation above. Also, update
             // the accumulator with the evaluated object.
-            Logger.verbose('LIRO, "[BlockExpr][Eval] Evaluating next object in block...")
             this.evalRecWithAllCtxDelta(
               seqToProcess.tail,
               ctx :+ evaldObjCtxDelta,
@@ -61,10 +60,10 @@ case class BlockExpr(sequence: Vector[Object]) extends Expr {
         // The resultant object is the evaluated form of the final object in
         // the sequence. The resultant change in context is the sum of all the
         // reassignments.
-        Logger.verbose('LIRO, "[BlockExpr][Eval] No more objects in block; Producing evaluation...")
+        Logger.verbose('LIRO, "[BlockExpr][Eval] 2*. No more objects in block; Producing evaluation...")
         val res = Evaluation(seqAccum.head, ctxDelta.onlyReassignments())
         Logger.verbose(
-          'LIRO, "[BlockExpr][Eval]\n" +
+          'LIRO, "[BlockExpr][Eval] 3*.\n" +
                  "    Evaluation produced.\n" +
                 s"    Result of evaluating the block: ${res.evaldObj}\n" +
                 s"    Resultant context reassignments: ${res.ctxDelta.getReassignments}"
