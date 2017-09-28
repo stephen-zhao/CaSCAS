@@ -33,6 +33,6 @@ package object builtin {
   //builtInContextMutationSet.assign(Identifier("...."), .....Operator())
 
   // Export the built-ins as a context
-  val builtInCtx: Context = Context() :+ builtInContextMutationSet
+  val builtInCtx: Context = Context.empty :+ builtInContextMutationSet
 
 }
