@@ -78,17 +78,17 @@ case class RationalNumber private (numerator: BigInt, denominator: BigInt) exten
     reducedThis.numerator == that
   }
 
-  def isInteger(): Boolean = {
+  def isInteger: Boolean = {
     this.numerator.mod(this.denominator) == 0
   }
 
-  def isWhole(): Boolean = {
+  def isWhole: Boolean = {
     val reducedThis = this.reduced()
     this.numerator.mod(this.denominator) == 0 &&
     reducedThis > RationalNumber.zero
   }
 
-  def isNatural(): Boolean = {
+  def isNatural: Boolean = {
     val reducedThis = this.reduced()
     this.numerator.mod(this.denominator) == 0 &&
     reducedThis >= RationalNumber.zero
@@ -106,6 +106,13 @@ case class RationalNumber private (numerator: BigInt, denominator: BigInt) exten
 
   def inferType(ctx: Context): Option[TypeIdentifier] = {
     Some(Identifier("Number"))
+  }
+
+  def inferTheirTypes(
+    ctx: Context,
+    themToTheirMaybeTypes: Map[Identifier, Option[TypeIdentifier]]
+  ): Map[Identifier, Option[TypeIdentifier]] = {
+    themToTheirMaybeTypes
   }
 
   def toRepr(indentLevel: Int): String = {

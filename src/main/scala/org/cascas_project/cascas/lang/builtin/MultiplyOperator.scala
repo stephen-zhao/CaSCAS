@@ -25,11 +25,11 @@ object MultiplyOperator extends BuiltInDefinition with AppearsAsBinaryInfixOp {
 
       // 1. case SUCCESS, is a ListExpr, then
       // do the multiplication
-      case ListExpr(multiplicands) => {
+      case ListExpr(Identifier("Number"), multiplicands) => {
         val res = (multiplicands foldLeft Accum(List(), RationalNumber.multiplicativeIdentity))(this.multiplyIfPossible)
         (res.constFactor :: res.nonConstFactors).reverse match {
           case (onlyConstFactor @ RationalNumber(_, _)) :: Nil => onlyConstFactor
-          case listOfFactors => ApplyExpr(this.ident, Vector(ListExpr(listOfFactors.toVector)))
+          case listOfFactors => ApplyExpr(this.ident, Vector(ListExpr(Identifier("Number"), listOfFactors.toVector)))
         }
       }
 

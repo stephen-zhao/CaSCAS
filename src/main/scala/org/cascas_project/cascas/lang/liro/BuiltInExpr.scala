@@ -94,14 +94,14 @@ case class BuiltInExpr(
       res
     }
     // 2. There is no explicitly defined behaviour for what to
-    //    do upon eval, so return the name of the built-in
+    //    do upon eval, so return the built-in
     case None => {
       Logger.verbose('LIRO, "[BuiltInExpr][Eval] 1. Producing default evaluation...")
-      val res = Evaluation(Identifier(this.name), ContextMutationSet.empty)
+      val res = Evaluation(this, ContextMutationSet.empty)
       Logger.verbose(
         'LIRO, "[BuiltInExpr][Eval] 2.\n" +
                "    Evaluation produced.\n" +
-              s"    Result of evaluating the built-in expression: ${res.evaldObj}\n" +
+              s"    Result of evaluating the built-in expression: ${res.evaldObj.toRepr()}\n" +
               s"    Resultant context reassignments: ${res.ctxDelta.getReassignments}"
       )
       res
@@ -133,8 +133,15 @@ case class BuiltInExpr(
     Some(OperatorType(this.formalParams, this.ret))
   }
 
+  def inferTheirTypes(
+    ctx: Context,
+    themToTheirMaybeTypes: Map[Identifier, Option[TypeIdentifier]]
+  ): Map[Identifier, Option[TypeIdentifier]] = {
+    themToTheirMaybeTypes
+  }
+
   def toRepr(indentLevel: Int): String = {
-    this.name
+    "__builtin_" + this.name
   }
 
 }

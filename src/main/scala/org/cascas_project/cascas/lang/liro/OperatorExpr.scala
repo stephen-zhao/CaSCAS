@@ -13,6 +13,9 @@ import org.cascas_project.cascas.lang.FormalParameter
 import org.cascas_project.cascas.lang.OperatorType
 import org.cascas_project.cascas.lang.TypeIdentifier
 
+import scala.annotation.tailrec
+import scala.collection.immutable.Queue
+
 //=============================================================================
 
 case class OperatorExpr(
@@ -56,7 +59,29 @@ case class OperatorExpr(
   }
 
   def inferType(ctx: Context): Option[TypeIdentifier] = {
-    None //TODO
+    this.body.inferType(ctx :+ ContextMutationSet.empty.withIntroductions(this.formalParams)) match {
+      case None => None
+      case Some(bodyTpe) => {
+        Some(OperatorType(this.formalParams, bodyTpe))
+      }
+    }
+  }
+
+//  @tailrec
+//  private def inferTypeRec(
+//    ctx:                 Context,
+//    formalParams:        Queue[FormalParameter],
+//    accum:               Map[],
+//    noActionConsecCount: Int = 0
+//  ): ContextMutationSet = {
+//
+//  }
+
+  def inferTheirTypes(
+    ctx: Context,
+    themToTheirMaybeTypes: Map[Identifier, Option[TypeIdentifier]]
+  ): Map[Identifier, Option[TypeIdentifier]] = {
+    themToTheirMaybeTypes //TODO: make this actually work
   }
 
   def toRepr(indentLevel: Int): String = {

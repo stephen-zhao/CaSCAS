@@ -12,11 +12,11 @@ import org.cascas_project.cascas.lang._
 
 case class Identifier(name: String) extends TypeIdentifier with Object {
 
-  override def toString(): String = name
+  override def toString: String = name
 
   def eval(ctx: Context): Evaluation = {
     ctx.get(this) match {
-      case Some(TypedObject(tpe, obj)) => obj.eval(ctx).keepOnlyReassignments
+      case Some(TypedObject(tpe, obj)) => obj.eval(ctx).keepOnlyReassignments()
       case Some(tpe) => Evaluation(this, ContextMutationSet.empty)
       case None => Evaluation(this, ContextMutationSet.empty)
     }
@@ -40,6 +40,13 @@ case class Identifier(name: String) extends TypeIdentifier with Object {
       case Some(other) => throw new Exception("Not possible damn it") //TODO
       case None => None
     }
+  }
+
+  def inferTheirTypes(
+    ctx: Context,
+    themToTheirMaybeTypes: Map[Identifier, Option[TypeIdentifier]]
+  ): Map[Identifier, Option[TypeIdentifier]] = {
+    themToTheirMaybeTypes
   }
 
   def toRepr(indentLevel: Int): String = {

@@ -25,11 +25,11 @@ object AdditionOperator extends BuiltInDefinition with AppearsAsBinaryInfixOp {
 
       // 1. case SUCCESS, is a ListExpr, then
       // do the addition
-      case ListExpr(summands) => {
+      case ListExpr(Identifier("Number"), summands) => {
         val res = (summands foldLeft Accum(List(), RationalNumber.additiveIdentity))(this.addIfPossible)
         (res.constTerm :: res.nonConstTerms).reverse match {
           case (onlyConstTerm @ RationalNumber(_, _)) :: Nil => onlyConstTerm
-          case listOfTerms => ApplyExpr(this.ident, Vector(ListExpr(listOfTerms.toVector)))
+          case listOfTerms => ApplyExpr(this.ident, Vector(ListExpr(Identifier("Number"), listOfTerms.toVector)))
         }
       }
 

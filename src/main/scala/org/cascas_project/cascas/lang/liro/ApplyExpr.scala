@@ -35,7 +35,7 @@ case class ApplyExpr(
     this.evalLogVerbose(Vector(
       "2.",
       "Operator evaluated.",
-      s"Evaluated operator: $evaldOp",
+      s"Evaluated operator: ${evaldOp.toRepr()}",
       s"Reassignments: ${evaldOpCtxDeltaOR.getReassignments}"
     ))
 
@@ -293,6 +293,60 @@ case class ApplyExpr(
     }
     else {
       (false, formalParams)
+    }
+  }
+
+  def inferTheirTypes(
+    ctx: Context,
+    themToTheirMaybeTypes: Map[Identifier, Option[TypeIdentifier]]
+  ): Map[Identifier, Option[TypeIdentifier]] = {
+    // Assess the type of the operator
+    this.op.inferType(ctx) match {
+      // 1. Cannot determine the type of the operator,
+      //    so no additional type info can be determined
+      case None => themToTheirMaybeTypes
+      // 2. Found some operator type
+      case Some(OperatorType(formalParams, retTpe)) => {
+        var _themToTheirMaybeTypes = themToTheirMaybeTypes
+        // For each actualParam-formalParam pair,
+        for ((ap, fp) <- this.actualParams.zip(formalParams.take(this.actualParams.length))) {
+          // Cast the actual param to an identifier if possible
+          ap match {
+            // 2.1. Actual parameter is an identifier, so search it up in the map
+            //      and see if its type has not yet been identified.
+            case apAsIdentifier @ Identifier(_) => {
+              _themToTheirMaybeTypes.get(apAsIdentifier) match {
+                // 2.1.1. There is already a type associated with it, so check if
+                //        it's the same as the type found in this operator's
+                //        formal parameter.
+                case Some(Some(tpe)) => {
+                  // Types are not the same
+                  if (tpe != fp.tpe) {
+                    throw new Exception("Type inference is conflicting...") //TODO error handling
+                  }
+                }
+                // 2.1.2. There is no type associated with it yet, so add this
+                //        operator's formal parameter's type.
+                case Some(None) => {
+                  _themToTheirMaybeTypes = _themToTheirMaybeTypes + (apAsIdentifier -> Some(fp.tpe))
+                }
+                // 2.1.3. The actual parameter is not in the map, so it doesn't
+                //        matter to this type inference
+                case None => null
+              }
+            }
+            // 2.2. Actual parameter is not an identifier,
+            //      so recursively try to infer types on it
+            case other => {
+              _themToTheirMaybeTypes = other.inferTheirTypes(ctx, _themToTheirMaybeTypes)
+            }
+          }
+        }
+        _themToTheirMaybeTypes
+      }
+      case Some(other) => {
+        throw new Exception("what the fuck man") //TODO error handling for bad type
+      }
     }
   }
 

@@ -15,7 +15,7 @@ case class OperatorType(
   ret:  TypeIdentifier
 ) extends TypeIdentifier {
 
-  override def toString(): String = args.map {
+  override def toString: String = args.map {
    case FormalParameter(id, tpe, One) => f"($id : $tpe)"
    case FormalParameter(id, tpe, Many) => f"($id* : List($tpe))"
   }.mkString(" -> ")

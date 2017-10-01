@@ -41,7 +41,7 @@ class CodeGenerator {
       case UnaryOperatorNode(kind, operator, operand) => {
         ApplyExpr(this.generateLIRO(operator), operand match {
           // 4.1. when there is a parameter list longer than length 1
-          case SequenceNode('AParams, seq) => seq.map(this.generateLIRO(_))
+          case SequenceNode('AParams, seq) => seq.map(this.generateLIRO)
           // 4.2. when there is only one parameter
           case node => Vector[liro.Object](this.generateLIRO(node))
         })
@@ -52,8 +52,10 @@ class CodeGenerator {
       //                                     becomes ApplyExpr
       //                                     with operator (Identifier("+")) or
       //                                     with operator (Identifier("*"))    and
-      //                                     with flattened parameter ListExpr as the only parameter
-      //                                     (if nested operators of the same kind)
+      //                                     with flattened parameter ListExpr
+      //                                          ofType Number as the only
+      //                                          parameter (if nested operators
+      //                                          of the same kind)
       case BinaryOperatorNode(kind, operator @ TerminalNode(opKind,_), operands)
            if (kind == 'MathExpr && opKind == 'PLUS) || (kind == 'Term && opKind == 'STAR) => {
 
@@ -62,7 +64,7 @@ class CodeGenerator {
           // Generate operand1's LIR Object to extract the operands that need promoting
           this.generateLIRO(operands._1) match {
             // Extract the operands
-            case ApplyExpr(_, Vector(ListExpr(leftOperands))) => operands._2 match {
+            case ApplyExpr(_, Vector(ListExpr(Identifier("Number"), leftOperands))) => operands._2 match {
               // 5.1.1. right operand kind == currently processing kind and
               //        right operator == current operator, so do flattening work on it too
               // CASE: Both left and right operands are the same kind, so flatten both
@@ -72,7 +74,7 @@ class CodeGenerator {
                 // Generate operand2's LIR Object to extract the operands that need promoting
                 this.generateLIRO(operands._2) match {
                   // Extract the operands and do the append
-                  case ApplyExpr(_, Vector(ListExpr(rightOperands))) => leftOperands ++ rightOperands
+                  case ApplyExpr(_, Vector(ListExpr(Identifier("Number"), rightOperands))) => leftOperands ++ rightOperands
                   // Error in extraction
                   case other => throw new Exception("ERROR") //TODO
                 }
@@ -87,7 +89,7 @@ class CodeGenerator {
           }
         }
 
-        ApplyExpr(this.generateLIRO(operator), Vector(ListExpr(operands._1 match {
+        ApplyExpr(this.generateLIRO(operator), Vector(ListExpr(Identifier("Number"), operands._1 match {
           // 5.1 left operand kind == currently processing kind and
           //     left operator == current operator, so do flattening work
           case BinaryOperatorNode(kindOperandLeft, TerminalNode(kindOperatorLeft, _), _)
@@ -102,7 +104,7 @@ class CodeGenerator {
               // Generate operand2's LIR Object to extract the operands that need promoting
               this.generateLIRO(operands._2) match {
                 // Extract the operands and do the flatten
-                case ApplyExpr(_, Vector(ListExpr(rightOperands))) => this.generateLIRO(operand1) +: rightOperands
+                case ApplyExpr(_, Vector(ListExpr(Identifier("Number"), rightOperands))) => this.generateLIRO(operand1) +: rightOperands
                 // Error in extraction
                 case other => throw new Exception("ERROR") //TODO
               }
@@ -139,12 +141,20 @@ class CodeGenerator {
 
       // 8. Assign kind OperatorAssignNode becomes an AssignmentExpr with an
       //    operator assigned to it
-//      case OperatorAssignNode('Assign, TerminalNode(_, idToken), params, assigned) => {
-//        AssignmentExpr(
-//          Identifier(idToken.lexeme),
-//          this.getOperatorExprFromFParamsAndBodyNodes(params, assigned)
-//        )
-//      }
+      case OperatorAssignNode('Assign, TerminalNode(_, idToken), params, assigned) => {
+        OperatorAssignmentExpr(
+          Identifier(idToken.lexeme),
+          params match {
+            case SequenceNode('FParams, formalParamNodes) => {
+              formalParamNodes.map(formalParamNode => Identifier(formalParamNode.toRepr))
+            }
+            case node => {
+              Vector[liro.Identifier](Identifier(node.toRepr))
+            }
+          },
+          this.generateLIRO(assigned)
+        )
+      }
 
       // 9. Statements kind StatementsNode becomes a BlockExpr containing
       //    the sequence of LIRO to execute in order of definition.
@@ -160,7 +170,7 @@ class CodeGenerator {
 
 
 
-  def processDecimalToken(dt: DecimalToken): RationalNumber = {
+  private def processDecimalToken(dt: DecimalToken): RationalNumber = {
     Logger.info('TRNSLTR, f"Processing DecimalToken $dt...")
 
     @tailrec
@@ -198,20 +208,11 @@ class CodeGenerator {
     res
   }
 
-  def processIntegerToken(it: IntegerToken): RationalNumber = {
+  private def processIntegerToken(it: IntegerToken): RationalNumber = {
     Logger.info('TRNSLTR, f"Processing IntegerToken $it...")
     val res = RationalNumber(BigInt(it.lexeme.filter(_ != '_')))
     Logger.info('TRNSLTR, f"Generated RationalNumber ${res.toRepr()}")
     res
   }
-
-//  def getOperatorExprFromFParamsAndBodyNodes(
-//    params: ParseNodeLike,
-//    body: ParseNodeLike
-//  ): OperatorExpr = {
-//    params match {
-//      case SequenceNode('FParams, )
-//    }
-//  }
 
 }

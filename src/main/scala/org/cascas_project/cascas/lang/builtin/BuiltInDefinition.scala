@@ -78,12 +78,12 @@ trait AppearsAsBinaryInfixOp extends BuiltInOnApplyAppearance {
     application: ApplyExpr,
     indentLevel: Int
   ) => {
-    if (application.actualParams.length == 0) {
+    if (application.actualParams.isEmpty) {
       application.op.toRepr(indentLevel) + "()"
     }
     else if (application.actualParams.length == 1) {
       application.actualParams.head match {
-        case ListExpr(actualParamsList) => {
+        case ListExpr(_, actualParamsList) => {
           actualParamsList.map(_.toRepr(indentLevel)).mkString(" " + application.op.toRepr(indentLevel) + " ")
         }
         case other => {

@@ -15,7 +15,7 @@ import scala.annotation.tailrec
 
 //=============================================================================
 
-case class ListExpr(list: Vector[Object]) extends Expr {
+case class ListExpr(ofType: TypeIdentifier, list: Vector[Object]) extends Expr {
 
   def eval(ctx: Context): Evaluation = {
     // Evaluate each element in a ListExpr in order to evaluate a ListExpr.
@@ -31,7 +31,7 @@ case class ListExpr(list: Vector[Object]) extends Expr {
     accum:      List[Object] = List()
   ): Evaluation = {
     listToEval.headOption match {
-      case None => Evaluation(ListExpr(accum.reverse.toVector), ctxDelta)
+      case None => Evaluation(ListExpr(this.ofType, accum.reverse.toVector), ctxDelta)
       case Some(obj) => obj.eval(ctx).keepOnlyReassignments() match {
         case Evaluation(evaldObj, evaldCtxDeltaOR) => {
           this.evalRec(listToEval.tail, ctx :+ evaldCtxDeltaOR, ctxDelta ++ evaldCtxDeltaOR, evaldObj :: accum)
@@ -75,16 +75,53 @@ case class ListExpr(list: Vector[Object]) extends Expr {
     }
   }
 
+  def inferTheirTypes(
+    ctx: Context,
+    themToTheirMaybeTypes: Map[Identifier, Option[TypeIdentifier]]
+  ): Map[Identifier, Option[TypeIdentifier]] = {
+    var _themToTheirMaybeTypes = themToTheirMaybeTypes
+    // Check if any of the direct elements are matching identifiers
+    for (elem <- this.list) {
+      elem match {
+        // 1. Element is an identifier, so check to see if it matches
+        //    anything in the map
+        case elemAsIdentifier @ Identifier(_) => {
+          _themToTheirMaybeTypes.get(elemAsIdentifier) match {
+            // 1.1. Identifier matches, and identifier is already typed,
+            //      so do nothing //TODO check type inference conflict
+            case Some(Some(tpe)) => null
+            // 1.2. Identifier matches, but identifier is not typed yet,
+            //      so add type of whatever type the list is applied to
+            case Some(None) => {
+              this.inferType(ctx) match {
+                case Some(ApplyExpr(Identifier("List"), Vector(appliedTpe))) => {
+                  _themToTheirMaybeTypes = _themToTheirMaybeTypes +
+                    (elemAsIdentifier -> Some(appliedTpe.asInstanceOf[TypeIdentifier]))
+                }
+                case other => null
+              }
+            }
+            // 1.3. Identifier does not match, so leave it alone
+            case None => null
+          }
+        }
+        // 2. It is not an identifier, so leave it be
+        case other => null
+      }
+    }
+    _themToTheirMaybeTypes
+  }
+
   def toRepr(indentLevel: Int): String = {
     "[" + this.list.map(_.toRepr(indentLevel)).mkString(", ") + "]"
   }
 
-  def :+(newElement: Object): ListExpr = ListExpr(this.list :+ newElement)
+  def :+(newElement: Object): ListExpr = ListExpr(this.ofType, this.list :+ newElement)
 
 }
 
 object ListExpr {
 
-  def apply(): ListExpr = ListExpr(Vector())
+  def apply(ofType: TypeIdentifier): ListExpr = ListExpr(ofType, Vector())
 
 }

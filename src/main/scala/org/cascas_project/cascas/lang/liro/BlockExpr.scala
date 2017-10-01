@@ -89,6 +89,17 @@ case class BlockExpr(sequence: Vector[Object]) extends Expr {
     }
   }
 
+  def inferTheirTypes(
+    ctx: Context,
+    themToTheirMaybeTypes: Map[Identifier, Option[TypeIdentifier]]
+  ): Map[Identifier, Option[TypeIdentifier]] = {
+    var _themToTheirMaybeTypes = themToTheirMaybeTypes
+    for (element <- this.sequence) {
+      _themToTheirMaybeTypes = element.inferTheirTypes(ctx, themToTheirMaybeTypes)
+    }
+    _themToTheirMaybeTypes
+  }
+
   def toRepr(indentLevel: Int): String = {
     val indentStringExterior = this.getIndentationString(indentLevel)
     val indentStringInterior = this.getIndentationString(indentLevel + 1)

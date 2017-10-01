@@ -55,6 +55,13 @@ case class WhileExpr(predicate: Object, body: Object) extends Expr {
     None
   }
 
+  def inferTheirTypes(
+    ctx: Context,
+    themToTheirMaybeTypes: Map[Identifier, Option[TypeIdentifier]]
+  ): Map[Identifier, Option[TypeIdentifier]] = {
+    themToTheirMaybeTypes //TODO: make this actually work
+  }
+
   def toRepr(indentLevel: Int): String = {
     //TODO
     ""

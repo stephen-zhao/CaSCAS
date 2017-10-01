@@ -39,6 +39,13 @@ case class AssignmentExpr(
 
   def inferType(ctx: Context): Option[TypeIdentifier] = None //TODO
 
+  def inferTheirTypes(
+    ctx: Context,
+    themToTheirMaybeTypes: Map[Identifier, Option[TypeIdentifier]]
+  ): Map[Identifier, Option[TypeIdentifier]] = {
+    this.value.inferTheirTypes(ctx, themToTheirMaybeTypes)
+  }
+
   def toRepr(indentLevel: Int): String = {
     "let " + identifier.toRepr(indentLevel) + " := " + value.toRepr(indentLevel)
   }
